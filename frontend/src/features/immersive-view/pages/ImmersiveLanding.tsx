@@ -172,7 +172,7 @@ export default function ImmersiveLanding() {
               The foundation for AI Analytics, Dynamic Pricing, IoT Smart Locks, and your ultimate enterprise operational dashboard.
             </p>
             <div className="animate-text pointer-events-auto">
-              <Link to="/dashboard" className="inline-block bg-orange text-black font-bold text-xl px-12 py-5 rounded-full hover:bg-white hover:scale-110 hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] transition-all duration-300">
+              <Link to="/auth/signin" className="inline-block bg-orange text-black font-bold text-xl px-12 py-5 rounded-full hover:bg-white hover:scale-110 hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] transition-all duration-300">
                 Enter EPMP Workspace
               </Link>
             </div>
