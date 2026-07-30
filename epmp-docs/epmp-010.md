@@ -92,11 +92,11 @@ Source code, struktur folder, dan dokumentasi **MUST** mudah dipahami oleh manus
 | --------------- | ----------------------- |
 | Language        | Go                      |
 | HTTP            | net/http                |
-| Router          | chi                     |
+| Router          | echo                    |
 | Architecture    | Clean Architecture      |
 | Design          | Domain Driven Design    |
 | Database Access | pgx + sqlc              |
-| Logging         | slog                    |
+| Logging         | zerolog                 |
 | Validation      | go-playground/validator |
 | Migration       | golang-migrate          |
 | Configuration   | koanf                   |

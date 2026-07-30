@@ -1,0 +1,50 @@
+# MODULE.md — {{.Name}}
+
+| Metadata         | Value                |
+| ---------------- | -------------------- |
+| Module           | {{.Name}}            |
+| Package          | {{.Package}}         |
+| Table            | {{.Table}}           |
+| Bounded Context  | {{.BoundedContext}}  |
+| Module Path      | {{.ModulePath}}      |
+
+## REST API
+
+| Property     | Value              |
+| ------------ | ------------------ |
+| Base Path    | {{.RESTBasePath}}  |
+| Operations   | {{range .Operations}}{{.}} {{end}}|
+
+## Behaviors
+
+| Behavior     | Enabled |
+| ------------ | ------- |
+| Soft Delete  | {{.HasSoftDelete}}  |
+| Pagination   | {{.HasPagination}}  |
+| Search       | {{.HasSearch}}      |
+
+## Fields
+
+| Name | Type | Primary Key | Nullable | Searchable |
+| ---- | ---- | ----------- | -------- | ---------- |
+{{- range .Fields}}
+| {{.Name}} | {{.GoType}} | {{.PrimaryKey}} | {{.Nullable}} | {{.Searchable}} |
+{{- end}}
+
+## Structure
+
+```
+internal/modules/{{.Package}}/
+  application/
+    dto/
+    service/
+  domain/
+    entity/
+    repository/
+  infrastructure/
+    repository/
+  interfaces/
+    http/
+  module.go
+  MODULE.md
+```

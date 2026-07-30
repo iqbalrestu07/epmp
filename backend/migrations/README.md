@@ -1,0 +1,4 @@
+-- EPMP database migrations
+-- Place migration files here using the golang-migrate naming convention:
+--   {version}_{description}.up.sql
+--   {version}_{description}.down.sql

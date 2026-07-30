@@ -1,0 +1,63 @@
+version: "1.0"
+dry_run: false
+
+frontend:
+  output_root: "./src"
+  base_url: "/api"
+
+domain:
+  name: Property
+  package: property
+  table: properties
+  bounded_context: property
+
+  fields:
+    - name: id
+      type: uuid
+      primary_key: true
+      auto: true
+
+    - name: name
+      type: string
+      max_length: 255
+      searchable: true
+
+    - name: description
+      type: text
+      nullable: true
+
+    - name: address
+      type: text
+      nullable: true
+
+    - name: property_type
+      type: enum
+      enum_values:
+        - boarding_house
+        - apartment
+        - villa
+        - warehouse
+
+    - name: is_active
+      type: bool
+      default: true
+
+  behaviors:
+    soft_delete: true
+    pagination: true
+    search: true
+    filter_by:
+      - property_type
+      - is_active
+    sort_by:
+      - name
+
+  rest:
+    base_path: /api/properties
+    auth_required: true
+    operations:
+      - create
+      - read
+      - update
+      - delete
+      - list

@@ -1,0 +1,89 @@
+package config
+
+// FieldType is the set of supported domain field types.
+type FieldType string
+
+const (
+	FieldTypeUUID      FieldType = "uuid"
+	FieldTypeString    FieldType = "string"
+	FieldTypeInt       FieldType = "int"
+	FieldTypeBool      FieldType = "bool"
+	FieldTypeText      FieldType = "text"
+	FieldTypeEnum      FieldType = "enum"
+	FieldTypeTimestamp FieldType = "timestamp"
+	FieldTypeDecimal   FieldType = "decimal"
+)
+
+// Operation is a REST API operation.
+type Operation string
+
+const (
+	OperationCreate Operation = "create"
+	OperationRead   Operation = "read"
+	OperationUpdate Operation = "update"
+	OperationDelete Operation = "delete"
+	OperationList   Operation = "list"
+)
+
+// GeneratorConfig is the root configuration object loaded from YAML.
+type GeneratorConfig struct {
+	Version  string         `yaml:"version"`
+	DryRun   bool           `yaml:"dry_run"`
+	Frontend FrontendConfig `yaml:"frontend"`
+	Domain   DomainSpec     `yaml:"domain"`
+}
+
+// FrontendConfig holds frontend generation settings.
+type FrontendConfig struct {
+	OutputRoot string `yaml:"output_root"`
+	BaseURL    string `yaml:"base_url"`
+}
+
+// DomainSpec describes one bounded-context entity to generate.
+type DomainSpec struct {
+	Name           string       `yaml:"name"`
+	Package        string       `yaml:"package"`
+	Table          string       `yaml:"table"`
+	BoundedContext string       `yaml:"bounded_context"`
+	Fields         []FieldSpec  `yaml:"fields"`
+	Behaviors      BehaviorSpec `yaml:"behaviors"`
+	REST           RESTSpec     `yaml:"rest"`
+	Events         []string     `yaml:"events"`
+}
+
+// FieldSpec describes a single domain field.
+type FieldSpec struct {
+	Name       string      `yaml:"name"`
+	Type       FieldType   `yaml:"type"`
+	Nullable   bool        `yaml:"nullable"`
+	PrimaryKey bool        `yaml:"primary_key"`
+	Unique     bool        `yaml:"unique"`
+	MaxLength  int         `yaml:"max_length"`
+	Default    interface{} `yaml:"default"`
+	Searchable bool        `yaml:"searchable"`
+	EnumValues []string    `yaml:"enum_values"`
+	ForeignKey *ForeignKey `yaml:"foreign_key"`
+	Auto       bool        `yaml:"auto"`
+}
+
+// ForeignKey describes a reference to another domain entity.
+type ForeignKey struct {
+	Domain string `yaml:"domain"`
+	Field  string `yaml:"field"`
+}
+
+// BehaviorSpec controls cross-cutting behaviors.
+type BehaviorSpec struct {
+	SoftDelete bool     `yaml:"soft_delete"`
+	Pagination bool     `yaml:"pagination"`
+	Search     bool     `yaml:"search"`
+	FilterBy   []string `yaml:"filter_by"`
+	SortBy     []string `yaml:"sort_by"`
+}
+
+// RESTSpec controls the REST API surface.
+type RESTSpec struct {
+	BasePath     string      `yaml:"base_path"`
+	AuthRequired bool        `yaml:"auth_required"`
+	Operations   []Operation `yaml:"operations"`
+}
