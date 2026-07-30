@@ -1,13 +1,13 @@
 import { Routes, Route } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import DashboardPage from "./pages/DashboardPage";
-import LandingPage from "./pages/LandingPage";
+import ImmersiveLanding from "./features/immersive-view/pages/ImmersiveLanding";
 
 export default function App() {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route path="/" element={<LandingPage />} />
+      <Route path="/" element={<ImmersiveLanding />} />
       
       {/* Protected/App Routes */}
       <Route element={<MainLayout />}>

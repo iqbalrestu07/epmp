@@ -24,6 +24,9 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        border: "rgba(255, 255, 255, 0.1)",
+        input: "rgba(255, 255, 255, 0.1)",
+        ring: "#ff6711",
         muted: {
           DEFAULT: "rgba(242, 239, 233, 0.62)",
           foreground: "rgba(242, 239, 233, 0.62)",
