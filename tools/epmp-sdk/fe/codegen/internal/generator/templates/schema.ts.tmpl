@@ -4,11 +4,14 @@ import { z } from "zod";
 
 export const {{.NameLower}}Schema = z.object({
 {{- range .Fields}}
-  {{.JSONName}}: z.{{tsZodType .TsType .Nullable}}()
-{{- if .HasMaxLen}}.max({{.MaxLength}}){{end}}
-{{- if .Nullable}}.optional(){{else if not .PrimaryKey}}.nonempty(){{end}}
-{{- if .HasEnum}}.enum([{{range $i, $v := .EnumValues}}{{if $i}}, {{end}}"{{$v}}"{{end}}]){{end}},
+{{- if .HasEnum}}
+  {{.JSONName}}: z.enum([{{range $i, $v := .EnumValues}}{{if $i}}, {{end}}"{{$v}}"{{end}}]){{if .Nullable}}.optional(){{end}},
+{{- else}}
+  {{.JSONName}}: z.{{tsZodType .TsType .Nullable}}(){{if .HasMaxLen}}.max({{.MaxLength}}){{end}}{{if .Nullable}}.optional(){{end}},
 {{- end}}
+{{- end}}
+  created_at: z.string().optional(),
+  updated_at: z.string().optional(),
 });
 
 export const create{{.Name}}Schema = {{.NameLower}}Schema.omit({

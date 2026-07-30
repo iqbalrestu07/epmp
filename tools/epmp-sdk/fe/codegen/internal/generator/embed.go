@@ -39,12 +39,12 @@ func contains(slice []string, val string) bool {
 func tsZodType(tsType string, nullable bool) string {
 	switch tsType {
 	case "string":
-		return "z.string"
+		return "string"
 	case "number":
-		return "z.number"
+		return "number"
 	case "boolean":
-		return "z.boolean"
+		return "boolean"
 	default:
-		return "z.string"
+		return "string"
 	}
 }
