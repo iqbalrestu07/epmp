@@ -1,0 +1,108 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# EPMP — .gitignore
+# Covers: Go backend, React/Vite frontend, codegen tools, IDE, OS, Docker
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Environment & Secrets ─────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.staging
+*.pem
+*.key
+*.crt
+*.p12
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ── IDE / Editor ──────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# ── Go ────────────────────────────────────────────────────────────────────────
+# Compiled binaries
+backend/bin/
+tools/epmp-sdk/be/codegen/bin/
+tools/epmp-sdk/fe/codegen/bin/
+
+# Built executables (any directory)
+**/bin/server
+**/bin/migrate
+**/bin/api
+epmp-codegen
+fe-codegen
+
+# Go test artefacts
+*.test
+*.out
+coverage.out
+coverage.html
+
+# Go workspace (if used)
+go.work.sum
+
+# ── Node / Frontend ───────────────────────────────────────────────────────────
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.vite/
+frontend/coverage/
+frontend/*.tsbuildinfo
+
+# pnpm / yarn
+.pnpm-store/
+.yarn/
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# ── Docker ────────────────────────────────────────────────────────────────────
+# Keep Dockerfiles tracked; ignore generated layers artefacts
+.dockerignore  # tracked separately per service
+
+# ── Database ──────────────────────────────────────────────────────────────────
+*.sql.bak
+dump.sql
+*.dump
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── Temporary / Cache ─────────────────────────────────────────────────────────
+tmp/
+temp/
+.cache/
+.parcel-cache/
+.turbo/
+
+# ── Test Coverage ─────────────────────────────────────────────────────────────
+coverage/
+*.lcov
+
+# ── Misc ──────────────────────────────────────────────────────────────────────
+.history/

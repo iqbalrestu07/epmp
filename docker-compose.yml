@@ -1,0 +1,95 @@
+##############################################################################
+# EPMP — docker-compose.yml
+#
+# Services:
+#   postgres   — PostgreSQL 16 database
+#   migrate    — one-shot migration runner (depends on postgres)
+#   backend    — Go API server (depends on migrate completing)
+#   frontend   — React SPA served by nginx
+#
+# Usage:
+#   docker compose up -d              # start all services
+#   docker compose up -d --build      # rebuild images first
+#   docker compose logs -f backend    # tail backend logs
+#   docker compose down -v            # stop and remove volumes
+##############################################################################
+
+name: epmp
+
+services:
+
+  # ── PostgreSQL ──────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: epmp_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER:     ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB:       ${DB_NAME:-epmp}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-epmp}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── Migration Runner (one-shot) ─────────────────────────────────────────────
+  migrate:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: builder          # use the builder stage so we have the binary
+    container_name: epmp_migrate
+    restart: "no"
+    entrypoint: ["/build/bin/migrate", "up"]
+    environment:
+      DATABASE_URL: postgres://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-epmp}?sslmode=disable
+    working_dir: /build
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ── API Server ───────────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: epmp_backend
+    restart: unless-stopped
+    environment:
+      APP_ENV:      ${APP_ENV:-development}
+      PORT:         8080
+      DATABASE_URL: postgres://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-epmp}?sslmode=disable
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Frontend (SPA) ───────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080}
+    container_name: epmp_frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+    driver: local
