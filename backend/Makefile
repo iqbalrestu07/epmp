@@ -28,11 +28,18 @@ lint:
 # ─── Database Migrations ──────────────────────────────────────────────────────
 
 migrate-up:
-	migrate -path ./migrations -database "$(DATABASE_URL)" up
+	go run ./cmd/migrate up
 
 migrate-down:
-	migrate -path ./migrations -database "$(DATABASE_URL)" down 1
+	go run ./cmd/migrate down
 
-# Usage: make migrate-create name=create_properties
+migrate-version:
+	go run ./cmd/migrate version
+
+# Usage: make migrate-create name=add_column_to_tenants
 migrate-create:
-	migrate create -ext sql -dir ./migrations -seq $(name)
+	go run ./cmd/migrate create $(name)
+
+# Watch migrations/ and auto-apply on new files
+migrate-watch:
+	go run ./cmd/migrate watch

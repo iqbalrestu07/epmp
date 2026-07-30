@@ -25,8 +25,10 @@ Enterprise Property Management Platform — Backend API server.
 ```
 backend/
 ├── cmd/
-│   └── server/
-│       └── main.go           # Composition root — DI, Echo setup, graceful shutdown
+│   ├── server/
+│   │   └── main.go           # Composition root — DI, Echo setup, graceful shutdown
+│   └── migrate/
+│       └── main.go           # Migration runner (up/down/version/force/create/watch)
 ├── internal/
 │   ├── shared/               # Cross-domain utilities
 │   │   ├── errors.go         # DomainError types + sentinel errors
@@ -41,6 +43,13 @@ backend/
 │       └── room/             # Room module
 ├── configs/                  # Config files (koanf / env)
 ├── migrations/               # SQL migration files (golang-migrate)
+│   ├── 000001_create_properties.up.sql
+│   ├── 000001_create_properties.down.sql
+│   ├── 000002_create_tenants.up.sql
+│   ├── 000002_create_tenants.down.sql
+│   ├── 000003_create_rooms.up.sql
+│   ├── 000003_create_rooms.down.sql
+│   └── README.md             # Migration guide
 └── go.mod
 ```
 
@@ -174,13 +183,56 @@ go build -o bin/server ./cmd/server/...
 
 ## Database Migrations
 
-```bash
-# apply all pending migrations
-migrate -path ./migrations -database "$DATABASE_URL" up
+Migrations are managed by `golang-migrate` and run via `cmd/migrate`.
 
-# rollback last migration
-migrate -path ./migrations -database "$DATABASE_URL" down 1
+### Apply / rollback
+
+```bash
+# Apply all pending migrations
+go run ./cmd/migrate up
+
+# Rollback last migration
+go run ./cmd/migrate down
+
+# Rollback N migrations
+go run ./cmd/migrate down 2
+
+# Show current schema version
+go run ./cmd/migrate version
+
+# Fix dirty state after a failed migration
+go run ./cmd/migrate force <version>
 ```
+
+### Add a new migration
+
+```bash
+# Scaffold a numbered migration pair
+go run ./cmd/migrate create add_status_to_properties
+# → migrations/000004_add_status_to_properties.up.sql
+# → migrations/000004_add_status_to_properties.down.sql
+
+# Fill in the SQL, then apply
+go run ./cmd/migrate up
+```
+
+### Watch mode (auto-apply)
+
+```bash
+go run ./cmd/migrate watch
+```
+
+Polls `migrations/` every 3 seconds. When new `.up.sql` files appear (e.g. after running the EPMP codegen), it automatically applies all pending migrations. Stop with `Ctrl+C`.
+
+### Makefile shortcuts
+
+```bash
+make migrate-up
+make migrate-down
+make migrate-create name=add_column_to_tenants
+```
+
+See [`migrations/README.md`](migrations/README.md) for the full migration guide.
 
 ---
 
