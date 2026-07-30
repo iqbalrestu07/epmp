@@ -327,3 +327,34 @@ Sketchfab memberikan kemudahan dengan menyediakan tag `<iframe>` yang sudah mend
 **Kapan menggunakan R3F (WebGL murni) vs Iframe Embed?**
 - Gunakan **R3F (Native WebGL)**: Jika Anda ingin model tersebut *react* (berinteraksi) dengan kursor mouse secara presisi, bereaksi terhadap *scroll* GSAP, atau jika Anda ingin menambahkan tombol interaktif langsung menempel di atas gedung (seperti *floor selector*).
 - Gunakan **Iframe (Sketchfab)**: Untuk sekedar _showcase_ statis di mana pengguna hanya memutar-mutar model secara manual, tanpa perlu interaksi yang terhubung dengan state React Anda.
+
+---
+
+## 6. Pengaturan 3D Lanjutan (Kamera, Ukuran, dan Motion)
+
+Anda memiliki kendali penuh atas bagaimana model ditampilkan saat pengguna pertama kali membuka web.
+
+### A. Mengubah Default Zoom & Sudut Kamera
+Kamera 3D dikendalikan di dalam file **`src/features/immersive-view/components/Scene3D.tsx`**.
+Cari baris ini:
+```tsx
+<Canvas camera={{ position: [0, 2, 8], fov: 45 }} className="...">
+```
+- **`position: [x, y, z]`**: Atur koordinat kamera. Membesarkan nilai Z (contoh: `10`) akan melakukan *zoom-out*. Mengecilkan Z (contoh: `4`) akan melakukan *zoom-in*.
+- **`fov` (Field of View)**: Ubah dari `45` ke `75` untuk mendapatkan efek lensa *ultra-wide* sinematik.
+
+### B. Mengubah Ukuran Default Model (Scale)
+Ukuran model Anda (entah itu terlalu kecil atau terlalu besar) dapat diatur saat Anda memanggilnya di **`FloatingMesh.tsx`**.
+Cari baris ini:
+```tsx
+<CityNightModel scale={1} />
+```
+- Ubah `scale={2}` untuk membuatnya 2x lipat lebih besar, atau `scale={0.5}` untuk menyusutkannya.
+
+### C. Menambahkan Motion Tambahan
+R3F memiliki komponen siap pakai yang luar biasa dari `@react-three/drei` untuk menambahkan *motion* tanpa pusing mengurus matematika matriks:
+
+1. **Auto Rotate & Drag (OrbitControls)**:
+   Tambahkan tag `<OrbitControls autoRotate autoRotateSpeed={1} enableZoom={false} />` di dalam `Scene3D.tsx`. Model secara otomatis akan berputar konstan (mirip etalase produk) dan pengguna bisa menarik (*drag*) kursor untuk melihat sisi belakang kota.
+2. **Hover / Klik Model (Raycaster)**:
+   Pada komponen *Mesh* (misal: di dalam `CityNight.tsx`), Anda bisa langsung menambahkan prop React seperti `onPointerOver={(e) => console.log('di-hover!')}`. Ini berguna jika Anda ingin membuat setiap lantai atau jendela di gedung Anda bisa diklik secara individual.
