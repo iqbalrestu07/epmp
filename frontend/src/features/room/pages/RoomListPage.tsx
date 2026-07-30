@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RoomTable } from "../components/RoomTable";
-import { useRooms, useDeleteRoom } from "../hooks";
+import { useRooms } from "../hooks";
 import type { Room } from "../types";
 
 export function RoomListPage() {
@@ -20,7 +20,7 @@ export function RoomListPage() {
     search: search || undefined,
   });
 
-  const deleteMutation = useDeleteRoom();
+
 
   const handleRowClick = (row: Room) => {
     navigate(`/room/${row.id}`);

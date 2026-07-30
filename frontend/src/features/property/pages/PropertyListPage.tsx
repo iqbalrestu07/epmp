@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PropertyTable } from "../components/PropertyTable";
-import { usePropertys, useDeleteProperty } from "../hooks";
+import { usePropertys } from "../hooks";
 import type { Property } from "../types";
 
 export function PropertyListPage() {
@@ -20,7 +20,7 @@ export function PropertyListPage() {
     search: search || undefined,
   });
 
-  const deleteMutation = useDeleteProperty();
+
 
   const handleRowClick = (row: Property) => {
     navigate(`/property/${row.id}`);

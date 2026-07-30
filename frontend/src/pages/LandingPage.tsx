@@ -1,4 +1,4 @@
-import React from "react";
+
 import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle2, Building2, Users, Wallet } from "lucide-react";
 

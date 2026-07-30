@@ -26,7 +26,7 @@ export function PropertyEditPage() {
       <h1 className="text-2xl font-bold">Edit Property</h1>
       <PropertyForm
         onSubmit={handleSubmit}
-        defaultValues={data}
+        defaultValues={data as any}
         isSubmitting={updateMutation.isPending}
       />
     </div>
