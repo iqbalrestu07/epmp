@@ -1,3 +1,83 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 4% 5%; /* #0b0b0c */
+    --foreground: 40 24% 94%; /* #f2efe9 */
+    
+    --primary: 24.3 100% 53.3%; /* #ff6711 */
+    --primary-foreground: 0 0% 100%;
+    
+    --card: 240 5% 8%; /* #101012 */
+    --card-foreground: 40 24% 94%;
+    
+    --border: 0 0% 100% 0.1;
+    --input: 0 0% 100% 0.1;
+    --ring: 24.3 100% 53.3%;
+    --radius: 1.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-body font-light antialiased;
+    overflow-x: hidden;
+  }
+  
+  /* Warm orange orbs (GRIGOLETTO signature) */
+  body::before {
+    content: "";
+    @apply fixed inset-0 pointer-events-none;
+    background:
+      radial-gradient(60vmin 60vmin at 90% -10%, rgba(255,103,17,0.15), transparent 60%),
+      radial-gradient(70vmin 70vmin at -10% 40%, rgba(255,132,0,0.08), transparent 65%),
+      radial-gradient(50vmin 50vmin at 110% 100%, rgba(255,103,17,0.12), transparent 60%);
+    z-index: 0;
+  }
+  
+  /* Noise overlay */
+  body::after {
+    content: "";
+    @apply fixed inset-0 pointer-events-none;
+    z-index: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1   0 0 0 0 0.8   0 0 0 0 0.5   0 0 0 0.045 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: .5;
+    mix-blend-mode: overlay;
+  }
+
+  /* Make sure main content is above background effects */
+  #root {
+    @apply relative z-10;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-glass-bg border border-glass-border rounded-3xl backdrop-blur-[16px] backdrop-saturate-[1.2] relative overflow-hidden;
+  }
+  .glass::before {
+    content: "";
+    @apply absolute left-0 right-0 top-0 h-[1px] pointer-events-none;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  }
+  .glass-strong {
+    @apply bg-glass-bgStrong border-glass-borderStrong;
+  }
+  
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-3 h-14 px-6 rounded-full text-[16.5px] tracking-wide whitespace-nowrap;
+    background: linear-gradient(180deg, #ff8200 0%, #ff6711 100%);
+    color: #fff;
+    box-shadow: 0 10px 36px rgba(255,103,17,.35), 0 0 0 1px rgba(255,255,255,.10) inset, 0 -1px 0 rgba(0,0,0,.18) inset;
+    transition: transform .35s cubic-bezier(0.625,0.05,0,1), box-shadow .35s cubic-bezier(0.625,0.05,0,1);
+  }
+  .btn-primary:hover {
+    transform: translateY(-1px) scale(0.99);
+    box-shadow: 0 14px 44px rgba(255,103,17,.45), 0 0 0 1px rgba(255,255,255,.14) inset;
+  }
+}
