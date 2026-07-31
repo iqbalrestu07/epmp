@@ -44,6 +44,8 @@ tools/epmp-sdk/be/codegen/bin/
 tools/epmp-sdk/fe/codegen/bin/
 
 # Built executables (any directory)
+backend/server
+backend/migrate
 **/bin/server
 **/bin/migrate
 **/bin/api

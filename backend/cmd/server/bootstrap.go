@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/epmp/backend/configs"
 	"github.com/epmp/backend/internal/database/postgres"
 	"github.com/epmp/backend/internal/modules"
 	"github.com/epmp/backend/internal/pkg/logger"
@@ -20,10 +21,10 @@ type App struct {
 }
 
 // bootstrap initializes configuration, database, logger, middleware, and registers all modules.
-func bootstrap(ctx context.Context) (*App, func(), error) {
+func bootstrap(ctx context.Context, cfg *configs.Config) (*App, func(), error) {
 	log := logger.New()
 
-	db, err := postgres.Connect(ctx)
+	db, err := postgres.Connect(ctx, cfg.DatabaseURL)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to connect to database")
 		return nil, nil, err
@@ -47,7 +48,10 @@ func bootstrap(ctx context.Context) (*App, func(), error) {
 	})
 
 	// Init modules
-	modules.Register(e, db, log)
+	if err := modules.Register(e, db, log, cfg.JWTSecret); err != nil {
+		log.Error().Err(err).Msg("failed to register modules")
+		return nil, nil, err
+	}
 
 	return &App{
 		Engine: e,

@@ -7,25 +7,29 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/epmp/backend/configs"
 )
 
 // runServer orchestrates the server startup and graceful shutdown.
 func runServer() error {
 	ctx := context.Background()
-	app, cleanup, err := bootstrap(ctx)
+
+	// Load centralized configuration
+	cfg, err := configs.Load()
+	if err != nil {
+		return err
+	}
+
+	app, cleanup, err := bootstrap(ctx, cfg)
 	if err != nil {
 		return err
 	}
 	defer cleanup()
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-
 	go func() {
-		app.Log.Info().Str("port", port).Msg("server starting")
-		if err := app.Engine.Start(":" + port); err != nil && err != http.ErrServerClosed {
+		app.Log.Info().Str("port", cfg.Port).Msg("server starting")
+		if err := app.Engine.Start(":" + cfg.Port); err != nil && err != http.ErrServerClosed {
 			app.Log.Fatal().Err(err).Msg("server stopped unexpectedly")
 		}
 	}()

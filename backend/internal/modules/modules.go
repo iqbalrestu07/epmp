@@ -1,8 +1,6 @@
 package modules
 
 import (
-	"os"
-
 	"github.com/epmp/backend/internal/modules/iam"
 	"github.com/epmp/backend/internal/modules/property"
 	"github.com/epmp/backend/internal/modules/room"
@@ -15,9 +13,7 @@ import (
 )
 
 // Register registers all modules to the Echo router.
-func Register(e *echo.Echo, db *pgxpool.Pool, log zerolog.Logger) {
-	jwtSecret := jwtSecretFromEnv()
-
+func Register(e *echo.Echo, db *pgxpool.Pool, log zerolog.Logger, jwtSecret string) error {
 	v1 := e.Group("/api/v1")
 
 	// IAM module registers its own public and protected routes.
@@ -29,11 +25,6 @@ func Register(e *echo.Echo, db *pgxpool.Pool, log zerolog.Logger) {
 	property.NewModule(db, log).RegisterRoutes(protected)
 	tenant.NewModule(db, log).RegisterRoutes(protected)
 	room.NewModule(db, log).RegisterRoutes(protected)
-}
 
-func jwtSecretFromEnv() string {
-	if s := os.Getenv("JWT_SECRET"); s != "" {
-		return s
-	}
-	return "epmp-dev-secret-change-in-production"
+	return nil
 }
