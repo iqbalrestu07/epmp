@@ -6,17 +6,17 @@ Enterprise Property Management Platform — Backend API server.
 
 ## Tech Stack
 
-| Concern         | Library / Tool               | Notes                              |
-| --------------- | ---------------------------- | ---------------------------------- |
-| Language        | Go 1.26                      |                                    |
-| HTTP Framework  | [Echo v4](https://echo.labstack.com) | Router, middleware, binding |
-| Database Driver | pgx/v5                       | pgxpool for connection pooling     |
-| Query Builder   | sqlc                         | Type-safe SQL queries              |
+| Concern         | Library / Tool                           | Notes                                            |
+| --------------- | ---------------------------------------- | ------------------------------------------------ |
+| Language        | Go 1.26                                  |                                                  |
+| HTTP Framework  | [Echo v4](https://echo.labstack.com)     | Router, middleware, binding                      |
+| Database Driver | pgx/v5                                   | pgxpool for connection pooling                   |
+| Query Builder   | sqlc                                     | Type-safe SQL queries                            |
 | Logging         | [zerolog](https://github.com/rs/zerolog) | Structured JSON in prod, coloured console in dev |
-| Validation      | go-playground/validator v10  | Struct-tag based validation        |
-| Migration       | golang-migrate               | SQL migration files in `migrations/` |
-| Testing         | testing + testify            |                                    |
-| Architecture    | Clean Architecture + DDD     |                                    |
+| Validation      | go-playground/validator v10              | Struct-tag based validation                      |
+| Migration       | golang-migrate                           | SQL migration files in `migrations/`             |
+| Testing         | testing + testify                        |                                                  |
+| Architecture    | Clean Architecture + DDD                 |                                                  |
 
 ---
 
@@ -30,13 +30,16 @@ backend/
 │   └── migrate/
 │       └── main.go           # Migration runner (up/down/version/force/create/watch)
 ├── internal/
-│   ├── shared/               # Cross-domain utilities
-│   │   ├── errors.go         # DomainError types + sentinel errors
-│   │   ├── health.go         # /health helper
-│   │   ├── types.go          # Shared value types
-│   │   ├── logger/           # zerolog setup (New() zerolog.Logger)
-│   │   ├── middleware/       # RequestLogger, Recover (zerolog-aware)
-│   │   └── response/         # JSON envelope helpers (OK, Created, BadRequest …)
+│   ├── pkg/                # Shared packages across domains
+│       ├── helper/               # Helper functions
+│       ├── error/               # Error handling
+│           ├── errors.go         # DomainError types + sentinel errors
+│       ├── health/               # Health check
+│           ├── health.go         # /health helper
+│       ├── types/                # Shared value types
+│       ├── logger/           # zerolog setup (New() zerolog.Logger)
+│       ├── middleware/       # RequestLogger, Recover (zerolog-aware)
+│       └── response/         # JSON envelope helpers (OK, Created, BadRequest …)
 │   └── modules/              # Bounded contexts — one folder per domain
 │       ├── property/         # Property module
 │       ├── tenant/           # Tenant module
@@ -106,16 +109,17 @@ Each module follows the same layout:
 {module}/
 ├── module.go                 # DI wiring; exposes NewModule() and RegisterRoutes()
 ├── MODULE.md                 # Module contract (fields, endpoints, behaviors)
-├── application/
-│   ├── dto/                  # Request / response DTOs
-│   └── service/              # Use-case orchestration
-├── domain/
-│   ├── entity/               # Domain entity structs
-│   └── repository/           # Repository interface (port)
-├── infrastructure/
-│   └── repository/           # PostgreSQL adapter (sqlc-backed)
-└── interfaces/
-    └── http/                 # Echo handler + route registration
+├── service/
+│   └── service.go            # Use-case orchestration interface
+│   └── service_implementation.go # Use-case implementation
+├── entity/                   # Domain entity structs
+├── dto/                      # Request / response DTOs
+├── repository/               # PostgreSQL adapter (sqlc-backed)
+│   └── repository.go         # Repository interface
+│   └── repository_implementation.go # Repository implementation
+└── delivery/
+    └── http/                 # Echo handler REST API
+    └── route/                # Route registration
 ```
 
 ---
@@ -124,10 +128,10 @@ Each module follows the same layout:
 
 Middleware is registered globally in `main.go`.
 
-| Middleware       | Package                          | Behaviour                                   |
-| ---------------- | -------------------------------- | ------------------------------------------- |
-| `RequestLogger`  | `internal/shared/middleware`     | Logs method, path, status, latency via zerolog |
-| `Recover`        | `internal/shared/middleware`     | Catches panics, logs via zerolog, returns 500 |
+| Middleware      | Package                      | Behaviour                                      |
+| --------------- | ---------------------------- | ---------------------------------------------- |
+| `RequestLogger` | `internal/shared/middleware` | Logs method, path, status, latency via zerolog |
+| `Recover`       | `internal/shared/middleware` | Catches panics, logs via zerolog, returns 500  |
 
 ---
 
@@ -136,11 +140,13 @@ Middleware is registered globally in `main.go`.
 All endpoints return a consistent JSON shape:
 
 **Success**
+
 ```json
 { "success": true, "data": { … } }
 ```
 
 **Error**
+
 ```json
 { "success": false, "error": { "code": "NOT_FOUND", "message": "…" } }
 ```
@@ -155,11 +161,11 @@ Copy `.env.example` and adjust for your environment:
 cp .env.example .env
 ```
 
-| Variable       | Default                                                      | Description                  |
-| -------------- | ------------------------------------------------------------ | ---------------------------- |
-| `APP_ENV`      | `development`                                                | `production` → JSON logging  |
-| `PORT`         | `8080`                                                       | HTTP listen port             |
-| `DATABASE_URL` | `postgres://postgres:postgres@localhost:5432/epmp?sslmode=disable` | PostgreSQL DSN      |
+| Variable       | Default                                                            | Description                 |
+| -------------- | ------------------------------------------------------------------ | --------------------------- |
+| `APP_ENV`      | `development`                                                      | `production` → JSON logging |
+| `PORT`         | `8080`                                                             | HTTP listen port            |
+| `DATABASE_URL` | `postgres://postgres:postgres@localhost:5432/epmp?sslmode=disable` | PostgreSQL DSN              |
 
 ---
 

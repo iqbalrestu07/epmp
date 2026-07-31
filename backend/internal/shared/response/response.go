@@ -48,6 +48,27 @@ func NotFound(c echo.Context, msg string) error {
 	})
 }
 
+func Unauthorized(c echo.Context, msg string) error {
+	return c.JSON(http.StatusUnauthorized, Error{
+		Success: false,
+		Error:   ErrorDetail{Code: "UNAUTHORIZED", Message: msg},
+	})
+}
+
+func Forbidden(c echo.Context, msg string) error {
+	return c.JSON(http.StatusForbidden, Error{
+		Success: false,
+		Error:   ErrorDetail{Code: "FORBIDDEN", Message: msg},
+	})
+}
+
+func Conflict(c echo.Context, msg string) error {
+	return c.JSON(http.StatusConflict, Error{
+		Success: false,
+		Error:   ErrorDetail{Code: "CONFLICT", Message: msg},
+	})
+}
+
 func InternalError(c echo.Context, msg string) error {
 	return c.JSON(http.StatusInternalServerError, Error{
 		Success: false,

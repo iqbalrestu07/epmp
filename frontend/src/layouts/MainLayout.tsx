@@ -1,57 +1,63 @@
 import { useState } from 'react';
-import { Outlet, NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, Building2, DoorOpen, Users, ShieldCheck, UserCog, Settings, Menu, X, Bell, LogOut, ChevronDown } from 'lucide-react';
+import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
+import {
+  LayoutDashboard, Building2, DoorOpen, Users, ShieldCheck,
+  UserCog, Settings, Menu, X, Bell, LogOut, ChevronDown,
+} from 'lucide-react';
+import { useAuth } from '../features/iam/context/AuthContext';
 
-// DYNAMIC MENU CONFIGURATION
-// Nanti bisa difilter berdasarkan rbac user: MENU_CONFIG.filter(item => user.permissions.includes(item.requiredPermission))
-// Atau berdasarkan package langganan: MENU_CONFIG.filter(item => user.org.package.includes(item.requiredPackage))
+// ─── Menu Configuration ────────────────────────────────────────────────────
+// requiredPermission is checked against the user's permission set.
 const MENU_CONFIG = [
-  { label: 'Overview', path: '/dashboard', icon: LayoutDashboard, requiredPackage: 'core' },
-  { label: 'Properties', path: '/dashboard/properties', icon: Building2, requiredPackage: 'property' },
-  { label: 'Rooms & Units', path: '/dashboard/rooms', icon: DoorOpen, requiredPackage: 'property' },
-  { label: 'Tenants', path: '/dashboard/tenants', icon: Users, requiredPackage: 'tenant' },
-  { type: 'divider' }, // Visual separator
-  { 
-    label: 'Management (RBAC)', 
-    path: '/dashboard/management/rbac', 
-    icon: ShieldCheck, 
-    requiredRole: 'admin' 
-  },
-  { 
-    label: 'User Accounts', 
-    path: '/dashboard/management/users', 
-    icon: UserCog, 
-    requiredRole: 'admin' 
-  },
-  { 
-    label: 'Settings', 
-    path: '/dashboard/settings', 
-    icon: Settings, 
-    requiredPackage: 'core' 
-  },
+  { label: 'Overview',       path: '/dashboard',                  icon: LayoutDashboard },
+  { label: 'Properties',     path: '/dashboard/properties',       icon: Building2,  requiredPermission: 'property:read' },
+  { label: 'Rooms & Units',  path: '/dashboard/rooms',            icon: DoorOpen,   requiredPermission: 'room:read'     },
+  { label: 'Tenants',        path: '/dashboard/tenants',          icon: Users,      requiredPermission: 'tenant:read'   },
+  { type: 'divider' as const },
+  { label: 'Roles & Perms',  path: '/dashboard/management/rbac',  icon: ShieldCheck, requiredPermission: 'role:read'   },
+  { label: 'User Accounts',  path: '/dashboard/management/users', icon: UserCog,    requiredPermission: 'user:read'    },
+  { label: 'Settings',       path: '/dashboard/settings',         icon: Settings    },
 ];
 
 export default function MainLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout, hasPermission } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/auth/signin', { replace: true });
+  };
+
+  const visibleMenu = MENU_CONFIG.filter(item => {
+    if (item.type === 'divider') return true;
+    if (!item.requiredPermission) return true;
+    return hasPermission(item.requiredPermission);
+  });
+
+  const getInitials = (name: string) =>
+    name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) ?? 'U';
+
+  const primaryRole = user?.roles?.[0]?.name ?? 'User';
 
   return (
     <div className="min-h-screen bg-[#f2efe9] text-[#0b0b0c] flex">
-      
+
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
-        <div 
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden" 
-          onClick={() => setSidebarOpen(false)} 
+        <div
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside className={`fixed top-0 left-0 z-50 h-screen w-72 bg-[#0b0b0c] text-white flex flex-col transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 lg:static`}>
-        {/* Sidebar Header */}
+        {/* Logo */}
         <div className="h-16 flex items-center justify-between px-6 border-b border-white/10">
           <div className="flex items-center gap-3 text-xs tracking-[0.2em] uppercase text-orange font-bold">
-            <span className="w-4 h-px bg-orange"></span>
+            <span className="w-4 h-px bg-orange" />
             EPMP
           </div>
           <button className="lg:hidden text-white/70 hover:text-white" onClick={() => setSidebarOpen(false)}>
@@ -59,25 +65,27 @@ export default function MainLayout() {
           </button>
         </div>
 
-        {/* Sidebar Navigation */}
+        {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-6 px-4 flex flex-col gap-1">
-          {MENU_CONFIG.map((item, idx) => {
+          {visibleMenu.map((item, idx) => {
             if (item.type === 'divider') {
               return <hr key={idx} className="my-4 border-white/10" />;
             }
-            
+
             const Icon = item.icon as React.ElementType;
-            const isActive = location.pathname === item.path || (item.path !== '/dashboard' && location.pathname.startsWith(item.path!));
-            
+            const isActive =
+              location.pathname === item.path ||
+              (item.path !== '/dashboard' && location.pathname.startsWith(item.path!));
+
             return (
-              <NavLink 
-                key={idx} 
+              <NavLink
+                key={idx}
                 to={item.path || '#'}
                 onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-                  isActive 
-                  ? 'bg-orange text-black font-semibold' 
-                  : 'text-white/70 hover:bg-white/10 hover:text-white'
+                  isActive
+                    ? 'bg-orange text-black font-semibold'
+                    : 'text-white/70 hover:bg-white/10 hover:text-white'
                 }`}
               >
                 <Icon size={18} className={isActive ? 'text-black' : 'text-orange'} />
@@ -87,24 +95,30 @@ export default function MainLayout() {
           })}
         </nav>
 
-        {/* Sidebar Footer (User Info) */}
+        {/* User Footer */}
         <div className="p-4 border-t border-white/10">
-          <div className="flex items-center gap-3 bg-white/5 p-3 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
-            <div className="w-10 h-10 rounded-full bg-orange flex items-center justify-center text-black font-bold">
-              AD
+          <div className="flex items-center gap-3 bg-white/5 p-3 rounded-xl">
+            <div className="w-10 h-10 rounded-full bg-orange flex items-center justify-center text-black font-bold text-sm flex-shrink-0">
+              {user ? getInitials(user.name) : 'U'}
             </div>
             <div className="flex-1 overflow-hidden">
-              <p className="text-sm font-semibold truncate">Admin Acme</p>
-              <p className="text-xs text-white/50 truncate">Super Administrator</p>
+              <p className="text-sm font-semibold truncate">{user?.name ?? 'Loading…'}</p>
+              <p className="text-xs text-white/50 truncate capitalize">{primaryRole.replace('_', ' ')}</p>
             </div>
-            <LogOut size={16} className="text-white/50" />
+            <button
+              onClick={handleLogout}
+              className="text-white/50 hover:text-red-400 transition-colors p-1"
+              title="Sign out"
+            >
+              <LogOut size={16} />
+            </button>
           </div>
         </div>
       </aside>
 
-      {/* Main Content Area */}
+      {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
-        
+
         {/* Top Header */}
         <header className="h-16 bg-white border-b border-black/5 flex items-center justify-between px-6 sticky top-0 z-30 shadow-sm">
           <div className="flex items-center gap-4">
@@ -112,22 +126,20 @@ export default function MainLayout() {
               <Menu size={24} />
             </button>
             <h2 className="text-lg font-semibold capitalize hidden sm:block">
-              {location.pathname.split('/').pop() || 'Overview'}
+              {location.pathname.split('/').pop()?.replace('-', ' ') || 'Overview'}
             </h2>
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Context Switcher (e.g., Organization / Property selector) */}
             <button className="hidden md:flex items-center gap-2 bg-black/5 hover:bg-black/10 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
               <Building2 size={16} className="text-orange" />
-              Acme Properties Ltd.
+              <span className="max-w-40 truncate">{user?.email ?? 'Organization'}</span>
               <ChevronDown size={16} className="text-black/50 ml-2" />
             </button>
-            
-            {/* Notifications */}
+
             <button className="w-10 h-10 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center relative transition-colors">
               <Bell size={18} className="text-black/70" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-orange rounded-full border border-white"></span>
+              <span className="absolute top-2 right-2 w-2 h-2 bg-orange rounded-full border border-white" />
             </button>
           </div>
         </header>
@@ -139,7 +151,6 @@ export default function MainLayout() {
           </div>
         </main>
       </div>
-
     </div>
   );
 }

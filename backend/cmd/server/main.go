@@ -8,6 +8,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/epmp/backend/internal/modules/iam"
 	property "github.com/epmp/backend/internal/modules/property"
 	room "github.com/epmp/backend/internal/modules/room"
 	tenant "github.com/epmp/backend/internal/modules/tenant"
@@ -28,6 +29,8 @@ func main() {
 	}
 	defer db.Close()
 
+	jwtSecret := jwtSecretFromEnv()
+
 	e := echo.New()
 	e.HideBanner = true
 	e.HidePort = true
@@ -45,9 +48,15 @@ func main() {
 	// --- API v1 group ---
 	v1 := e.Group("/api/v1")
 
-	property.NewModule(db, log).RegisterRoutes(v1)
-	tenant.NewModule(db, log).RegisterRoutes(v1)
-	room.NewModule(db, log).RegisterRoutes(v1)
+	// IAM module registers its own public (/auth/*) and protected (/users, /roles) routes.
+	iamMod := iam.NewModule(db, log, jwtSecret)
+	iamMod.RegisterRoutes(v1)
+
+	// Resource modules — all protected by JWT auth middleware.
+	protected := v1.Group("", mw.AuthRequired(jwtSecret))
+	property.NewModule(db, log).RegisterRoutes(protected)
+	tenant.NewModule(db, log).RegisterRoutes(protected)
+	room.NewModule(db, log).RegisterRoutes(protected)
 
 	// --- Graceful shutdown ---
 	port := os.Getenv("PORT")
@@ -81,6 +90,15 @@ func dbURL() string {
 		return u
 	}
 	return "postgres://postgres:postgres@localhost:5432/epmp?sslmode=disable"
+}
+
+// jwtSecretFromEnv returns the JWT signing secret from the environment.
+// Falls back to a development-only secret — MUST be overridden in production.
+func jwtSecretFromEnv() string {
+	if s := os.Getenv("JWT_SECRET"); s != "" {
+		return s
+	}
+	return "epmp-dev-secret-change-in-production"
 }
 
 // errorHandler is the centralised Echo error handler.
