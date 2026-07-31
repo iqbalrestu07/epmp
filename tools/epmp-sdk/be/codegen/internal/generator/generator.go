@@ -52,13 +52,13 @@ func (g *Generator) Generate(req *GenerateRequest) error {
 	artifacts := []artifact{
 		{template: "module.md", path: filepath.Join(moduleDir, "MODULE.md")},
 		{template: "module.go", path: filepath.Join(moduleDir, "module.go")},
-		{template: "entity.go", path: filepath.Join(moduleDir, "domain", "entity", nameLower+".go")},
-		{template: "repository.go", path: filepath.Join(moduleDir, "domain", "repository", nameLower+"_repository.go")},
-		{template: "dto.go", path: filepath.Join(moduleDir, "application", "dto", nameLower+"_dto.go")},
-		{template: "service.go", path: filepath.Join(moduleDir, "application", "service", nameLower+"_service.go")},
-		{template: "repository_impl.go", path: filepath.Join(moduleDir, "infrastructure", "repository", nameLower+"_repository_impl.go")},
-		{template: "handler.go", path: filepath.Join(moduleDir, "interfaces", "http", nameLower+"_handler.go")},
-		{template: "routes.go", path: filepath.Join(moduleDir, "interfaces", "http", nameLower+"_routes.go")},
+		{template: "entity.go", path: filepath.Join(moduleDir, "entity", nameLower+".go")},
+		{template: "repository.go", path: filepath.Join(moduleDir, "repository", nameLower+"_repository.go")},
+		{template: "dto.go", path: filepath.Join(moduleDir, "dto", nameLower+"_dto.go")},
+		{template: "service.go", path: filepath.Join(moduleDir, "service", nameLower+"_service.go")},
+		{template: "repository_impl.go", path: filepath.Join(moduleDir, "repository", nameLower+"_repository_impl.go")},
+		{template: "handler.go", path: filepath.Join(moduleDir, "delivery", "http", nameLower+"_handler.go")},
+		{template: "routes.go", path: filepath.Join(moduleDir, "delivery", "http", nameLower+"_routes.go")},
 		{template: "test.go", path: filepath.Join(moduleDir, nameLower+"_test.go")},
 	}
 
@@ -115,13 +115,13 @@ func (g *Generator) artifacts(outputRoot string, domain config.DomainSpec) []art
 	return []artifact{
 		{template: "module.md", path: filepath.Join(moduleDir, "MODULE.md")},
 		{template: "module.go", path: filepath.Join(moduleDir, "module.go")},
-		{template: "entity.go", path: filepath.Join(moduleDir, "domain", "entity", nameLower+".go")},
-		{template: "repository.go", path: filepath.Join(moduleDir, "domain", "repository", nameLower+"_repository.go")},
-		{template: "dto.go", path: filepath.Join(moduleDir, "application", "dto", nameLower+"_dto.go")},
-		{template: "service.go", path: filepath.Join(moduleDir, "application", "service", nameLower+"_service.go")},
-		{template: "repository_impl.go", path: filepath.Join(moduleDir, "infrastructure", "repository", nameLower+"_repository_impl.go")},
-		{template: "handler.go", path: filepath.Join(moduleDir, "interfaces", "http", nameLower+"_handler.go")},
-		{template: "routes.go", path: filepath.Join(moduleDir, "interfaces", "http", nameLower+"_routes.go")},
+		{template: "entity.go", path: filepath.Join(moduleDir, "entity", nameLower+".go")},
+		{template: "repository.go", path: filepath.Join(moduleDir, "repository", nameLower+"_repository.go")},
+		{template: "dto.go", path: filepath.Join(moduleDir, "dto", nameLower+"_dto.go")},
+		{template: "service.go", path: filepath.Join(moduleDir, "service", nameLower+"_service.go")},
+		{template: "repository_impl.go", path: filepath.Join(moduleDir, "repository", nameLower+"_repository_impl.go")},
+		{template: "handler.go", path: filepath.Join(moduleDir, "delivery", "http", nameLower+"_handler.go")},
+		{template: "routes.go", path: filepath.Join(moduleDir, "delivery", "http", nameLower+"_routes.go")},
 		{template: "test.go", path: filepath.Join(moduleDir, nameLower+"_test.go")},
 	}
 }

@@ -186,20 +186,16 @@ For each module, the generator produces 10 files following Clean Architecture:
 internal/modules/{package}/
   MODULE.md                                    # Module documentation
   module.go                                    # Module init & DI wiring
-  domain/
-    entity/
-      {name}.go                                # Domain entity struct (lowercase)
-    repository/
-      {name}_repository.go                     # Repository interface (lowercase)
-  application/
-    dto/
-      {name}_dto.go                            # Request/Response DTOs (lowercase)
-    service/
-      {name}_service.go                        # Application service / use case (lowercase)
-  infrastructure/
-    repository/
-      {name}_repository_impl.go                # PostgreSQL repository impl (lowercase)
-  interfaces/
+  entity/
+    {name}.go                                  # Domain entity struct (lowercase)
+  dto/
+    {name}_dto.go                              # Request/Response DTOs (lowercase)
+  repository/
+    {name}_repository.go                       # Repository interface (lowercase)
+    {name}_repository_impl.go                  # PostgreSQL repository impl (lowercase)
+  service/
+    {name}_service.go                          # Application service / use case (lowercase)
+  delivery/
     http/
       {name}_handler.go                        # HTTP handler (lowercase)
       {name}_routes.go                         # Route registration (lowercase)
@@ -221,13 +217,13 @@ Generated from `examples/property.yaml`:
 
 - `modules/property/MODULE.md` — module metadata, fields, behaviors, REST config
 - `modules/property/module.go` — `NewModule(db, log)` + `RegisterRoutes(e)`
-- `modules/property/domain/entity/property.go` — `Property` struct with fields + soft delete
-- `modules/property/domain/repository/property_repository.go` — `PropertyRepository` interface (Save, FindByID, FindAll, Delete)
-- `modules/property/application/dto/property_dto.go` — `CreatePropertyRequest`, `UpdatePropertyRequest`, `PropertyResponse`, `PropertyListResponse`
-- `modules/property/application/service/property_service.go` — `PropertyService` with Create, GetByID, List, Update, Delete
-- `modules/property/infrastructure/repository/property_repository_impl.go` — `PropertyRepositoryImpl` (PostgreSQL, TODO: sqlc queries)
-- `modules/property/interfaces/http/property_handler.go` — `PropertyHandler` with Echo handlers for all CRUD operations
-- `modules/property/interfaces/http/property_routes.go` — `RegisterPropertyRoutes(g, h)` for route registration
+- `modules/property/entity/property.go` — `Property` struct with fields + soft delete
+- `modules/property/dto/property_dto.go` — `CreatePropertyRequest`, `UpdatePropertyRequest`, `PropertyResponse`, `PropertyListResponse`
+- `modules/property/repository/property_repository.go` — `PropertyRepository` interface (Save, FindByID, FindAll, Delete)
+- `modules/property/repository/property_repository_impl.go` — `PropertyRepositoryImpl` (PostgreSQL, TODO: sqlc queries)
+- `modules/property/service/property_service.go` — `PropertyService` with Create, GetByID, List, Update, Delete
+- `modules/property/delivery/http/property_handler.go` — `PropertyHandler` with Echo handlers for all CRUD operations
+- `modules/property/delivery/http/property_routes.go` — `RegisterPropertyRoutes(g, h)` for route registration
 - `modules/property/property_test.go` — test skeleton with suggested test cases
 
 ## Generated Modules

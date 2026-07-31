@@ -3,10 +3,9 @@
 package {{.Package}}
 
 import (
-	"{{.ModulePath}}/internal/modules/{{.Package}}/application/service"
-	domainrepo "{{.ModulePath}}/internal/modules/{{.Package}}/domain/repository"
-	"{{.ModulePath}}/internal/modules/{{.Package}}/infrastructure/repository"
-	"{{.ModulePath}}/internal/modules/{{.Package}}/interfaces/http"
+	"{{.ModulePath}}/internal/modules/{{.Package}}/delivery/http"
+	"{{.ModulePath}}/internal/modules/{{.Package}}/repository"
+	"{{.ModulePath}}/internal/modules/{{.Package}}/service"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/labstack/echo/v4"
@@ -20,7 +19,7 @@ type Module struct {
 
 // NewModule creates and wires all {{.Name}} dependencies.
 func NewModule(db *pgxpool.Pool, log zerolog.Logger) *Module {
-	var repo domainrepo.{{.Name}}Repository = repository.New{{.Name}}RepositoryImpl(db)
+	var repo repository.{{.Name}}Repository = repository.New{{.Name}}RepositoryImpl(db)
 	svc := service.New{{.Name}}Service(repo)
 	handler := http.New{{.Name}}Handler(svc)
 

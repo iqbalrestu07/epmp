@@ -61,13 +61,13 @@ func TestGenerate_AllArtifacts(t *testing.T) {
 	expectedFiles := []string{
 		"modules/property/MODULE.md",
 		"modules/property/module.go",
-		"modules/property/domain/entity/property.go",
-		"modules/property/domain/repository/property_repository.go",
-		"modules/property/application/dto/property_dto.go",
-		"modules/property/application/service/property_service.go",
-		"modules/property/infrastructure/repository/property_repository_impl.go",
-		"modules/property/interfaces/http/property_handler.go",
-		"modules/property/interfaces/http/property_routes.go",
+		"modules/property/entity/property.go",
+		"modules/property/repository/property_repository.go",
+		"modules/property/dto/property_dto.go",
+		"modules/property/service/property_service.go",
+		"modules/property/repository/property_repository_impl.go",
+		"modules/property/delivery/http/property_handler.go",
+		"modules/property/delivery/http/property_routes.go",
 		"modules/property/property_test.go",
 	}
 
@@ -151,7 +151,7 @@ func TestGenerate_EntityContent(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	content, err := fs.Read(filepath.Join(outputRoot, "modules", "property", "domain", "entity", "property.go"))
+	content, err := fs.Read(filepath.Join(outputRoot, "modules", "property", "entity", "property.go"))
 	if err != nil {
 		t.Fatalf("read entity: %v", err)
 	}
@@ -189,7 +189,7 @@ func TestGenerate_RepositoryContent(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	content, err := fs.Read(filepath.Join(outputRoot, "modules", "property", "domain", "repository", "property_repository.go"))
+	content, err := fs.Read(filepath.Join(outputRoot, "modules", "property", "repository", "property_repository.go"))
 	if err != nil {
 		t.Fatalf("read repository: %v", err)
 	}
@@ -231,7 +231,7 @@ func TestGenerate_DTOContent(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	content, err := fs.Read(filepath.Join(outputRoot, "modules", "property", "application", "dto", "property_dto.go"))
+	content, err := fs.Read(filepath.Join(outputRoot, "modules", "property", "dto", "property_dto.go"))
 	if err != nil {
 		t.Fatalf("read dto: %v", err)
 	}
@@ -276,7 +276,7 @@ func TestGenerate_HandlerContent(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	content, err := fs.Read(filepath.Join(outputRoot, "modules", "property", "interfaces", "http", "property_handler.go"))
+	content, err := fs.Read(filepath.Join(outputRoot, "modules", "property", "delivery", "http", "property_handler.go"))
 	if err != nil {
 		t.Fatalf("read handler: %v", err)
 	}
@@ -453,16 +453,12 @@ func TestGenerate_CreatesDirectoryStructure(t *testing.T) {
 	dirs := []string{
 		"modules",
 		"modules/contract",
-		"modules/contract/domain",
-		"modules/contract/domain/entity",
-		"modules/contract/domain/repository",
-		"modules/contract/application",
-		"modules/contract/application/dto",
-		"modules/contract/application/service",
-		"modules/contract/infrastructure",
-		"modules/contract/infrastructure/repository",
-		"modules/contract/interfaces",
-		"modules/contract/interfaces/http",
+		"modules/contract/entity",
+		"modules/contract/dto",
+		"modules/contract/repository",
+		"modules/contract/service",
+		"modules/contract/delivery",
+		"modules/contract/delivery/http",
 	}
 
 	for _, d := range dirs {

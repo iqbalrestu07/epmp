@@ -6,8 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"{{.ModulePath}}/internal/modules/{{.Package}}/domain/entity"
-	domainrepo "{{.ModulePath}}/internal/modules/{{.Package}}/domain/repository"
+	"{{.ModulePath}}/internal/modules/{{.Package}}/entity"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -23,7 +22,7 @@ func New{{.Name}}RepositoryImpl(db *pgxpool.Pool) *{{.Name}}RepositoryImpl {
 }
 
 // Ensure {{.Name}}RepositoryImpl implements domain repository interface.
-var _ domainrepo.{{.Name}}Repository = (*{{.Name}}RepositoryImpl)(nil)
+var _ {{.Name}}Repository = (*{{.Name}}RepositoryImpl)(nil)
 
 func (r *{{.Name}}RepositoryImpl) Save(ctx context.Context, e *entity.{{.Name}}) error {
 	// TODO: implement with sqlc queries

@@ -109,14 +109,14 @@ Each module follows the same layout:
 {module}/
 ├── module.go                 # DI wiring; exposes NewModule() and RegisterRoutes()
 ├── MODULE.md                 # Module contract (fields, endpoints, behaviors)
-├── service/
-│   └── service.go            # Use-case orchestration interface
-│   └── service_implementation.go # Use-case implementation
 ├── entity/                   # Domain entity structs
 ├── dto/                      # Request / response DTOs
 ├── repository/               # PostgreSQL adapter (sqlc-backed)
 │   └── repository.go         # Repository interface
 │   └── repository_implementation.go # Repository implementation
+├── service/
+│   └── service.go            # Use-case orchestration interface
+│   └── service_implementation.go # Use-case implementation
 └── delivery/
     └── http/                 # Echo handler REST API
     └── route/                # Route registration
