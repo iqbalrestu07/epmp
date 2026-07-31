@@ -1,11 +1,11 @@
 package iam
 
 import (
-	iamhttp "github.com/epmp/backend/internal/modules/iam/interfaces/http"
-	iamrepo "github.com/epmp/backend/internal/modules/iam/infrastructure/repository"
-	"github.com/epmp/backend/internal/modules/iam/application/service"
-	domainrepo "github.com/epmp/backend/internal/modules/iam/domain/repository"
-	mw "github.com/epmp/backend/internal/shared/middleware"
+	iamhttp "github.com/epmp/backend/internal/modules/iam/delivery/http"
+	"github.com/epmp/backend/internal/modules/iam/repository"
+	iamrepo "github.com/epmp/backend/internal/modules/iam/repository"
+	"github.com/epmp/backend/internal/modules/iam/service"
+	mw "github.com/epmp/backend/internal/pkg/middleware"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/labstack/echo/v4"
@@ -17,17 +17,17 @@ type Module struct {
 	AuthHandler  *iamhttp.AuthHandler
 	UserHandler  *iamhttp.UserHandler
 	RoleHandler  *iamhttp.RoleHandler
-	UserRoleRepo domainrepo.UserRoleRepository // used by PermissionLoader
+	UserRoleRepo repository.UserRoleRepository // used by PermissionLoader
 	JWTSecret    string
 }
 
 // NewModule creates and wires all IAM dependencies.
 func NewModule(db *pgxpool.Pool, log zerolog.Logger, jwtSecret string) *Module {
 	// Repositories
-	userRepo         := iamrepo.NewUserRepository(db)
-	roleRepo         := iamrepo.NewRoleRepository(db)
-	permissionRepo   := iamrepo.NewPermissionRepository(db)
-	userRoleRepo     := iamrepo.NewUserRoleRepository(db)
+	userRepo := iamrepo.NewUserRepository(db)
+	roleRepo := iamrepo.NewRoleRepository(db)
+	permissionRepo := iamrepo.NewPermissionRepository(db)
+	userRoleRepo := iamrepo.NewUserRoleRepository(db)
 	refreshTokenRepo := iamrepo.NewRefreshTokenRepository(db)
 
 	// Services

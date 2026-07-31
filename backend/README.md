@@ -26,7 +26,9 @@ Enterprise Property Management Platform — Backend API server.
 backend/
 ├── cmd/
 │   ├── server/
-│   │   └── main.go           # Composition root — DI, Echo setup, graceful shutdown
+│   │   └── main.go           # Entry point apps
+│   │   └── server.go         # Start Echo Server & Graceful Shutdown
+│   │   └── bootstrap.go      # Load configuration and initialize dependencies (database, logger, etc.) to active application and init modules
 │   └── migrate/
 │       └── main.go           # Migration runner (up/down/version/force/create/watch)
 ├── internal/
@@ -44,6 +46,10 @@ backend/
 │       ├── property/         # Property module
 │       ├── tenant/           # Tenant module
 │       └── room/             # Room module
+│       └── modules.go        # Modules registration
+│   └── database/             # Database configuration
+│       └── postgres/         # PostgreSQL configuration
+│           └── postgres.go   # PostgreSQL connection
 ├── configs/                  # Config files (koanf / env)
 ├── migrations/               # SQL migration files (golang-migrate)
 │   ├── 000001_create_properties.up.sql

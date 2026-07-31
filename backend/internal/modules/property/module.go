@@ -3,10 +3,9 @@
 package property
 
 import (
-	"github.com/epmp/backend/internal/modules/property/application/service"
-	domainrepo "github.com/epmp/backend/internal/modules/property/domain/repository"
-	"github.com/epmp/backend/internal/modules/property/infrastructure/repository"
-	"github.com/epmp/backend/internal/modules/property/interfaces/http"
+	"github.com/epmp/backend/internal/modules/property/delivery/http"
+	"github.com/epmp/backend/internal/modules/property/repository"
+	"github.com/epmp/backend/internal/modules/property/service"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/labstack/echo/v4"
@@ -20,7 +19,7 @@ type Module struct {
 
 // NewModule creates and wires all Property dependencies.
 func NewModule(db *pgxpool.Pool, log zerolog.Logger) *Module {
-	var repo domainrepo.PropertyRepository = repository.NewPropertyRepositoryImpl(db)
+	var repo repository.PropertyRepository = repository.NewPropertyRepositoryImpl(db)
 	svc := service.NewPropertyService(repo)
 	handler := http.NewPropertyHandler(svc)
 

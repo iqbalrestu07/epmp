@@ -3,10 +3,9 @@
 package room
 
 import (
-	"github.com/epmp/backend/internal/modules/room/application/service"
-	domainrepo "github.com/epmp/backend/internal/modules/room/domain/repository"
-	"github.com/epmp/backend/internal/modules/room/infrastructure/repository"
-	"github.com/epmp/backend/internal/modules/room/interfaces/http"
+	"github.com/epmp/backend/internal/modules/room/delivery/http"
+	"github.com/epmp/backend/internal/modules/room/repository"
+	"github.com/epmp/backend/internal/modules/room/service"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/labstack/echo/v4"
@@ -20,7 +19,7 @@ type Module struct {
 
 // NewModule creates and wires all Room dependencies.
 func NewModule(db *pgxpool.Pool, log zerolog.Logger) *Module {
-	var repo domainrepo.RoomRepository = repository.NewRoomRepositoryImpl(db)
+	var repo repository.RoomRepository = repository.NewRoomRepositoryImpl(db)
 	svc := service.NewRoomService(repo)
 	handler := http.NewRoomHandler(svc)
 

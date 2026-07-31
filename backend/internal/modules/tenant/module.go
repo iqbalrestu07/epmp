@@ -3,10 +3,9 @@
 package tenant
 
 import (
-	"github.com/epmp/backend/internal/modules/tenant/application/service"
-	domainrepo "github.com/epmp/backend/internal/modules/tenant/domain/repository"
-	"github.com/epmp/backend/internal/modules/tenant/infrastructure/repository"
-	"github.com/epmp/backend/internal/modules/tenant/interfaces/http"
+	"github.com/epmp/backend/internal/modules/tenant/delivery/http"
+	"github.com/epmp/backend/internal/modules/tenant/repository"
+	"github.com/epmp/backend/internal/modules/tenant/service"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/labstack/echo/v4"
@@ -20,7 +19,7 @@ type Module struct {
 
 // NewModule creates and wires all Tenant dependencies.
 func NewModule(db *pgxpool.Pool, log zerolog.Logger) *Module {
-	var repo domainrepo.TenantRepository = repository.NewTenantRepositoryImpl(db)
+	var repo repository.TenantRepository = repository.NewTenantRepositoryImpl(db)
 	svc := service.NewTenantService(repo)
 	handler := http.NewTenantHandler(svc)
 
