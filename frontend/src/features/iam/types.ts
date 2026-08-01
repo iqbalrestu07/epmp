@@ -21,6 +21,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  organization_id?: string;
   is_active: boolean;
   roles: Role[];
   permissions: string[]; // ["property:read", "property:write", ...]
