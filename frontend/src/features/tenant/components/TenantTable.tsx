@@ -27,6 +27,10 @@ const columns = [
     header: "Phone",
     cell: (info) => info.getValue(),
   }),
+  columnHelper.accessor("identity_number", {
+    header: "IdentityNumber",
+    cell: (info) => info.getValue(),
+  }),
   columnHelper.accessor("is_active", {
     header: "IsActive",
     cell: (info) => info.getValue(),

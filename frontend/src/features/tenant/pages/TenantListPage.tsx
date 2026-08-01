@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TenantTable } from "../components/TenantTable";
-import { useTenants } from "../hooks";
+import { useTenants, useDeleteTenant } from "../hooks";
 import type { Tenant } from "../types";
 
 export function TenantListPage() {
@@ -20,7 +20,7 @@ export function TenantListPage() {
     search: search || undefined,
   });
 
-
+  const deleteMutation = useDeleteTenant();
 
   const handleRowClick = (row: Tenant) => {
     navigate(`/tenant/${row.id}`);

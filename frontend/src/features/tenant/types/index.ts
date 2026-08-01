@@ -5,6 +5,7 @@ export interface Tenant {
   full_name: string;
   email: string;
   phone?: string;
+  identity_number?: string;
   is_active: boolean;
   deleted_at?: string;
   created_at: string;
@@ -23,6 +24,7 @@ export interface CreateTenantRequest {
   full_name: string;
   email: string;
   phone?: string;
+  identity_number?: string;
   is_active: boolean;
 }
 
@@ -30,6 +32,7 @@ export interface UpdateTenantRequest {
   full_name: string;
   email: string;
   phone?: string;
+  identity_number?: string;
   is_active: boolean;
 }
 

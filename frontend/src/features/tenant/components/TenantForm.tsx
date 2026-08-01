@@ -63,6 +63,16 @@ export function TenantForm({
         )}
       </div>
       <div className="space-y-2">
+        <Label htmlFor="identity_number">IdentityNumber</Label>
+        <Input
+          id="identity_number"
+          {...register("identity_number")}
+        />
+        {errors.identity_number && (
+          <p className="text-sm text-red-500">{errors.identity_number.message}</p>
+        )}
+      </div>
+      <div className="space-y-2">
         <Label htmlFor="is_active">IsActive</Label>
         <Input
           id="is_active"

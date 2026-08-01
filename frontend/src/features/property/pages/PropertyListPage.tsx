@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PropertyTable } from "../components/PropertyTable";
-import { usePropertys } from "../hooks";
+import { usePropertys, useDeleteProperty } from "../hooks";
 import type { Property } from "../types";
 
 export function PropertyListPage() {
@@ -20,7 +20,7 @@ export function PropertyListPage() {
     search: search || undefined,
   });
 
-
+  const deleteMutation = useDeleteProperty();
 
   const handleRowClick = (row: Property) => {
     navigate(`/property/${row.id}`);
@@ -34,15 +34,10 @@ export function PropertyListPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Properties</h1>
-        <div className="flex items-center gap-4">
-          <Button onClick={() => navigate("/dashboard/properties/interactive")} variant="outline" className="border-orange text-orange hover:bg-orange hover:text-white">
-            Interactive View
-          </Button>
-          <Button onClick={() => navigate("/dashboard/properties/new")}>
-            New Property
-          </Button>
-        </div>
+        <h1 className="text-2xl font-bold">Propertys</h1>
+        <Button onClick={() => navigate("/property/new")}>
+          New Property
+        </Button>
       </div>
       <form onSubmit={handleSearch} className="flex gap-2">
         <Input

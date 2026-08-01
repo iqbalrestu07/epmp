@@ -55,6 +55,10 @@ export function TenantDetailPage() {
           <dd className="text-sm">{String(data.phone ?? "—")}</dd>
         </div>
         <div className="space-y-1">
+          <dt className="text-sm font-medium text-gray-500">IdentityNumber</dt>
+          <dd className="text-sm">{String(data.identity_number ?? "—")}</dd>
+        </div>
+        <div className="space-y-1">
           <dt className="text-sm font-medium text-gray-500">IsActive</dt>
           <dd className="text-sm">{String(data.is_active ?? "—")}</dd>
         </div>

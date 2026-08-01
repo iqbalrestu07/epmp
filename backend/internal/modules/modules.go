@@ -3,6 +3,7 @@ package modules
 import (
 	"github.com/epmp/backend/internal/modules/iam"
 	"github.com/epmp/backend/internal/modules/property"
+	"github.com/epmp/backend/internal/modules/reservation"
 	"github.com/epmp/backend/internal/modules/room"
 	"github.com/epmp/backend/internal/modules/tenant"
 	mw "github.com/epmp/backend/internal/pkg/middleware"
@@ -25,6 +26,7 @@ func Register(e *echo.Echo, db *pgxpool.Pool, log zerolog.Logger, jwtSecret stri
 	property.NewModule(db, log).RegisterRoutes(protected)
 	tenant.NewModule(db, log).RegisterRoutes(protected)
 	room.NewModule(db, log).RegisterRoutes(protected)
+	reservation.NewModule(db, log).RegisterRoutes(protected)
 
 	return nil
 }
