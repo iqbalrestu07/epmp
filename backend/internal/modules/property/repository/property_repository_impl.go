@@ -25,21 +25,68 @@ func NewPropertyRepositoryImpl(db *pgxpool.Pool) *PropertyRepositoryImpl {
 var _ PropertyRepository = (*PropertyRepositoryImpl)(nil)
 
 func (r *PropertyRepositoryImpl) Save(ctx context.Context, e *entity.Property) error {
-	// TODO: implement with sqlc queries
-	return fmt.Errorf("property repository: Save not implemented")
+	if e.Id == "" {
+		// INSERT
+		err := r.db.QueryRow(ctx, `
+			INSERT INTO properties (name, description, address, property_type, is_active)
+			VALUES ($1, $2, $3, $4, $5)
+			RETURNING id`,
+			e.Name, e.Description, e.Address, e.PropertyType, e.IsActive,
+		).Scan(&e.Id)
+		return err
+	}
+	// UPDATE
+	_, err := r.db.Exec(ctx, `
+		UPDATE properties
+		SET    name=$1, description=$2, address=$3, property_type=$4, is_active=$5
+		WHERE  id=$6 AND deleted_at IS NULL`,
+		e.Name, e.Description, e.Address, e.PropertyType, e.IsActive, e.Id,
+	)
+	return err
 }
 
 func (r *PropertyRepositoryImpl) FindByID(ctx context.Context, id string) (*entity.Property, error) {
-	// TODO: implement with sqlc queries
-	return nil, fmt.Errorf("property repository: FindByID not implemented")
+	e := &entity.Property{}
+	err := r.db.QueryRow(ctx, `
+		SELECT id, name, description, address, property_type, is_active, deleted_at
+		FROM   properties
+		WHERE  id = $1 AND deleted_at IS NULL`,
+		id,
+	).Scan(&e.Id, &e.Name, &e.Description, &e.Address, &e.PropertyType, &e.IsActive, &e.DeletedAt)
+
+	if err != nil {
+		return nil, fmt.Errorf("property repository: find by id: %w", err)
+	}
+	return e, nil
 }
 
 func (r *PropertyRepositoryImpl) FindAll(ctx context.Context, limit, offset int) ([]*entity.Property, error) {
-	// TODO: implement with sqlc queries
-	return nil, fmt.Errorf("property repository: FindAll not implemented")
+	rows, err := r.db.Query(ctx, `
+		SELECT id, name, description, address, property_type, is_active, deleted_at
+		FROM   properties
+		WHERE  deleted_at IS NULL
+		ORDER BY created_at DESC
+		LIMIT $1 OFFSET $2`,
+		limit, offset,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("property repository: find all: %w", err)
+	}
+	defer rows.Close()
+
+	var list []*entity.Property
+	for rows.Next() {
+		e := &entity.Property{}
+		if err := rows.Scan(&e.Id, &e.Name, &e.Description, &e.Address, &e.PropertyType, &e.IsActive, &e.DeletedAt); err != nil {
+			return nil, err
+		}
+		list = append(list, e)
+	}
+	return list, rows.Err()
 }
 
 func (r *PropertyRepositoryImpl) Delete(ctx context.Context, id string) error {
-	// TODO: implement with sqlc queries
-	return fmt.Errorf("property repository: Delete not implemented")
+	_, err := r.db.Exec(ctx, `
+		UPDATE properties SET deleted_at = now() WHERE id = $1 AND deleted_at IS NULL`, id)
+	return err
 }

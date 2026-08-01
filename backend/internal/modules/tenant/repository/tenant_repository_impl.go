@@ -25,21 +25,68 @@ func NewTenantRepositoryImpl(db *pgxpool.Pool) *TenantRepositoryImpl {
 var _ TenantRepository = (*TenantRepositoryImpl)(nil)
 
 func (r *TenantRepositoryImpl) Save(ctx context.Context, e *entity.Tenant) error {
-	// TODO: implement with sqlc queries
-	return fmt.Errorf("tenant repository: Save not implemented")
+	if e.Id == "" {
+		// INSERT
+		err := r.db.QueryRow(ctx, `
+			INSERT INTO tenants (full_name, email, phone, identity_number, is_active)
+			VALUES ($1, $2, $3, $4, $5)
+			RETURNING id`,
+			e.FullName, e.Email, e.Phone, e.IdentityNumber, e.IsActive,
+		).Scan(&e.Id)
+		return err
+	}
+	// UPDATE
+	_, err := r.db.Exec(ctx, `
+		UPDATE tenants
+		SET    full_name=$1, email=$2, phone=$3, identity_number=$4, is_active=$5
+		WHERE  id=$6 AND deleted_at IS NULL`,
+		e.FullName, e.Email, e.Phone, e.IdentityNumber, e.IsActive, e.Id,
+	)
+	return err
 }
 
 func (r *TenantRepositoryImpl) FindByID(ctx context.Context, id string) (*entity.Tenant, error) {
-	// TODO: implement with sqlc queries
-	return nil, fmt.Errorf("tenant repository: FindByID not implemented")
+	e := &entity.Tenant{}
+	err := r.db.QueryRow(ctx, `
+		SELECT id, full_name, email, phone, identity_number, is_active, deleted_at
+		FROM   tenants
+		WHERE  id = $1 AND deleted_at IS NULL`,
+		id,
+	).Scan(&e.Id, &e.FullName, &e.Email, &e.Phone, &e.IdentityNumber, &e.IsActive, &e.DeletedAt)
+
+	if err != nil {
+		return nil, fmt.Errorf("tenant repository: find by id: %w", err)
+	}
+	return e, nil
 }
 
 func (r *TenantRepositoryImpl) FindAll(ctx context.Context, limit, offset int) ([]*entity.Tenant, error) {
-	// TODO: implement with sqlc queries
-	return nil, fmt.Errorf("tenant repository: FindAll not implemented")
+	rows, err := r.db.Query(ctx, `
+		SELECT id, full_name, email, phone, identity_number, is_active, deleted_at
+		FROM   tenants
+		WHERE  deleted_at IS NULL
+		ORDER BY created_at DESC
+		LIMIT $1 OFFSET $2`,
+		limit, offset,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("tenant repository: find all: %w", err)
+	}
+	defer rows.Close()
+
+	var list []*entity.Tenant
+	for rows.Next() {
+		e := &entity.Tenant{}
+		if err := rows.Scan(&e.Id, &e.FullName, &e.Email, &e.Phone, &e.IdentityNumber, &e.IsActive, &e.DeletedAt); err != nil {
+			return nil, err
+		}
+		list = append(list, e)
+	}
+	return list, rows.Err()
 }
 
 func (r *TenantRepositoryImpl) Delete(ctx context.Context, id string) error {
-	// TODO: implement with sqlc queries
-	return fmt.Errorf("tenant repository: Delete not implemented")
+	_, err := r.db.Exec(ctx, `
+		UPDATE tenants SET deleted_at = now() WHERE id = $1 AND deleted_at IS NULL`, id)
+	return err
 }

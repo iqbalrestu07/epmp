@@ -144,6 +144,15 @@ type templateData struct {
 	HasSearch      bool        // search enabled
 	RESTBasePath   string      // REST base path (e.g. /api/properties)
 	Operations     []string    // enabled operations
+
+	// SQL generation helpers
+	SelectColumns string // "id, name, description, is_active, deleted_at"
+	InsertColumns string // "name, description, is_active"
+	InsertValues  string // "$1, $2, $3"
+	InsertArgs    string // "e.Name, e.Description, e.IsActive"
+	UpdateSet     string // "name=$1, description=$2, is_active=$3"
+	UpdateArgs    string // "e.Name, e.Description, e.IsActive"
+	ScanArgs      string // "&e.Id, &e.Name, &e.Description, &e.IsActive, &e.DeletedAt"
 }
 
 type fieldData struct {
@@ -175,6 +184,29 @@ func buildTemplateData(domain *config.DomainSpec, modulePath string) map[string]
 		})
 	}
 
+	var selectCols, insertCols, insertVals, insertArgs, updateSet, updateArgs, scanArgs []string
+	
+	insertIdx := 1
+	for _, f := range fields {
+		selectCols = append(selectCols, f.ColumnName)
+		scanArgs = append(scanArgs, "&e."+f.Name)
+
+		if !f.PrimaryKey {
+			insertCols = append(insertCols, f.ColumnName)
+			insertVals = append(insertVals, fmt.Sprintf("$%d", insertIdx))
+			insertArgs = append(insertArgs, "e."+f.Name)
+			
+			updateSet = append(updateSet, fmt.Sprintf("%s=$%d", f.ColumnName, insertIdx))
+			updateArgs = append(updateArgs, "e."+f.Name)
+			
+			insertIdx++
+		}
+	}
+
+	// Always add deleted_at for soft delete capability scanning
+	selectCols = append(selectCols, "deleted_at")
+	scanArgs = append(scanArgs, "&e.DeletedAt")
+
 	return map[string]any{
 		"Name":           domain.Name,
 		"Package":        domain.Package,
@@ -187,6 +219,14 @@ func buildTemplateData(domain *config.DomainSpec, modulePath string) map[string]
 		"HasSearch":      domain.Behaviors.Search,
 		"RESTBasePath":   domain.REST.BasePath,
 		"Operations":     operations,
+		
+		"SelectColumns": strings.Join(selectCols, ", "),
+		"InsertColumns": strings.Join(insertCols, ", "),
+		"InsertValues":  strings.Join(insertVals, ", "),
+		"InsertArgs":    strings.Join(insertArgs, ", "),
+		"UpdateSet":     strings.Join(updateSet, ", "),
+		"UpdateArgs":    strings.Join(updateArgs, ", "),
+		"ScanArgs":      strings.Join(scanArgs, ", "),
 	}
 }
 

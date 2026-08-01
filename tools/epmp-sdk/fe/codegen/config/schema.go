@@ -26,11 +26,19 @@ const (
 )
 
 // GeneratorConfig is the root configuration object loaded from YAML.
+// It is a unified configuration shared between both Backend and Frontend generators.
 type GeneratorConfig struct {
 	Version  string         `yaml:"version"`
 	DryRun   bool           `yaml:"dry_run"`
+	Backend  BackendConfig  `yaml:"backend"`
 	Frontend FrontendConfig `yaml:"frontend"`
 	Domain   DomainSpec     `yaml:"domain"`
+}
+
+// BackendConfig holds backend generation settings (ignored by FE but mapped for shared yaml compatibility).
+type BackendConfig struct {
+	OutputRoot string `yaml:"output_root"`
+	ModulePath string `yaml:"module_path"`
 }
 
 // FrontendConfig holds frontend generation settings.

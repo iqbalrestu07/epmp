@@ -49,6 +49,7 @@ const (
 )
 
 // GeneratorConfig is the root configuration object loaded from YAML.
+// It is a unified configuration shared between both Backend and Frontend generators.
 type GeneratorConfig struct {
 	Version  string         `yaml:"version"`
 	DryRun   bool           `yaml:"dry_run"`

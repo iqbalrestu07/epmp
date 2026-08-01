@@ -15,7 +15,6 @@ epmp-sdk/be/codegen/
     filesystem/         # File I/O operations
     generator/          # Module generator (uses renderer + filesystem)
       templates/        # Embedded Go templates
-  examples/             # Sample config files
 ```
 
 ## Architecture
@@ -50,7 +49,7 @@ go build -o epmp-codegen ./cmd/codegen/
 ### Generate a Module
 
 ```bash
-./epmp-codegen --config examples/property.yaml --output ../../../../backend/internal
+./epmp-codegen --config ../../schemas/property.yaml --output ../../../../backend/internal
 ```
 
 The generator creates files under `{output}/modules/{package}/`. So with `--output backend/internal`, files go to `backend/internal/modules/property/`.
@@ -58,13 +57,13 @@ The generator creates files under `{output}/modules/{package}/`. So with `--outp
 ### Dry Run (no files written)
 
 ```bash
-./epmp-codegen --config examples/property.yaml --output ./output --dry-run
+./epmp-codegen --config ../../schemas/property.yaml --output ./output --dry-run
 ```
 
 ### Override Module Path
 
 ```bash
-./epmp-codegen --config examples/property.yaml --output ./output --module github.com/myorg/myapp
+./epmp-codegen --config ../../schemas/property.yaml --output ./output --module github.com/myorg/myapp
 ```
 
 ### Flags
@@ -213,7 +212,7 @@ Each module is self-contained and isolated:
 
 ### Example: Property Module
 
-Generated from `examples/property.yaml`:
+Generated from `schemas/property.yaml`:
 
 - `modules/property/MODULE.md` — module metadata, fields, behaviors, REST config
 - `modules/property/module.go` — `NewModule(db, log)` + `RegisterRoutes(e)`
@@ -248,7 +247,7 @@ import (
 )
 
 func main() {
-    cfg, _ := config.Load("property.yaml")
+    cfg, _ := config.Load("../../schemas/property.yaml")
 
     fs := filesystem.New()
     gen := generator.New(generator.DefaultRenderer(), fs)

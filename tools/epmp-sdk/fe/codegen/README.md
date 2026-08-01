@@ -15,7 +15,6 @@ epmp-sdk/fe/codegen/
     filesystem/         # File I/O operations
     generator/          # Frontend module generator
       templates/        # Embedded TypeScript/React templates
-  examples/             # Sample config files
 ```
 
 ## Architecture
@@ -51,13 +50,13 @@ go build -o epmp-fe-codegen ./cmd/codegen/
 ### Generate a Module
 
 ```bash
-./epmp-fe-codegen --config examples/property.yaml --output ../../../../frontend/src
+./epmp-fe-codegen --config ../../schemas/property.yaml --output ../../../../frontend/src
 ```
 
 ### Dry Run (no files written)
 
 ```bash
-./epmp-fe-codegen --config examples/property.yaml --output ./output --dry-run
+./epmp-fe-codegen --config ../../schemas/property.yaml --output ./output --dry-run
 ```
 
 ### Flags
@@ -182,9 +181,9 @@ The following modules have been generated in `frontend/src/features/`:
 cd tools/epmp-sdk/fe/codegen
 go build -o epmp-fe-codegen ./cmd/codegen/
 
-./epmp-fe-codegen --config examples/property.yaml --output ../../../../frontend/src
-./epmp-fe-codegen --config examples/tenant.yaml --output ../../../../frontend/src
-./epmp-fe-codegen --config examples/room.yaml --output ../../../../frontend/src
+./epmp-fe-codegen --config ../../schemas/property.yaml --output ../../../../frontend/src
+./epmp-fe-codegen --config ../../schemas/tenant.yaml --output ../../../../frontend/src
+./epmp-fe-codegen --config ../../schemas/room.yaml --output ../../../../frontend/src
 ```
 
 ## Using the Generator Programmatically
@@ -199,7 +198,7 @@ import (
 )
 
 func main() {
-    cfg, _ := config.Load("property.yaml")
+    cfg, _ := config.Load("../../schemas/property.yaml")
 
     fs := filesystem.New()
     gen := generator.New(generator.DefaultRenderer(), fs)

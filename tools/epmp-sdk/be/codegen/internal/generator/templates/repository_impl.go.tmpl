@@ -25,21 +25,69 @@ func New{{.Name}}RepositoryImpl(db *pgxpool.Pool) *{{.Name}}RepositoryImpl {
 var _ {{.Name}}Repository = (*{{.Name}}RepositoryImpl)(nil)
 
 func (r *{{.Name}}RepositoryImpl) Save(ctx context.Context, e *entity.{{.Name}}) error {
-	// TODO: implement with sqlc queries
-	return fmt.Errorf("{{.Package}} repository: Save not implemented")
+	if e.Id == "" {
+		// INSERT
+		err := r.db.QueryRow(ctx, `
+			INSERT INTO {{.Table}} ({{.InsertColumns}})
+			VALUES ({{.InsertValues}})
+			RETURNING id`,
+			{{.InsertArgs}},
+		).Scan(&e.Id)
+		return err
+	}
+	// UPDATE
+	// Note: id is dynamically added as the last argument in Exec for UPDATE
+	_, err := r.db.Exec(ctx, `
+		UPDATE {{.Table}}
+		SET    {{.UpdateSet}}
+		WHERE  id=${{len .Fields}} AND deleted_at IS NULL`,
+		{{.UpdateArgs}}, e.Id,
+	)
+	return err
 }
 
 func (r *{{.Name}}RepositoryImpl) FindByID(ctx context.Context, id string) (*entity.{{.Name}}, error) {
-	// TODO: implement with sqlc queries
-	return nil, fmt.Errorf("{{.Package}} repository: FindByID not implemented")
+	e := &entity.{{.Name}}{}
+	err := r.db.QueryRow(ctx, `
+		SELECT {{.SelectColumns}}
+		FROM   {{.Table}}
+		WHERE  id = $1 AND deleted_at IS NULL`,
+		id,
+	).Scan({{.ScanArgs}})
+	
+	if err != nil {
+		return nil, fmt.Errorf("{{.Package}} repository: find by id: %w", err)
+	}
+	return e, nil
 }
 
 func (r *{{.Name}}RepositoryImpl) FindAll(ctx context.Context, limit, offset int) ([]*entity.{{.Name}}, error) {
-	// TODO: implement with sqlc queries
-	return nil, fmt.Errorf("{{.Package}} repository: FindAll not implemented")
+	rows, err := r.db.Query(ctx, `
+		SELECT {{.SelectColumns}}
+		FROM   {{.Table}}
+		WHERE  deleted_at IS NULL
+		ORDER BY created_at DESC
+		LIMIT $1 OFFSET $2`,
+		limit, offset,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("{{.Package}} repository: find all: %w", err)
+	}
+	defer rows.Close()
+
+	var list []*entity.{{.Name}}
+	for rows.Next() {
+		e := &entity.{{.Name}}{}
+		if err := rows.Scan({{.ScanArgs}}); err != nil {
+			return nil, err
+		}
+		list = append(list, e)
+	}
+	return list, rows.Err()
 }
 
 func (r *{{.Name}}RepositoryImpl) Delete(ctx context.Context, id string) error {
-	// TODO: implement with sqlc queries
-	return fmt.Errorf("{{.Package}} repository: Delete not implemented")
+	_, err := r.db.Exec(ctx, `
+		UPDATE {{.Table}} SET deleted_at = now() WHERE id = $1 AND deleted_at IS NULL`, id)
+	return err
 }

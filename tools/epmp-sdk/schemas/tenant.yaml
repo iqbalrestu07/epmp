@@ -1,0 +1,78 @@
+version: "1.0"
+dry_run: false
+
+# Shared configuration for both backend and frontend SDKs
+backend:
+  output_root: "./internal"
+  module_path: "github.com/epmp/backend"
+  artifacts:
+    - dto
+    - repository
+    - rest
+    - test
+
+frontend:
+  output_root: "./src"
+  base_url: "/api"
+
+domain:
+  name: Tenant
+  package: tenant
+  table: tenants
+  bounded_context: tenant
+
+  fields:
+    - name: id
+      type: uuid
+      primary_key: true
+      auto: true
+
+    - name: full_name
+      type: string
+      max_length: 255
+      searchable: true
+
+    - name: email
+      type: string
+      max_length: 255
+      unique: true
+
+    - name: phone
+      type: string
+      max_length: 50
+      nullable: true
+
+    - name: identity_number
+      type: string
+      max_length: 100
+      nullable: true
+
+    - name: is_active
+      type: bool
+      default: true
+
+  behaviors:
+    soft_delete: true
+    audit_trail: true
+    pagination: true
+    search: true
+    filter_by:
+      - is_active
+    sort_by:
+      - full_name
+      - created_at
+
+  rest:
+    base_path: /api/tenants
+    auth_required: true
+    operations:
+      - create
+      - read
+      - update
+      - delete
+      - list
+
+  events:
+    - TenantCreated
+    - TenantUpdated
+    - TenantDeleted

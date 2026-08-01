@@ -25,21 +25,68 @@ func NewRoomRepositoryImpl(db *pgxpool.Pool) *RoomRepositoryImpl {
 var _ RoomRepository = (*RoomRepositoryImpl)(nil)
 
 func (r *RoomRepositoryImpl) Save(ctx context.Context, e *entity.Room) error {
-	// TODO: implement with sqlc queries
-	return fmt.Errorf("room repository: Save not implemented")
+	if e.Id == "" {
+		// INSERT
+		err := r.db.QueryRow(ctx, `
+			INSERT INTO rooms (property_id, name, floor, capacity, price, is_available)
+			VALUES ($1, $2, $3, $4, $5, $6)
+			RETURNING id`,
+			e.PropertyId, e.Name, e.Floor, e.Capacity, e.Price, e.IsAvailable,
+		).Scan(&e.Id)
+		return err
+	}
+	// UPDATE
+	_, err := r.db.Exec(ctx, `
+		UPDATE rooms
+		SET    property_id=$1, name=$2, floor=$3, capacity=$4, price=$5, is_available=$6
+		WHERE  id=$7 AND deleted_at IS NULL`,
+		e.PropertyId, e.Name, e.Floor, e.Capacity, e.Price, e.IsAvailable, e.Id,
+	)
+	return err
 }
 
 func (r *RoomRepositoryImpl) FindByID(ctx context.Context, id string) (*entity.Room, error) {
-	// TODO: implement with sqlc queries
-	return nil, fmt.Errorf("room repository: FindByID not implemented")
+	e := &entity.Room{}
+	err := r.db.QueryRow(ctx, `
+		SELECT id, property_id, name, floor, capacity, price, is_available, deleted_at
+		FROM   rooms
+		WHERE  id = $1 AND deleted_at IS NULL`,
+		id,
+	).Scan(&e.Id, &e.PropertyId, &e.Name, &e.Floor, &e.Capacity, &e.Price, &e.IsAvailable, &e.DeletedAt)
+
+	if err != nil {
+		return nil, fmt.Errorf("room repository: find by id: %w", err)
+	}
+	return e, nil
 }
 
 func (r *RoomRepositoryImpl) FindAll(ctx context.Context, limit, offset int) ([]*entity.Room, error) {
-	// TODO: implement with sqlc queries
-	return nil, fmt.Errorf("room repository: FindAll not implemented")
+	rows, err := r.db.Query(ctx, `
+		SELECT id, property_id, name, floor, capacity, price, is_available, deleted_at
+		FROM   rooms
+		WHERE  deleted_at IS NULL
+		ORDER BY created_at DESC
+		LIMIT $1 OFFSET $2`,
+		limit, offset,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("room repository: find all: %w", err)
+	}
+	defer rows.Close()
+
+	var list []*entity.Room
+	for rows.Next() {
+		e := &entity.Room{}
+		if err := rows.Scan(&e.Id, &e.PropertyId, &e.Name, &e.Floor, &e.Capacity, &e.Price, &e.IsAvailable, &e.DeletedAt); err != nil {
+			return nil, err
+		}
+		list = append(list, e)
+	}
+	return list, rows.Err()
 }
 
 func (r *RoomRepositoryImpl) Delete(ctx context.Context, id string) error {
-	// TODO: implement with sqlc queries
-	return fmt.Errorf("room repository: Delete not implemented")
+	_, err := r.db.Exec(ctx, `
+		UPDATE rooms SET deleted_at = now() WHERE id = $1 AND deleted_at IS NULL`, id)
+	return err
 }
