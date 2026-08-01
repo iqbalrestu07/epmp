@@ -23,6 +23,7 @@ func NewRoomService(repo repository.RoomRepository) *RoomService {
 
 func (s *RoomService) Create(ctx context.Context, req *dto.CreateRoomRequest) (*dto.RoomResponse, error) {
 	e := entity.NewRoom()
+	e.OrganizationId = req.OrganizationId
 	e.Name = req.Name
 	e.Floor = req.Floor
 	e.Capacity = req.Capacity
@@ -76,6 +77,7 @@ func (s *RoomService) Update(ctx context.Context, id string, req *dto.UpdateRoom
 	if err != nil {
 		return nil, fmt.Errorf("room service: update: find: %w", err)
 	}
+	e.OrganizationId = req.OrganizationId
 	e.Name = req.Name
 	e.Floor = req.Floor
 	e.Capacity = req.Capacity
@@ -99,12 +101,13 @@ func (s *RoomService) Delete(ctx context.Context, id string) error {
 
 func (s *RoomService) toResponse(e *entity.Room) *dto.RoomResponse {
 	return &dto.RoomResponse{
-		Id:          e.Id,
-		Name:        e.Name,
-		Floor:       e.Floor,
-		Capacity:    e.Capacity,
-		Price:       e.Price,
+		OrganizationId: e.OrganizationId,
+		Id: e.Id,
+		Name: e.Name,
+		Floor: e.Floor,
+		Capacity: e.Capacity,
+		Price: e.Price,
 		IsAvailable: e.IsAvailable,
-		PropertyId:  e.PropertyId,
+		PropertyId: e.PropertyId,
 	}
 }

@@ -23,6 +23,7 @@ func NewReservationService(repo repository.ReservationRepository) *ReservationSe
 
 func (s *ReservationService) Create(ctx context.Context, req *dto.CreateReservationRequest) (*dto.ReservationResponse, error) {
 	e := entity.NewReservation()
+	e.OrganizationId = req.OrganizationId
 	e.TenantId = req.TenantId
 	e.PropertyId = req.PropertyId
 	e.RoomId = req.RoomId
@@ -78,6 +79,7 @@ func (s *ReservationService) Update(ctx context.Context, id string, req *dto.Upd
 	if err != nil {
 		return nil, fmt.Errorf("reservation service: update: find: %w", err)
 	}
+	e.OrganizationId = req.OrganizationId
 	e.TenantId = req.TenantId
 	e.PropertyId = req.PropertyId
 	e.RoomId = req.RoomId
@@ -103,6 +105,7 @@ func (s *ReservationService) Delete(ctx context.Context, id string) error {
 
 func (s *ReservationService) toResponse(e *entity.Reservation) *dto.ReservationResponse {
 	return &dto.ReservationResponse{
+		OrganizationId: e.OrganizationId,
 		Id: e.Id,
 		TenantId: e.TenantId,
 		PropertyId: e.PropertyId,

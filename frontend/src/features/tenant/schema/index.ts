@@ -3,6 +3,7 @@
 import { z } from "zod";
 
 export const tenantSchema = z.object({
+  organization_id: z.string(),
   id: z.string(),
   full_name: z.string().max(255),
   email: z.string().max(255),

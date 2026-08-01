@@ -11,6 +11,10 @@ import type { Property } from "../types";
 const columnHelper = createColumnHelper<Property>();
 
 const columns = [
+  columnHelper.accessor("organization_id", {
+    header: "OrganizationId",
+    cell: (info) => info.getValue(),
+  }),
   columnHelper.accessor("id", {
     header: "Id",
     cell: (info) => info.getValue(),

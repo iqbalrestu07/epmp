@@ -3,6 +3,7 @@
 import { z } from "zod";
 
 export const propertySchema = z.object({
+  organization_id: z.string(),
   id: z.string(),
   name: z.string().max(255),
   description: z.string().optional(),

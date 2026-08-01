@@ -23,6 +23,7 @@ func NewTenantService(repo repository.TenantRepository) *TenantService {
 
 func (s *TenantService) Create(ctx context.Context, req *dto.CreateTenantRequest) (*dto.TenantResponse, error) {
 	e := entity.NewTenant()
+	e.OrganizationId = req.OrganizationId
 	e.FullName = req.FullName
 	e.Email = req.Email
 	e.Phone = req.Phone
@@ -75,6 +76,7 @@ func (s *TenantService) Update(ctx context.Context, id string, req *dto.UpdateTe
 	if err != nil {
 		return nil, fmt.Errorf("tenant service: update: find: %w", err)
 	}
+	e.OrganizationId = req.OrganizationId
 	e.FullName = req.FullName
 	e.Email = req.Email
 	e.Phone = req.Phone
@@ -97,11 +99,12 @@ func (s *TenantService) Delete(ctx context.Context, id string) error {
 
 func (s *TenantService) toResponse(e *entity.Tenant) *dto.TenantResponse {
 	return &dto.TenantResponse{
-		Id:             e.Id,
-		FullName:       e.FullName,
-		Email:          e.Email,
-		Phone:          e.Phone,
+		OrganizationId: e.OrganizationId,
+		Id: e.Id,
+		FullName: e.FullName,
+		Email: e.Email,
+		Phone: e.Phone,
 		IdentityNumber: e.IdentityNumber,
-		IsActive:       e.IsActive,
+		IsActive: e.IsActive,
 	}
 }

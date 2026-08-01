@@ -1,0 +1,104 @@
+version: "1.0"
+dry_run: false
+
+backend:
+  output_root: "./internal"
+  module_path: "github.com/epmp/backend"
+  artifacts:
+    - dto
+    - repository
+    - rest
+    - test
+
+frontend:
+  output_root: "./src"
+  base_url: "/api"
+
+domain:
+  name: Contract
+  package: contract
+  table: contracts
+  bounded_context: contract
+
+  fields:
+    - name: organization_id
+      type: uuid
+      searchable: true
+    - name: id
+      type: uuid
+      primary_key: true
+      auto: true
+
+    - name: reservation_id
+      type: uuid
+      nullable: true
+      searchable: true
+
+    - name: tenant_id
+      type: uuid
+      searchable: true
+
+    - name: property_id
+      type: uuid
+      searchable: true
+
+    - name: room_id
+      type: uuid
+      searchable: true
+
+    - name: status
+      type: enum
+      enum_values:
+        - Draft
+        - Pending
+        - Active
+        - Expired
+        - Renewed
+        - Completed
+        - Terminated
+      default: "Draft"
+
+    - name: start_date
+      type: timestamp
+
+    - name: end_date
+      type: timestamp
+
+    - name: monthly_rent
+      type: decimal
+      default: 0
+
+    - name: deposit_amount
+      type: decimal
+      default: 0
+
+    - name: terms
+      type: text
+      nullable: true
+
+  behaviors:
+    soft_delete: true
+    pagination: true
+    search: true
+    filter_by:
+      - status
+      - property_id
+    sort_by:
+      - start_date
+      - created_at
+
+  rest:
+    base_path: /api/contracts
+    auth_required: true
+    operations:
+      - create
+      - read
+      - update
+      - delete
+      - list
+
+  events:
+    - ContractCreated
+    - ContractActivated
+    - ContractRenewed
+    - ContractTerminated

@@ -28,19 +28,20 @@ func (r *RoomRepositoryImpl) Save(ctx context.Context, e *entity.Room) error {
 	if e.Id == "" {
 		// INSERT
 		err := r.db.QueryRow(ctx, `
-			INSERT INTO rooms (property_id, name, floor, capacity, price, is_available)
-			VALUES ($1, $2, $3, $4, $5, $6)
+			INSERT INTO rooms (organization_id, name, floor, capacity, price, is_available, property_id)
+			VALUES ($1, $2, $3, $4, $5, $6, $7)
 			RETURNING id`,
-			e.PropertyId, e.Name, e.Floor, e.Capacity, e.Price, e.IsAvailable,
+			e.OrganizationId, e.Name, e.Floor, e.Capacity, e.Price, e.IsAvailable, e.PropertyId,
 		).Scan(&e.Id)
 		return err
 	}
 	// UPDATE
+	// Note: id is dynamically added as the last argument in Exec for UPDATE
 	_, err := r.db.Exec(ctx, `
 		UPDATE rooms
-		SET    property_id=$1, name=$2, floor=$3, capacity=$4, price=$5, is_available=$6
-		WHERE  id=$7 AND deleted_at IS NULL`,
-		e.PropertyId, e.Name, e.Floor, e.Capacity, e.Price, e.IsAvailable, e.Id,
+		SET    organization_id=$1, name=$2, floor=$3, capacity=$4, price=$5, is_available=$6, property_id=$7
+		WHERE  id=$8 AND deleted_at IS NULL`,
+		e.OrganizationId, e.Name, e.Floor, e.Capacity, e.Price, e.IsAvailable, e.PropertyId, e.Id,
 	)
 	return err
 }
@@ -48,12 +49,12 @@ func (r *RoomRepositoryImpl) Save(ctx context.Context, e *entity.Room) error {
 func (r *RoomRepositoryImpl) FindByID(ctx context.Context, id string) (*entity.Room, error) {
 	e := &entity.Room{}
 	err := r.db.QueryRow(ctx, `
-		SELECT id, property_id, name, floor, capacity, price, is_available, deleted_at
+		SELECT organization_id, id, name, floor, capacity, price, is_available, property_id, deleted_at
 		FROM   rooms
 		WHERE  id = $1 AND deleted_at IS NULL`,
 		id,
-	).Scan(&e.Id, &e.PropertyId, &e.Name, &e.Floor, &e.Capacity, &e.Price, &e.IsAvailable, &e.DeletedAt)
-
+	).Scan(&e.OrganizationId, &e.Id, &e.Name, &e.Floor, &e.Capacity, &e.Price, &e.IsAvailable, &e.PropertyId, &e.DeletedAt)
+	
 	if err != nil {
 		return nil, fmt.Errorf("room repository: find by id: %w", err)
 	}
@@ -62,7 +63,7 @@ func (r *RoomRepositoryImpl) FindByID(ctx context.Context, id string) (*entity.R
 
 func (r *RoomRepositoryImpl) FindAll(ctx context.Context, limit, offset int) ([]*entity.Room, error) {
 	rows, err := r.db.Query(ctx, `
-		SELECT id, property_id, name, floor, capacity, price, is_available, deleted_at
+		SELECT organization_id, id, name, floor, capacity, price, is_available, property_id, deleted_at
 		FROM   rooms
 		WHERE  deleted_at IS NULL
 		ORDER BY created_at DESC
@@ -77,7 +78,7 @@ func (r *RoomRepositoryImpl) FindAll(ctx context.Context, limit, offset int) ([]
 	var list []*entity.Room
 	for rows.Next() {
 		e := &entity.Room{}
-		if err := rows.Scan(&e.Id, &e.PropertyId, &e.Name, &e.Floor, &e.Capacity, &e.Price, &e.IsAvailable, &e.DeletedAt); err != nil {
+		if err := rows.Scan(&e.OrganizationId, &e.Id, &e.Name, &e.Floor, &e.Capacity, &e.Price, &e.IsAvailable, &e.PropertyId, &e.DeletedAt); err != nil {
 			return nil, err
 		}
 		list = append(list, e)

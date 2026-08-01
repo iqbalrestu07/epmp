@@ -6,6 +6,7 @@ import "time"
 
 // CreateReservationRequest is the DTO for creating a Reservation.
 type CreateReservationRequest struct {
+	OrganizationId string `json:"organization_id"`
 	TenantId string `json:"tenant_id"`
 	PropertyId string `json:"property_id"`
 	RoomId string `json:"room_id"`
@@ -18,6 +19,7 @@ type CreateReservationRequest struct {
 
 // UpdateReservationRequest is the DTO for updating a Reservation.
 type UpdateReservationRequest struct {
+	OrganizationId string `json:"organization_id"`
 	TenantId string `json:"tenant_id"`
 	PropertyId string `json:"property_id"`
 	RoomId string `json:"room_id"`
@@ -30,6 +32,7 @@ type UpdateReservationRequest struct {
 
 // ReservationResponse is the DTO for returning a Reservation.
 type ReservationResponse struct {
+	OrganizationId string `json:"organization_id"`
 	Id string `json:"id"`
 	TenantId string `json:"tenant_id"`
 	PropertyId string `json:"property_id"`

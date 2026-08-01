@@ -1,0 +1,70 @@
+version: "1.0"
+dry_run: false
+
+backend:
+  output_root: "./internal"
+  module_path: "github.com/epmp/backend"
+  artifacts:
+    - dto
+    - repository
+    - rest
+    - test
+
+frontend:
+  output_root: "./src"
+  base_url: "/api"
+
+domain:
+  name: WorkOrder
+  package: workorder
+  table: work_orders
+  bounded_context: maintenance
+
+  fields:
+    - name: organization_id
+      type: uuid
+      searchable: true
+    - name: id
+      type: uuid
+      primary_key: true
+      auto: true
+    - name: property_id
+      type: uuid
+      searchable: true
+    - name: room_id
+      type: uuid
+      nullable: true
+      searchable: true
+    - name: description
+      type: text
+    - name: status
+      type: enum
+      enum_values:
+        - Open
+        - InProgress
+        - Resolved
+      default: "Open"
+    - name: priority
+      type: string
+      max_length: 50
+      default: "Medium"
+
+  behaviors:
+    soft_delete: true
+    pagination: true
+    search: true
+    sort_by:
+      - created_at
+
+  rest:
+    base_path: /api/work_orders
+    auth_required: true
+    operations:
+      - create
+      - read
+      - update
+      - delete
+      - list
+
+  events:
+    - WorkOrderCreated

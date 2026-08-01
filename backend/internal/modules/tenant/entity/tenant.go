@@ -6,13 +6,14 @@ import "time"
 
 // Tenant is the domain entity for tenant.
 type Tenant struct {
-	Id             string     `json:"id"`
-	FullName       string     `json:"full_name"`
-	Email          string     `json:"email"`
-	Phone          string     `json:"phone"`
-	IdentityNumber string     `json:"identity_number"`
-	IsActive       bool       `json:"is_active"`
-	DeletedAt      *time.Time `json:"deleted_at,omitempty"`
+	OrganizationId string `json:"organization_id"`
+	Id string `json:"id"`
+	FullName string `json:"full_name"`
+	Email string `json:"email"`
+	Phone string `json:"phone"`
+	IdentityNumber string `json:"identity_number"`
+	IsActive bool `json:"is_active"`
+	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 }
 
 // NewTenant creates a new Tenant instance.

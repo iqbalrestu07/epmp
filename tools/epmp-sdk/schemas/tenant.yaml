@@ -22,6 +22,9 @@ domain:
   bounded_context: tenant
 
   fields:
+    - name: organization_id
+      type: uuid
+      searchable: true
     - name: id
       type: uuid
       primary_key: true

@@ -6,6 +6,7 @@ import "time"
 
 // Reservation is the domain entity for reservation.
 type Reservation struct {
+	OrganizationId string `json:"organization_id"`
 	Id string `json:"id"`
 	TenantId string `json:"tenant_id"`
 	PropertyId string `json:"property_id"`

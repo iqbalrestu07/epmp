@@ -1,0 +1,87 @@
+version: "1.0"
+dry_run: false
+
+backend:
+  output_root: "./internal"
+  module_path: "github.com/epmp/backend"
+  artifacts:
+    - dto
+    - repository
+    - rest
+    - test
+
+frontend:
+  output_root: "./src"
+  base_url: "/api"
+
+domain:
+  name: Deposit
+  package: deposit
+  table: deposits
+  bounded_context: billing
+
+  fields:
+    - name: organization_id
+      type: uuid
+      searchable: true
+    - name: id
+      type: uuid
+      primary_key: true
+      auto: true
+
+    - name: contract_id
+      type: uuid
+      searchable: true
+
+    - name: tenant_id
+      type: uuid
+      searchable: true
+
+    - name: amount
+      type: decimal
+      default: 0
+
+    - name: status
+      type: enum
+      enum_values:
+        - Collected
+        - Returned
+        - Forfeited
+      default: "Collected"
+
+    - name: collection_date
+      type: timestamp
+
+    - name: refund_date
+      type: timestamp
+      nullable: true
+
+    - name: notes
+      type: text
+      nullable: true
+
+  behaviors:
+    soft_delete: true
+    pagination: true
+    search: true
+    filter_by:
+      - status
+      - contract_id
+    sort_by:
+      - collection_date
+      - created_at
+
+  rest:
+    base_path: /api/deposits
+    auth_required: true
+    operations:
+      - create
+      - read
+      - update
+      - delete
+      - list
+
+  events:
+    - DepositCollected
+    - DepositReturned
+    - DepositForfeited

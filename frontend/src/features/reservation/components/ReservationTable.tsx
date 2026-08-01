@@ -11,6 +11,10 @@ import type { Reservation } from "../types";
 const columnHelper = createColumnHelper<Reservation>();
 
 const columns = [
+  columnHelper.accessor("organization_id", {
+    header: "OrganizationId",
+    cell: (info) => info.getValue(),
+  }),
   columnHelper.accessor("id", {
     header: "Id",
     cell: (info) => info.getValue(),

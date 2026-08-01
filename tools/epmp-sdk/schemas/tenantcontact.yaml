@@ -1,0 +1,67 @@
+version: "1.0"
+dry_run: false
+
+backend:
+  output_root: "./internal"
+  module_path: "github.com/epmp/backend"
+  artifacts:
+    - dto
+    - repository
+    - rest
+    - test
+
+frontend:
+  output_root: "./src"
+  base_url: "/api"
+
+domain:
+  name: TenantContact
+  package: tenantcontact
+  table: tenant_contacts
+  bounded_context: tenant
+
+  fields:
+    - name: organization_id
+      type: uuid
+      searchable: true
+    - name: id
+      type: uuid
+      primary_key: true
+      auto: true
+    - name: tenant_id
+      type: uuid
+      searchable: true
+    - name: contact_type
+      type: enum
+      enum_values:
+        - Email
+        - Phone
+        - Emergency
+      default: "Phone"
+    - name: contact_value
+      type: string
+      max_length: 100
+      searchable: true
+    - name: is_primary
+      type: bool
+      default: false
+
+  behaviors:
+    soft_delete: true
+    pagination: true
+    search: true
+    sort_by:
+      - created_at
+
+  rest:
+    base_path: /api/tenant_contacts
+    auth_required: true
+    operations:
+      - create
+      - read
+      - update
+      - delete
+      - list
+
+  events:
+    - TenantContactCreated

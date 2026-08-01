@@ -302,8 +302,8 @@ EPMP dirancang untuk berbagai jenis pengguna.
 - Finance Staff
 - Maintenance Staff
 - Receptionist
-- Tenant (Future)
-- Vendor (Future)
+- Tenant
+- Vendor
 
 ---
 

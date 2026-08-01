@@ -1,0 +1,93 @@
+version: "1.0"
+dry_run: false
+
+backend:
+  output_root: "./internal"
+  module_path: "github.com/epmp/backend"
+  artifacts:
+    - dto
+    - repository
+    - rest
+    - test
+
+frontend:
+  output_root: "./src"
+  base_url: "/api"
+
+domain:
+  name: Payment
+  package: payment
+  table: payments
+  bounded_context: billing
+
+  fields:
+    - name: organization_id
+      type: uuid
+      searchable: true
+    - name: id
+      type: uuid
+      primary_key: true
+      auto: true
+
+    - name: invoice_id
+      type: uuid
+      searchable: true
+
+    - name: tenant_id
+      type: uuid
+      searchable: true
+
+    - name: amount
+      type: decimal
+      default: 0
+
+    - name: payment_date
+      type: timestamp
+
+    - name: payment_method
+      type: enum
+      enum_values:
+        - Transfer
+        - CreditCard
+        - Cash
+        - EWallet
+      default: "Transfer"
+
+    - name: status
+      type: enum
+      enum_values:
+        - Pending
+        - Success
+        - Failed
+        - Refunded
+      default: "Pending"
+
+    - name: reference_number
+      type: string
+      nullable: true
+
+  behaviors:
+    soft_delete: true
+    pagination: true
+    search: true
+    filter_by:
+      - status
+      - invoice_id
+    sort_by:
+      - payment_date
+      - created_at
+
+  rest:
+    base_path: /api/payments
+    auth_required: true
+    operations:
+      - create
+      - read
+      - update
+      - delete
+      - list
+
+  events:
+    - PaymentReceived
+    - PaymentFailed
+    - PaymentRefunded

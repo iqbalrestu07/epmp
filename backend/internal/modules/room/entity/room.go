@@ -6,14 +6,15 @@ import "time"
 
 // Room is the domain entity for room.
 type Room struct {
-	Id          string     `json:"id"`
-	Name        string     `json:"name"`
-	Floor       int        `json:"floor"`
-	Capacity    int        `json:"capacity"`
-	Price       float64    `json:"price"`
-	IsAvailable bool       `json:"is_available"`
-	PropertyId  string     `json:"property_id"`
-	DeletedAt   *time.Time `json:"deleted_at,omitempty"`
+	OrganizationId string `json:"organization_id"`
+	Id string `json:"id"`
+	Name string `json:"name"`
+	Floor int `json:"floor"`
+	Capacity int `json:"capacity"`
+	Price float64 `json:"price"`
+	IsAvailable bool `json:"is_available"`
+	PropertyId string `json:"property_id"`
+	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 }
 
 // NewRoom creates a new Room instance.

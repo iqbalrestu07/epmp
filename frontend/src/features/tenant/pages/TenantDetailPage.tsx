@@ -39,6 +39,10 @@ export function TenantDetailPage() {
 
       <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-1">
+          <dt className="text-sm font-medium text-gray-500">OrganizationId</dt>
+          <dd className="text-sm">{String(data.organization_id ?? "—")}</dd>
+        </div>
+        <div className="space-y-1">
           <dt className="text-sm font-medium text-gray-500">Id</dt>
           <dd className="text-sm">{String(data.id ?? "—")}</dd>
         </div>

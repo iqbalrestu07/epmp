@@ -1,0 +1,63 @@
+version: "1.0"
+dry_run: false
+
+backend:
+  output_root: "./internal"
+  module_path: "github.com/epmp/backend"
+  artifacts:
+    - dto
+    - repository
+    - rest
+    - test
+
+frontend:
+  output_root: "./src"
+  base_url: "/api"
+
+domain:
+  name: Bed
+  package: bed
+  table: beds
+  bounded_context: property
+
+  fields:
+    - name: organization_id
+      type: uuid
+      searchable: true
+    - name: id
+      type: uuid
+      primary_key: true
+      auto: true
+    - name: room_id
+      type: uuid
+      searchable: true
+    - name: name
+      type: string
+      max_length: 100
+      searchable: true
+    - name: status
+      type: enum
+      enum_values:
+        - Available
+        - Occupied
+      default: "Available"
+
+  behaviors:
+    soft_delete: true
+    pagination: true
+    search: true
+    sort_by:
+      - created_at
+
+  rest:
+    base_path: /api/beds
+    auth_required: true
+    operations:
+      - create
+      - read
+      - update
+      - delete
+      - list
+
+  events:
+    - BedCreated

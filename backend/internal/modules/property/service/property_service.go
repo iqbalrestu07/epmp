@@ -23,6 +23,7 @@ func NewPropertyService(repo repository.PropertyRepository) *PropertyService {
 
 func (s *PropertyService) Create(ctx context.Context, req *dto.CreatePropertyRequest) (*dto.PropertyResponse, error) {
 	e := entity.NewProperty()
+	e.OrganizationId = req.OrganizationId
 	e.Name = req.Name
 	e.Description = req.Description
 	e.Address = req.Address
@@ -75,6 +76,7 @@ func (s *PropertyService) Update(ctx context.Context, id string, req *dto.Update
 	if err != nil {
 		return nil, fmt.Errorf("property service: update: find: %w", err)
 	}
+	e.OrganizationId = req.OrganizationId
 	e.Name = req.Name
 	e.Description = req.Description
 	e.Address = req.Address
@@ -97,11 +99,12 @@ func (s *PropertyService) Delete(ctx context.Context, id string) error {
 
 func (s *PropertyService) toResponse(e *entity.Property) *dto.PropertyResponse {
 	return &dto.PropertyResponse{
-		Id:           e.Id,
-		Name:         e.Name,
-		Description:  e.Description,
-		Address:      e.Address,
+		OrganizationId: e.OrganizationId,
+		Id: e.Id,
+		Name: e.Name,
+		Description: e.Description,
+		Address: e.Address,
 		PropertyType: e.PropertyType,
-		IsActive:     e.IsActive,
+		IsActive: e.IsActive,
 	}
 }

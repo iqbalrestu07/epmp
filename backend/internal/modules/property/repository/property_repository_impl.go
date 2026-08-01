@@ -28,19 +28,20 @@ func (r *PropertyRepositoryImpl) Save(ctx context.Context, e *entity.Property) e
 	if e.Id == "" {
 		// INSERT
 		err := r.db.QueryRow(ctx, `
-			INSERT INTO properties (name, description, address, property_type, is_active)
-			VALUES ($1, $2, $3, $4, $5)
+			INSERT INTO properties (organization_id, name, description, address, property_type, is_active)
+			VALUES ($1, $2, $3, $4, $5, $6)
 			RETURNING id`,
-			e.Name, e.Description, e.Address, e.PropertyType, e.IsActive,
+			e.OrganizationId, e.Name, e.Description, e.Address, e.PropertyType, e.IsActive,
 		).Scan(&e.Id)
 		return err
 	}
 	// UPDATE
+	// Note: id is dynamically added as the last argument in Exec for UPDATE
 	_, err := r.db.Exec(ctx, `
 		UPDATE properties
-		SET    name=$1, description=$2, address=$3, property_type=$4, is_active=$5
-		WHERE  id=$6 AND deleted_at IS NULL`,
-		e.Name, e.Description, e.Address, e.PropertyType, e.IsActive, e.Id,
+		SET    organization_id=$1, name=$2, description=$3, address=$4, property_type=$5, is_active=$6
+		WHERE  id=$7 AND deleted_at IS NULL`,
+		e.OrganizationId, e.Name, e.Description, e.Address, e.PropertyType, e.IsActive, e.Id,
 	)
 	return err
 }
@@ -48,12 +49,12 @@ func (r *PropertyRepositoryImpl) Save(ctx context.Context, e *entity.Property) e
 func (r *PropertyRepositoryImpl) FindByID(ctx context.Context, id string) (*entity.Property, error) {
 	e := &entity.Property{}
 	err := r.db.QueryRow(ctx, `
-		SELECT id, name, description, address, property_type, is_active, deleted_at
+		SELECT organization_id, id, name, description, address, property_type, is_active, deleted_at
 		FROM   properties
 		WHERE  id = $1 AND deleted_at IS NULL`,
 		id,
-	).Scan(&e.Id, &e.Name, &e.Description, &e.Address, &e.PropertyType, &e.IsActive, &e.DeletedAt)
-
+	).Scan(&e.OrganizationId, &e.Id, &e.Name, &e.Description, &e.Address, &e.PropertyType, &e.IsActive, &e.DeletedAt)
+	
 	if err != nil {
 		return nil, fmt.Errorf("property repository: find by id: %w", err)
 	}
@@ -62,7 +63,7 @@ func (r *PropertyRepositoryImpl) FindByID(ctx context.Context, id string) (*enti
 
 func (r *PropertyRepositoryImpl) FindAll(ctx context.Context, limit, offset int) ([]*entity.Property, error) {
 	rows, err := r.db.Query(ctx, `
-		SELECT id, name, description, address, property_type, is_active, deleted_at
+		SELECT organization_id, id, name, description, address, property_type, is_active, deleted_at
 		FROM   properties
 		WHERE  deleted_at IS NULL
 		ORDER BY created_at DESC
@@ -77,7 +78,7 @@ func (r *PropertyRepositoryImpl) FindAll(ctx context.Context, limit, offset int)
 	var list []*entity.Property
 	for rows.Next() {
 		e := &entity.Property{}
-		if err := rows.Scan(&e.Id, &e.Name, &e.Description, &e.Address, &e.PropertyType, &e.IsActive, &e.DeletedAt); err != nil {
+		if err := rows.Scan(&e.OrganizationId, &e.Id, &e.Name, &e.Description, &e.Address, &e.PropertyType, &e.IsActive, &e.DeletedAt); err != nil {
 			return nil, err
 		}
 		list = append(list, e)

@@ -1,0 +1,62 @@
+version: "1.0"
+dry_run: false
+
+backend:
+  output_root: "./internal"
+  module_path: "github.com/epmp/backend"
+  artifacts:
+    - dto
+    - repository
+    - rest
+    - test
+
+frontend:
+  output_root: "./src"
+  base_url: "/api"
+
+domain:
+  name: Organization
+  package: organization
+  table: organizations
+  bounded_context: organization
+
+  fields:
+    - name: id
+      type: uuid
+      primary_key: true
+      auto: true
+
+    - name: name
+      type: string
+      max_length: 100
+      searchable: true
+
+    - name: domain
+      type: string
+      max_length: 100
+      searchable: true
+
+    - name: is_active
+      type: bool
+      default: true
+
+  behaviors:
+    soft_delete: true
+    pagination: true
+    search: true
+    sort_by:
+      - name
+      - created_at
+
+  rest:
+    base_path: /api/organizations
+    auth_required: true
+    operations:
+      - create
+      - read
+      - update
+      - delete
+      - list
+
+  events:
+    - OrganizationCreated

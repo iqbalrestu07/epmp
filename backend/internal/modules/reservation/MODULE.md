@@ -27,6 +27,7 @@
 
 | Name | Type | Primary Key | Nullable | Searchable |
 | ---- | ---- | ----------- | -------- | ---------- |
+| OrganizationId | string | false | false | true |
 | Id | string | true | false | false |
 | TenantId | string | false | false | true |
 | PropertyId | string | false | false | true |

@@ -3,6 +3,7 @@
 import { z } from "zod";
 
 export const reservationSchema = z.object({
+  organization_id: z.string(),
   id: z.string(),
   tenant_id: z.string(),
   property_id: z.string(),

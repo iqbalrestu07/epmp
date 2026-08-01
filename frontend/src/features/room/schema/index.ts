@@ -3,6 +3,7 @@
 import { z } from "zod";
 
 export const roomSchema = z.object({
+  organization_id: z.string(),
   id: z.string(),
   name: z.string().max(100),
   floor: z.number(),

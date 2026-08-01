@@ -30,9 +30,8 @@ func NewModule(db *pgxpool.Pool, log zerolog.Logger) *Module {
 	}
 }
 
-// RegisterRoutes registers all Property routes under the given API group.
-// Call as: propertyMod.RegisterRoutes(v1) where v1 = e.Group("/api/v1").
-func (m *Module) RegisterRoutes(v1 *echo.Group) {
-	g := v1.Group("/properties")
+// RegisterRoutes registers all Property routes on the given Echo instance.
+func (m *Module) RegisterRoutes(e *echo.Group) {
+	g := e.Group("/api/properties")
 	http.RegisterPropertyRoutes(g, m.Handler)
 }

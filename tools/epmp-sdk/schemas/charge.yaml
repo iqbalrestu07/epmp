@@ -1,0 +1,97 @@
+version: "1.0"
+dry_run: false
+
+backend:
+  output_root: "./internal"
+  module_path: "github.com/epmp/backend"
+  artifacts:
+    - dto
+    - repository
+    - rest
+    - test
+
+frontend:
+  output_root: "./src"
+  base_url: "/api"
+
+domain:
+  name: Charge
+  package: charge
+  table: charges
+  bounded_context: billing
+
+  fields:
+    - name: organization_id
+      type: uuid
+      searchable: true
+    - name: id
+      type: uuid
+      primary_key: true
+      auto: true
+
+    - name: contract_id
+      type: uuid
+      searchable: true
+
+    - name: invoice_id
+      type: uuid
+      nullable: true
+      searchable: true
+
+    - name: charge_type
+      type: enum
+      enum_values:
+        - Rental
+        - Water
+        - Electricity
+        - Cleaning
+        - Parking
+        - Internet
+        - Other
+      default: "Rental"
+
+    - name: amount
+      type: decimal
+      default: 0
+
+    - name: status
+      type: enum
+      enum_values:
+        - Unbilled
+        - Billed
+        - Cancelled
+      default: "Unbilled"
+
+    - name: charge_date
+      type: timestamp
+
+    - name: notes
+      type: text
+      nullable: true
+
+  behaviors:
+    soft_delete: true
+    pagination: true
+    search: true
+    filter_by:
+      - status
+      - contract_id
+      - invoice_id
+    sort_by:
+      - charge_date
+      - created_at
+
+  rest:
+    base_path: /api/charges
+    auth_required: true
+    operations:
+      - create
+      - read
+      - update
+      - delete
+      - list
+
+  events:
+    - ChargeCreated
+    - ChargeBilled
+    - ChargeCancelled

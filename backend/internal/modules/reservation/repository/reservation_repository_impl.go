@@ -28,10 +28,10 @@ func (r *ReservationRepositoryImpl) Save(ctx context.Context, e *entity.Reservat
 	if e.Id == "" {
 		// INSERT
 		err := r.db.QueryRow(ctx, `
-			INSERT INTO reservations (tenant_id, property_id, room_id, status, check_in_date, check_out_date, booking_fee, notes)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+			INSERT INTO reservations (organization_id, tenant_id, property_id, room_id, status, check_in_date, check_out_date, booking_fee, notes)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 			RETURNING id`,
-			e.TenantId, e.PropertyId, e.RoomId, e.Status, e.CheckInDate, e.CheckOutDate, e.BookingFee, e.Notes,
+			e.OrganizationId, e.TenantId, e.PropertyId, e.RoomId, e.Status, e.CheckInDate, e.CheckOutDate, e.BookingFee, e.Notes,
 		).Scan(&e.Id)
 		return err
 	}
@@ -39,9 +39,9 @@ func (r *ReservationRepositoryImpl) Save(ctx context.Context, e *entity.Reservat
 	// Note: id is dynamically added as the last argument in Exec for UPDATE
 	_, err := r.db.Exec(ctx, `
 		UPDATE reservations
-		SET    tenant_id=$1, property_id=$2, room_id=$3, status=$4, check_in_date=$5, check_out_date=$6, booking_fee=$7, notes=$8
-		WHERE  id=$9 AND deleted_at IS NULL`,
-		e.TenantId, e.PropertyId, e.RoomId, e.Status, e.CheckInDate, e.CheckOutDate, e.BookingFee, e.Notes, e.Id,
+		SET    organization_id=$1, tenant_id=$2, property_id=$3, room_id=$4, status=$5, check_in_date=$6, check_out_date=$7, booking_fee=$8, notes=$9
+		WHERE  id=$10 AND deleted_at IS NULL`,
+		e.OrganizationId, e.TenantId, e.PropertyId, e.RoomId, e.Status, e.CheckInDate, e.CheckOutDate, e.BookingFee, e.Notes, e.Id,
 	)
 	return err
 }
@@ -49,11 +49,11 @@ func (r *ReservationRepositoryImpl) Save(ctx context.Context, e *entity.Reservat
 func (r *ReservationRepositoryImpl) FindByID(ctx context.Context, id string) (*entity.Reservation, error) {
 	e := &entity.Reservation{}
 	err := r.db.QueryRow(ctx, `
-		SELECT id, tenant_id, property_id, room_id, status, check_in_date, check_out_date, booking_fee, notes, deleted_at
+		SELECT organization_id, id, tenant_id, property_id, room_id, status, check_in_date, check_out_date, booking_fee, notes, deleted_at
 		FROM   reservations
 		WHERE  id = $1 AND deleted_at IS NULL`,
 		id,
-	).Scan(&e.Id, &e.TenantId, &e.PropertyId, &e.RoomId, &e.Status, &e.CheckInDate, &e.CheckOutDate, &e.BookingFee, &e.Notes, &e.DeletedAt)
+	).Scan(&e.OrganizationId, &e.Id, &e.TenantId, &e.PropertyId, &e.RoomId, &e.Status, &e.CheckInDate, &e.CheckOutDate, &e.BookingFee, &e.Notes, &e.DeletedAt)
 	
 	if err != nil {
 		return nil, fmt.Errorf("reservation repository: find by id: %w", err)
@@ -63,7 +63,7 @@ func (r *ReservationRepositoryImpl) FindByID(ctx context.Context, id string) (*e
 
 func (r *ReservationRepositoryImpl) FindAll(ctx context.Context, limit, offset int) ([]*entity.Reservation, error) {
 	rows, err := r.db.Query(ctx, `
-		SELECT id, tenant_id, property_id, room_id, status, check_in_date, check_out_date, booking_fee, notes, deleted_at
+		SELECT organization_id, id, tenant_id, property_id, room_id, status, check_in_date, check_out_date, booking_fee, notes, deleted_at
 		FROM   reservations
 		WHERE  deleted_at IS NULL
 		ORDER BY created_at DESC
@@ -78,7 +78,7 @@ func (r *ReservationRepositoryImpl) FindAll(ctx context.Context, limit, offset i
 	var list []*entity.Reservation
 	for rows.Next() {
 		e := &entity.Reservation{}
-		if err := rows.Scan(&e.Id, &e.TenantId, &e.PropertyId, &e.RoomId, &e.Status, &e.CheckInDate, &e.CheckOutDate, &e.BookingFee, &e.Notes, &e.DeletedAt); err != nil {
+		if err := rows.Scan(&e.OrganizationId, &e.Id, &e.TenantId, &e.PropertyId, &e.RoomId, &e.Status, &e.CheckInDate, &e.CheckOutDate, &e.BookingFee, &e.Notes, &e.DeletedAt); err != nil {
 			return nil, err
 		}
 		list = append(list, e)

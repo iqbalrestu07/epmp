@@ -1,0 +1,87 @@
+version: "1.0"
+dry_run: false
+
+backend:
+  output_root: "./internal"
+  module_path: "github.com/epmp/backend"
+  artifacts:
+    - dto
+    - repository
+    - rest
+    - test
+
+frontend:
+  output_root: "./src"
+  base_url: "/api"
+
+domain:
+  name: Occupancy
+  package: occupancy
+  table: occupancies
+  bounded_context: occupancy
+
+  fields:
+    - name: organization_id
+      type: uuid
+      searchable: true
+    - name: id
+      type: uuid
+      primary_key: true
+      auto: true
+
+    - name: contract_id
+      type: uuid
+      searchable: true
+
+    - name: room_id
+      type: uuid
+      searchable: true
+
+    - name: tenant_id
+      type: uuid
+      searchable: true
+
+    - name: status
+      type: enum
+      enum_values:
+        - CheckedIn
+        - CheckedOut
+      default: "CheckedIn"
+
+    - name: check_in_time
+      type: timestamp
+
+    - name: check_out_time
+      type: timestamp
+      nullable: true
+
+    - name: notes
+      type: text
+      nullable: true
+
+  behaviors:
+    soft_delete: true
+    pagination: true
+    search: true
+    filter_by:
+      - status
+      - room_id
+    sort_by:
+      - check_in_time
+      - created_at
+
+  rest:
+    base_path: /api/occupancies
+    auth_required: true
+    operations:
+      - create
+      - read
+      - update
+      - delete
+      - list
+
+  events:
+    - TenantCheckedIn
+    - TenantCheckedOut
+    - RoomOccupied
+    - RoomVacated

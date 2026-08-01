@@ -28,19 +28,20 @@ func (r *TenantRepositoryImpl) Save(ctx context.Context, e *entity.Tenant) error
 	if e.Id == "" {
 		// INSERT
 		err := r.db.QueryRow(ctx, `
-			INSERT INTO tenants (full_name, email, phone, identity_number, is_active)
-			VALUES ($1, $2, $3, $4, $5)
+			INSERT INTO tenants (organization_id, full_name, email, phone, identity_number, is_active)
+			VALUES ($1, $2, $3, $4, $5, $6)
 			RETURNING id`,
-			e.FullName, e.Email, e.Phone, e.IdentityNumber, e.IsActive,
+			e.OrganizationId, e.FullName, e.Email, e.Phone, e.IdentityNumber, e.IsActive,
 		).Scan(&e.Id)
 		return err
 	}
 	// UPDATE
+	// Note: id is dynamically added as the last argument in Exec for UPDATE
 	_, err := r.db.Exec(ctx, `
 		UPDATE tenants
-		SET    full_name=$1, email=$2, phone=$3, identity_number=$4, is_active=$5
-		WHERE  id=$6 AND deleted_at IS NULL`,
-		e.FullName, e.Email, e.Phone, e.IdentityNumber, e.IsActive, e.Id,
+		SET    organization_id=$1, full_name=$2, email=$3, phone=$4, identity_number=$5, is_active=$6
+		WHERE  id=$7 AND deleted_at IS NULL`,
+		e.OrganizationId, e.FullName, e.Email, e.Phone, e.IdentityNumber, e.IsActive, e.Id,
 	)
 	return err
 }
@@ -48,12 +49,12 @@ func (r *TenantRepositoryImpl) Save(ctx context.Context, e *entity.Tenant) error
 func (r *TenantRepositoryImpl) FindByID(ctx context.Context, id string) (*entity.Tenant, error) {
 	e := &entity.Tenant{}
 	err := r.db.QueryRow(ctx, `
-		SELECT id, full_name, email, phone, identity_number, is_active, deleted_at
+		SELECT organization_id, id, full_name, email, phone, identity_number, is_active, deleted_at
 		FROM   tenants
 		WHERE  id = $1 AND deleted_at IS NULL`,
 		id,
-	).Scan(&e.Id, &e.FullName, &e.Email, &e.Phone, &e.IdentityNumber, &e.IsActive, &e.DeletedAt)
-
+	).Scan(&e.OrganizationId, &e.Id, &e.FullName, &e.Email, &e.Phone, &e.IdentityNumber, &e.IsActive, &e.DeletedAt)
+	
 	if err != nil {
 		return nil, fmt.Errorf("tenant repository: find by id: %w", err)
 	}
@@ -62,7 +63,7 @@ func (r *TenantRepositoryImpl) FindByID(ctx context.Context, id string) (*entity
 
 func (r *TenantRepositoryImpl) FindAll(ctx context.Context, limit, offset int) ([]*entity.Tenant, error) {
 	rows, err := r.db.Query(ctx, `
-		SELECT id, full_name, email, phone, identity_number, is_active, deleted_at
+		SELECT organization_id, id, full_name, email, phone, identity_number, is_active, deleted_at
 		FROM   tenants
 		WHERE  deleted_at IS NULL
 		ORDER BY created_at DESC
@@ -77,7 +78,7 @@ func (r *TenantRepositoryImpl) FindAll(ctx context.Context, limit, offset int) (
 	var list []*entity.Tenant
 	for rows.Next() {
 		e := &entity.Tenant{}
-		if err := rows.Scan(&e.Id, &e.FullName, &e.Email, &e.Phone, &e.IdentityNumber, &e.IsActive, &e.DeletedAt); err != nil {
+		if err := rows.Scan(&e.OrganizationId, &e.Id, &e.FullName, &e.Email, &e.Phone, &e.IdentityNumber, &e.IsActive, &e.DeletedAt); err != nil {
 			return nil, err
 		}
 		list = append(list, e)

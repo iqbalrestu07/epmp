@@ -6,39 +6,42 @@ import "time"
 
 // CreateTenantRequest is the DTO for creating a Tenant.
 type CreateTenantRequest struct {
-	FullName       string `json:"full_name"`
-	Email          string `json:"email"`
-	Phone          string `json:"phone"`
+	OrganizationId string `json:"organization_id"`
+	FullName string `json:"full_name"`
+	Email string `json:"email"`
+	Phone string `json:"phone"`
 	IdentityNumber string `json:"identity_number"`
-	IsActive       bool   `json:"is_active"`
+	IsActive bool `json:"is_active"`
 }
 
 // UpdateTenantRequest is the DTO for updating a Tenant.
 type UpdateTenantRequest struct {
-	FullName       string `json:"full_name"`
-	Email          string `json:"email"`
-	Phone          string `json:"phone"`
+	OrganizationId string `json:"organization_id"`
+	FullName string `json:"full_name"`
+	Email string `json:"email"`
+	Phone string `json:"phone"`
 	IdentityNumber string `json:"identity_number"`
-	IsActive       bool   `json:"is_active"`
+	IsActive bool `json:"is_active"`
 }
 
 // TenantResponse is the DTO for returning a Tenant.
 type TenantResponse struct {
-	Id             string    `json:"id"`
-	FullName       string    `json:"full_name"`
-	Email          string    `json:"email"`
-	Phone          string    `json:"phone"`
-	IdentityNumber string    `json:"identity_number"`
-	IsActive       bool      `json:"is_active"`
-	CreatedAt      time.Time `json:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at"`
+	OrganizationId string `json:"organization_id"`
+	Id string `json:"id"`
+	FullName string `json:"full_name"`
+	Email string `json:"email"`
+	Phone string `json:"phone"`
+	IdentityNumber string `json:"identity_number"`
+	IsActive bool `json:"is_active"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 // TenantListResponse is the DTO for a paginated list of Tenant.
 type TenantListResponse struct {
 	Data       []TenantResponse `json:"data"`
-	Total      int64            `json:"total"`
-	Page       int              `json:"page"`
-	PerPage    int              `json:"per_page"`
-	TotalPages int              `json:"total_pages"`
+	Total      int64               `json:"total"`
+	Page       int                 `json:"page"`
+	PerPage    int                 `json:"per_page"`
+	TotalPages int                 `json:"total_pages"`
 }

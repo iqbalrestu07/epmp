@@ -1,0 +1,74 @@
+version: "1.0"
+dry_run: false
+
+backend:
+  output_root: "./internal"
+  module_path: "github.com/epmp/backend"
+  artifacts:
+    - dto
+    - repository
+    - rest
+    - test
+
+frontend:
+  output_root: "./src"
+  base_url: "/api"
+
+domain:
+  name: Adjustment
+  package: adjustment
+  table: adjustments
+  bounded_context: billing
+
+  fields:
+    - name: organization_id
+      type: uuid
+      searchable: true
+    - name: id
+      type: uuid
+      primary_key: true
+      auto: true
+
+    - name: invoice_id
+      type: uuid
+      searchable: true
+
+    - name: adjustment_type
+      type: enum
+      enum_values:
+        - Credit
+        - Debit
+      default: "Credit"
+
+    - name: amount
+      type: decimal
+      default: 0
+
+    - name: adjustment_date
+      type: timestamp
+
+    - name: reason
+      type: text
+
+  behaviors:
+    soft_delete: true
+    pagination: true
+    search: true
+    filter_by:
+      - invoice_id
+    sort_by:
+      - adjustment_date
+      - created_at
+
+  rest:
+    base_path: /api/adjustments
+    auth_required: true
+    operations:
+      - create
+      - read
+      - update
+      - delete
+      - list
+
+  events:
+    - AdjustmentCreated

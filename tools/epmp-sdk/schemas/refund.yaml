@@ -1,0 +1,82 @@
+version: "1.0"
+dry_run: false
+
+backend:
+  output_root: "./internal"
+  module_path: "github.com/epmp/backend"
+  artifacts:
+    - dto
+    - repository
+    - rest
+    - test
+
+frontend:
+  output_root: "./src"
+  base_url: "/api"
+
+domain:
+  name: Refund
+  package: refund
+  table: refunds
+  bounded_context: billing
+
+  fields:
+    - name: organization_id
+      type: uuid
+      searchable: true
+    - name: id
+      type: uuid
+      primary_key: true
+      auto: true
+
+    - name: payment_id
+      type: uuid
+      searchable: true
+
+    - name: tenant_id
+      type: uuid
+      searchable: true
+
+    - name: amount
+      type: decimal
+      default: 0
+
+    - name: status
+      type: enum
+      enum_values:
+        - Pending
+        - Processed
+        - Failed
+      default: "Pending"
+
+    - name: refund_date
+      type: timestamp
+
+    - name: reason
+      type: text
+
+  behaviors:
+    soft_delete: true
+    pagination: true
+    search: true
+    filter_by:
+      - status
+      - payment_id
+    sort_by:
+      - refund_date
+      - created_at
+
+  rest:
+    base_path: /api/refunds
+    auth_required: true
+    operations:
+      - create
+      - read
+      - update
+      - delete
+      - list
+
+  events:
+    - RefundRequested
+    - RefundProcessed
+    - RefundFailed

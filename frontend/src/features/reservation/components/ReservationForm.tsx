@@ -33,6 +33,16 @@ export function ReservationForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="space-y-2">
+        <Label htmlFor="organization_id">OrganizationId</Label>
+        <Input
+          id="organization_id"
+          {...register("organization_id")}
+        />
+        {errors.organization_id && (
+          <p className="text-sm text-red-500">{errors.organization_id.message}</p>
+        )}
+      </div>
+      <div className="space-y-2">
         <Label htmlFor="tenant_id">TenantId</Label>
         <Input
           id="tenant_id"
