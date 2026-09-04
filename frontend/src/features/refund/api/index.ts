@@ -9,7 +9,7 @@ import type {
   RefundQueryParams,
 } from "../types";
 
-const BASE_PATH = "/api/refunds";
+const BASE_PATH = "/refunds";
 export async function fetchRefunds(params?: RefundQueryParams): Promise<RefundListResponse> {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));

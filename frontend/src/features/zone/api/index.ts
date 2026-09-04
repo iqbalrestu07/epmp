@@ -9,7 +9,7 @@ import type {
   ZoneQueryParams,
 } from "../types";
 
-const BASE_PATH = "/api/zones";
+const BASE_PATH = "/zones";
 export async function fetchZones(params?: ZoneQueryParams): Promise<ZoneListResponse> {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));

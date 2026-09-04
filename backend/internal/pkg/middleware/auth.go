@@ -15,6 +15,11 @@ const (
 	ContextKeyUserEmail = "user_email"
 	// ContextKeyPermissions is the echo context key for the user's permission set.
 	ContextKeyPermissions = "permissions"
+	// ContextKeyOrgID is the echo context key for the active organization ID.
+	// Set from X-Organization-ID header during auth middleware.
+	ContextKeyOrgID = "organization_id"
+	// OrgIDHeader is the HTTP header name for the active organization ID.
+	OrgIDHeader = "X-Organization-ID"
 )
 
 // AuthRequired is a JWT authentication middleware.
@@ -36,6 +41,12 @@ func AuthRequired(jwtSecret string) echo.MiddlewareFunc {
 
 			c.Set(ContextKeyUserID, claims.UserID)
 			c.Set(ContextKeyUserEmail, claims.Email)
+
+			// Inject organization context from header (multi-org support).
+			// Frontend sends X-Organization-ID for the currently active org.
+			if orgID := c.Request().Header.Get(OrgIDHeader); orgID != "" {
+				c.Set(ContextKeyOrgID, orgID)
+			}
 
 			return next(c)
 		}
@@ -77,6 +88,13 @@ func GetUserID(c echo.Context) string {
 func GetUserEmail(c echo.Context) string {
 	email, _ := c.Get(ContextKeyUserEmail).(string)
 	return email
+}
+
+// GetOrgID extracts the active organization ID from the echo context.
+// The value is set by AuthRequired from the X-Organization-ID request header.
+func GetOrgID(c echo.Context) string {
+	id, _ := c.Get(ContextKeyOrgID).(string)
+	return id
 }
 
 // SetPermissions injects a user's permissions into the echo context.

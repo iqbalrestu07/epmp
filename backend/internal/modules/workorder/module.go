@@ -32,6 +32,6 @@ func NewModule(db *pgxpool.Pool, log zerolog.Logger) *Module {
 
 // RegisterRoutes registers all WorkOrder routes on the given Echo instance.
 func (m *Module) RegisterRoutes(e *echo.Group) {
-	g := e.Group("/api/work_orders")
+	g := e.Group("/work_orders")
 	http.RegisterWorkOrderRoutes(g, m.Handler)
 }

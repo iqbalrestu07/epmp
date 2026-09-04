@@ -9,7 +9,7 @@ import type {
   SupplierQueryParams,
 } from "../types";
 
-const BASE_PATH = "/api/vendors";
+const BASE_PATH = "/vendors";
 export async function fetchSuppliers(params?: SupplierQueryParams): Promise<SupplierListResponse> {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));

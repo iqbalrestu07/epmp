@@ -15,4 +15,4 @@ CREATE TABLE payments (
 CREATE TRIGGER set_updated_at
 BEFORE UPDATE ON payments
 FOR EACH ROW
-EXECUTE FUNCTION trigger_set_updated_at();
+EXECUTE FUNCTION set_updated_at();

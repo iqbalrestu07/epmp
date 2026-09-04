@@ -32,6 +32,6 @@ func NewModule(db *pgxpool.Pool, log zerolog.Logger) *Module {
 
 // RegisterRoutes registers all Tenant routes on the given Echo instance.
 func (m *Module) RegisterRoutes(e *echo.Group) {
-	g := e.Group("/api/tenants")
+	g := e.Group("/tenants")
 	http.RegisterTenantRoutes(g, m.Handler)
 }

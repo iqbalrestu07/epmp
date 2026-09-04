@@ -9,7 +9,7 @@ import type {
   AssetQueryParams,
 } from "../types";
 
-const BASE_PATH = "/api/assets";
+const BASE_PATH = "/assets";
 export async function fetchAssets(params?: AssetQueryParams): Promise<AssetListResponse> {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));

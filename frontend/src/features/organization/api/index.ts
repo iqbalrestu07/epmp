@@ -9,7 +9,7 @@ import type {
   OrganizationQueryParams,
 } from "../types";
 
-const BASE_PATH = "/api/organizations";
+const BASE_PATH = "/organizations";
 export async function fetchOrganizations(params?: OrganizationQueryParams): Promise<OrganizationListResponse> {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));

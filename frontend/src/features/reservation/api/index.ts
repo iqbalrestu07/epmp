@@ -9,7 +9,7 @@ import type {
   ReservationQueryParams,
 } from "../types";
 
-const BASE_PATH = "/api/reservations";
+const BASE_PATH = "/reservations";
 export async function fetchReservations(params?: ReservationQueryParams): Promise<ReservationListResponse> {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));

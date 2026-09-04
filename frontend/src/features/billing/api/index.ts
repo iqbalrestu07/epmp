@@ -9,7 +9,7 @@ import type {
   InvoiceQueryParams,
 } from "../types";
 
-const BASE_PATH = "/api/invoices";
+const BASE_PATH = "/invoices";
 export async function fetchInvoices(params?: InvoiceQueryParams): Promise<InvoiceListResponse> {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));

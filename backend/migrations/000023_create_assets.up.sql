@@ -13,4 +13,4 @@ CREATE TABLE assets (
 CREATE TRIGGER set_updated_at
 BEFORE UPDATE ON assets
 FOR EACH ROW
-EXECUTE FUNCTION trigger_set_updated_at();
+EXECUTE FUNCTION set_updated_at();

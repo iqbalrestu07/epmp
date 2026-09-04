@@ -15,10 +15,10 @@ import type {
   Permission,
 } from '../types';
 
-const AUTH_BASE = '/v1/auth';
-const USERS_BASE = '/v1/users';
-const ROLES_BASE = '/v1/roles';
-const PERMISSIONS_BASE = '/v1/permissions';
+const AUTH_BASE = '/auth';
+const USERS_BASE = '/users';
+const ROLES_BASE = '/roles';
+const PERMISSIONS_BASE = '/permissions';
 
 // ─── Auth ──────────────────────────────────────────────────────────────────
 

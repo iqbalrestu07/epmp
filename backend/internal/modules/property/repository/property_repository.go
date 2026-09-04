@@ -19,6 +19,9 @@ type PropertyRepository interface {
 	// FindAll retrieves a paginated list of Property entities.
 	FindAll(ctx context.Context, limit, offset int) ([]*entity.Property, error)
 
+	// Count returns the total number of non-deleted Properties.
+	Count(ctx context.Context) (int64, error)
+
 	// Delete removes a Property by its primary key.
 	Delete(ctx context.Context, id string) error
 }

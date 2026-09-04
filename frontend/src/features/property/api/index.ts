@@ -9,7 +9,7 @@ import type {
   PropertyQueryParams,
 } from "../types";
 
-const BASE_PATH = "/api/properties";
+const BASE_PATH = "/properties";
 export async function fetchPropertys(params?: PropertyQueryParams): Promise<PropertyListResponse> {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));

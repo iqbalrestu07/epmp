@@ -32,6 +32,6 @@ func NewModule(db *pgxpool.Pool, log zerolog.Logger) *Module {
 
 // RegisterRoutes registers all Refund routes on the given Echo instance.
 func (m *Module) RegisterRoutes(e *echo.Group) {
-	g := e.Group("/api/refunds")
+	g := e.Group("/refunds")
 	http.RegisterRefundRoutes(g, m.Handler)
 }

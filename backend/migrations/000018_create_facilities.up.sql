@@ -11,4 +11,4 @@ CREATE TABLE facilities (
 CREATE TRIGGER set_updated_at
 BEFORE UPDATE ON facilities
 FOR EACH ROW
-EXECUTE FUNCTION trigger_set_updated_at();
+EXECUTE FUNCTION set_updated_at();

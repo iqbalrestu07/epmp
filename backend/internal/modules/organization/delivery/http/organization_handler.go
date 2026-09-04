@@ -27,6 +27,9 @@ func (h *OrganizationHandler) Create(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return response.BadRequest(c, "invalid request body")
 	}
+	if req.Name == "" {
+		return response.BadRequest(c, "name is required")
+	}
 
 	result, err := h.svc.Create(c.Request().Context(), &req)
 	if err != nil {
@@ -56,8 +59,9 @@ func (h *OrganizationHandler) List(c echo.Context) error {
 	if perPage == 0 {
 		perPage = 20
 	}
+	search := c.QueryParam("search")
 
-	result, err := h.svc.List(c.Request().Context(), page, perPage)
+	result, err := h.svc.List(c.Request().Context(), page, perPage, search)
 	if err != nil {
 		return response.InternalError(c, err.Error())
 	}

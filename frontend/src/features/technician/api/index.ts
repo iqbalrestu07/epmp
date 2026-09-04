@@ -9,7 +9,7 @@ import type {
   TechnicianQueryParams,
 } from "../types";
 
-const BASE_PATH = "/api/technicians";
+const BASE_PATH = "/technicians";
 export async function fetchTechnicians(params?: TechnicianQueryParams): Promise<TechnicianListResponse> {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));

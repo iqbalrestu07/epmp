@@ -9,7 +9,7 @@ import type {
   ContractQueryParams,
 } from "../types";
 
-const BASE_PATH = "/api/contracts";
+const BASE_PATH = "/contracts";
 export async function fetchContracts(params?: ContractQueryParams): Promise<ContractListResponse> {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));

@@ -27,6 +27,12 @@ func (h *BuildingHandler) Create(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return response.BadRequest(c, "invalid request body")
 	}
+	if req.Name == "" {
+		return response.BadRequest(c, "name is required")
+	}
+	if req.PropertyId == "" {
+		return response.BadRequest(c, "property_id is required")
+	}
 
 	result, err := h.svc.Create(c.Request().Context(), &req)
 	if err != nil {
@@ -56,8 +62,10 @@ func (h *BuildingHandler) List(c echo.Context) error {
 	if perPage == 0 {
 		perPage = 20
 	}
+	search := c.QueryParam("search")
+	propertyId := c.QueryParam("property_id")
 
-	result, err := h.svc.List(c.Request().Context(), page, perPage)
+	result, err := h.svc.List(c.Request().Context(), page, perPage, search, propertyId)
 	if err != nil {
 		return response.InternalError(c, err.Error())
 	}

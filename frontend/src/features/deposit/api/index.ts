@@ -9,7 +9,7 @@ import type {
   DepositQueryParams,
 } from "../types";
 
-const BASE_PATH = "/api/deposits";
+const BASE_PATH = "/deposits";
 export async function fetchDeposits(params?: DepositQueryParams): Promise<DepositListResponse> {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));

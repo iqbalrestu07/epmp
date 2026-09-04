@@ -9,7 +9,7 @@ import type {
   TenantIdentityQueryParams,
 } from "../types";
 
-const BASE_PATH = "/api/tenant_identities";
+const BASE_PATH = "/tenant_identities";
 export async function fetchTenantIdentitys(params?: TenantIdentityQueryParams): Promise<TenantIdentityListResponse> {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));

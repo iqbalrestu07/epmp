@@ -9,7 +9,7 @@ import type {
   AdjustmentQueryParams,
 } from "../types";
 
-const BASE_PATH = "/api/adjustments";
+const BASE_PATH = "/adjustments";
 export async function fetchAdjustments(params?: AdjustmentQueryParams): Promise<AdjustmentListResponse> {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));

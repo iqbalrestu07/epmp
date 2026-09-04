@@ -40,7 +40,7 @@ func NewAuthService(
 		refreshTokenRepo: refreshTokenRepo,
 		roleRepo:         roleRepo,
 		jwtSecret:        jwtSecret,
-		accessTTL:        15 * time.Minute,
+		accessTTL:        60 * time.Minute,
 		refreshTTL:       7 * 24 * time.Hour,
 	}
 }

@@ -13,4 +13,4 @@ CREATE TABLE work_orders (
 CREATE TRIGGER set_updated_at
 BEFORE UPDATE ON work_orders
 FOR EACH ROW
-EXECUTE FUNCTION trigger_set_updated_at();
+EXECUTE FUNCTION set_updated_at();

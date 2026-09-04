@@ -15,4 +15,4 @@ CREATE TABLE occupancies (
 CREATE TRIGGER set_updated_at
 BEFORE UPDATE ON occupancies
 FOR EACH ROW
-EXECUTE FUNCTION trigger_set_updated_at();
+EXECUTE FUNCTION set_updated_at();

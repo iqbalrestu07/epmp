@@ -18,4 +18,4 @@ CREATE TABLE contracts (
 CREATE TRIGGER set_updated_at
 BEFORE UPDATE ON contracts
 FOR EACH ROW
-EXECUTE FUNCTION trigger_set_updated_at();
+EXECUTE FUNCTION set_updated_at();

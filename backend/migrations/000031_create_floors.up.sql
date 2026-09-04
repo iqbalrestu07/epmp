@@ -9,4 +9,4 @@ CREATE TABLE IF NOT EXISTS floors (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     deleted_at TIMESTAMP WITH TIME ZONE
 );
-CREATE TRIGGER set_updated_at BEFORE UPDATE ON floors FOR EACH ROW EXECUTE FUNCTION trigger_set_updated_at();
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON floors FOR EACH ROW EXECUTE FUNCTION set_updated_at();

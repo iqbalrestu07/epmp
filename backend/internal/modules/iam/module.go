@@ -5,7 +5,6 @@ import (
 	"github.com/epmp/backend/internal/modules/iam/repository"
 	iamrepo "github.com/epmp/backend/internal/modules/iam/repository"
 	"github.com/epmp/backend/internal/modules/iam/service"
-	mw "github.com/epmp/backend/internal/pkg/middleware"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/labstack/echo/v4"
@@ -52,21 +51,9 @@ func NewModule(db *pgxpool.Pool, log zerolog.Logger, jwtSecret string) *Module {
 }
 
 // RegisterRoutes registers all IAM routes under the given API group.
-// The PermissionLoader middleware is applied to all authenticated routes
-// so that per-route RBAC checks have the user's permissions available.
+// The PermissionLoader middleware is applied inside the protected group
+// (after AuthRequired) so that per-route RBAC checks have the user's
+// permissions available.
 func (m *Module) RegisterRoutes(v1 *echo.Group) {
-	// Attach permission loader to authenticated group
-	v1.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			userID := mw.GetUserID(c)
-			if userID != "" {
-				// Only load permissions if the user is authenticated
-				loader := mw.PermissionLoader(m.UserRoleRepo)
-				return loader(next)(c)
-			}
-			return next(c)
-		}
-	})
-
-	iamhttp.RegisterIAMRoutes(v1, m.AuthHandler, m.UserHandler, m.RoleHandler, m.JWTSecret)
+	iamhttp.RegisterIAMRoutes(v1, m.AuthHandler, m.UserHandler, m.RoleHandler, m.JWTSecret, m.UserRoleRepo)
 }

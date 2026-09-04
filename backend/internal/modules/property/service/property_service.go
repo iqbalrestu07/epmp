@@ -59,15 +59,24 @@ func (s *PropertyService) List(ctx context.Context, page, perPage int) (*dto.Pro
 		return nil, fmt.Errorf("property service: list: %w", err)
 	}
 
+	total, err := s.repo.Count(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("property service: list: count: %w", err)
+	}
+
 	data := make([]dto.PropertyResponse, 0, len(items))
 	for _, e := range items {
 		data = append(data, *s.toResponse(e))
 	}
 
+	totalPages := int((total + int64(perPage) - 1) / int64(perPage))
+
 	return &dto.PropertyListResponse{
-		Data:    data,
-		Page:    page,
-		PerPage: perPage,
+		Data:       data,
+		Total:      total,
+		Page:       page,
+		PerPage:    perPage,
+		TotalPages: totalPages,
 	}, nil
 }
 
@@ -100,11 +109,13 @@ func (s *PropertyService) Delete(ctx context.Context, id string) error {
 func (s *PropertyService) toResponse(e *entity.Property) *dto.PropertyResponse {
 	return &dto.PropertyResponse{
 		OrganizationId: e.OrganizationId,
-		Id: e.Id,
-		Name: e.Name,
-		Description: e.Description,
-		Address: e.Address,
-		PropertyType: e.PropertyType,
-		IsActive: e.IsActive,
+		Id:             e.Id,
+		Name:           e.Name,
+		Description:    e.Description,
+		Address:        e.Address,
+		PropertyType:   e.PropertyType,
+		IsActive:       e.IsActive,
+		CreatedAt:      e.CreatedAt,
+		UpdatedAt:      e.UpdatedAt,
 	}
 }

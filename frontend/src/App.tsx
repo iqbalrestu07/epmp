@@ -11,6 +11,9 @@ import SignInPage from "./features/iam/pages/SignInPage";
 import SignUpPage from "./features/iam/pages/SignUpPage";
 
 import { PropertyListPage } from "./features/property/pages/PropertyListPage";
+import { PropertyCreatePage } from "./features/property/pages/PropertyCreatePage";
+import { PropertyDetailPage } from "./features/property/pages/PropertyDetailPage";
+import { PropertyEditPage } from "./features/property/pages/PropertyEditPage";
 import PropertyInteractiveView from "./features/property/pages/PropertyInteractiveView";
 import { RoomListPage } from "./features/room/pages/RoomListPage";
 import { TenantListPage } from "./features/tenant/pages/TenantListPage";
@@ -26,6 +29,9 @@ import { AdjustmentListPage } from "./features/adjustment/pages/AdjustmentListPa
 import { PenaltyListPage } from "./features/penalty/pages/PenaltyListPage";
 
 import { BuildingListPage } from "./features/building/pages/BuildingListPage";
+import { BuildingCreatePage } from "./features/building/pages/BuildingCreatePage";
+import { BuildingDetailPage } from "./features/building/pages/BuildingDetailPage";
+import { BuildingEditPage } from "./features/building/pages/BuildingEditPage";
 import { FloorListPage } from "./features/floor/pages/FloorListPage";
 import { ZoneListPage } from "./features/zone/pages/ZoneListPage";
 import { BedListPage } from "./features/bed/pages/BedListPage";
@@ -38,6 +44,9 @@ import { WorkOrderListPage } from "./features/workorder/pages/WorkOrderListPage"
 import { TechnicianListPage } from "./features/technician/pages/TechnicianListPage";
 import { SupplierListPage } from "./features/supplier/pages/SupplierListPage";
 import { OrganizationListPage } from "./features/organization/pages/OrganizationListPage";
+import { OrganizationCreatePage } from "./features/organization/pages/OrganizationCreatePage";
+import { OrganizationDetailPage } from "./features/organization/pages/OrganizationDetailPage";
+import { OrganizationEditPage } from "./features/organization/pages/OrganizationEditPage";
 
 import { MessagingSettingsPage } from "./features/communication/pages/MessagingSettingsPage";
 import { BlastMessagePage } from "./features/communication/pages/BlastMessagePage";
@@ -69,11 +78,20 @@ export default function App() {
         >
           <Route index element={<DashboardPage />} />
           
-          {/* Core Property & Tenant */}
+          {/* Core: Organization → Property → Building */}
           <Route path="organizations" element={<OrganizationListPage />} />
+          <Route path="organizations/new" element={<OrganizationCreatePage />} />
+          <Route path="organizations/:id" element={<OrganizationDetailPage />} />
+          <Route path="organizations/:id/edit" element={<OrganizationEditPage />} />
           <Route path="properties" element={<PropertyListPage />} />
+          <Route path="properties/new" element={<PropertyCreatePage />} />
           <Route path="properties/interactive" element={<PropertyInteractiveView />} />
+          <Route path="properties/:id" element={<PropertyDetailPage />} />
+          <Route path="properties/:id/edit" element={<PropertyEditPage />} />
           <Route path="buildings" element={<BuildingListPage />} />
+          <Route path="buildings/new" element={<BuildingCreatePage />} />
+          <Route path="buildings/:id" element={<BuildingDetailPage />} />
+          <Route path="buildings/:id/edit" element={<BuildingEditPage />} />
           <Route path="floors" element={<FloorListPage />} />
           <Route path="zones" element={<ZoneListPage />} />
           <Route path="rooms" element={<RoomListPage />} />

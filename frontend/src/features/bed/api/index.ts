@@ -9,7 +9,7 @@ import type {
   BedQueryParams,
 } from "../types";
 
-const BASE_PATH = "/api/beds";
+const BASE_PATH = "/beds";
 export async function fetchBeds(params?: BedQueryParams): Promise<BedListResponse> {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));

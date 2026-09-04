@@ -32,6 +32,6 @@ func NewModule(db *pgxpool.Pool, log zerolog.Logger) *Module {
 
 // RegisterRoutes registers all AssetAssignment routes on the given Echo instance.
 func (m *Module) RegisterRoutes(e *echo.Group) {
-	g := e.Group("/api/asset_assignments")
+	g := e.Group("/asset_assignments")
 	http.RegisterAssetAssignmentRoutes(g, m.Handler)
 }

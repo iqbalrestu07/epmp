@@ -9,7 +9,7 @@ import type {
   FacilityQueryParams,
 } from "../types";
 
-const BASE_PATH = "/api/facilities";
+const BASE_PATH = "/facilities";
 export async function fetchFacilitys(params?: FacilityQueryParams): Promise<FacilityListResponse> {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));

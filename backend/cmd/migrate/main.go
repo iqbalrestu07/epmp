@@ -326,7 +326,7 @@ func writeFile(path, content string) {
 }
 
 func printUsage() {
-	fmt.Println(`
+	fmt.Print(`
 EPMP Migration Runner
 
 Usage:

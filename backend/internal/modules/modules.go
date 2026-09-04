@@ -1,20 +1,21 @@
 package modules
 
 import (
-	"github.com/epmp/backend/internal/modules/building"
-	"github.com/epmp/backend/internal/modules/zone"
-	"github.com/epmp/backend/internal/modules/bed"
-	"github.com/epmp/backend/internal/modules/facility"
-	"github.com/epmp/backend/internal/modules/roomtype"
-	"github.com/epmp/backend/internal/modules/tenantidentity"
-	"github.com/epmp/backend/internal/modules/tenantcontact"
-	"github.com/epmp/backend/internal/modules/tenantdocument"
 	"github.com/epmp/backend/internal/modules/asset"
 	"github.com/epmp/backend/internal/modules/assetassignment"
 	"github.com/epmp/backend/internal/modules/assetinspection"
-	"github.com/epmp/backend/internal/modules/workorder"
-	"github.com/epmp/backend/internal/modules/technician"
+	"github.com/epmp/backend/internal/modules/bed"
+	"github.com/epmp/backend/internal/modules/building"
+	"github.com/epmp/backend/internal/modules/communication"
+	"github.com/epmp/backend/internal/modules/facility"
+	"github.com/epmp/backend/internal/modules/roomtype"
 	"github.com/epmp/backend/internal/modules/supplier"
+	"github.com/epmp/backend/internal/modules/technician"
+	"github.com/epmp/backend/internal/modules/tenantcontact"
+	"github.com/epmp/backend/internal/modules/tenantdocument"
+	"github.com/epmp/backend/internal/modules/tenantidentity"
+	"github.com/epmp/backend/internal/modules/workorder"
+	"github.com/epmp/backend/internal/modules/zone"
 
 	"github.com/epmp/backend/internal/modules/adjustment"
 	"github.com/epmp/backend/internal/modules/billing"
@@ -64,7 +65,7 @@ func Register(e *echo.Echo, db *pgxpool.Pool, log zerolog.Logger, jwtSecret stri
 	adjustment.NewModule(db, log).RegisterRoutes(protected)
 	penalty.NewModule(db, log).RegisterRoutes(protected)
 
-		building.NewModule(db, log).RegisterRoutes(protected)
+	building.NewModule(db, log).RegisterRoutes(protected)
 	floor.NewModule(db, log).RegisterRoutes(protected)
 	zone.NewModule(db, log).RegisterRoutes(protected)
 	bed.NewModule(db, log).RegisterRoutes(protected)
@@ -79,6 +80,8 @@ func Register(e *echo.Echo, db *pgxpool.Pool, log zerolog.Logger, jwtSecret stri
 	workorder.NewModule(db, log).RegisterRoutes(protected)
 	technician.NewModule(db, log).RegisterRoutes(protected)
 	supplier.NewModule(db, log).RegisterRoutes(protected)
+
+	communication.NewModule(db, log).RegisterRoutes(protected)
 
 	return nil
 }

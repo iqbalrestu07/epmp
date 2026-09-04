@@ -9,7 +9,7 @@ import type {
   BuildingQueryParams,
 } from "../types";
 
-const BASE_PATH = "/api/buildings";
+const BASE_PATH = "/buildings";
 export async function fetchBuildings(params?: BuildingQueryParams): Promise<BuildingListResponse> {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));

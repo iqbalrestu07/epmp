@@ -6,14 +6,16 @@ import "time"
 
 // Property is the domain entity for property.
 type Property struct {
-	OrganizationId string `json:"organization_id"`
-	Id string `json:"id"`
-	Name string `json:"name"`
-	Description string `json:"description"`
-	Address string `json:"address"`
-	PropertyType string `json:"property_type"`
-	IsActive bool `json:"is_active"`
-	DeletedAt *time.Time `json:"deleted_at,omitempty"`
+	OrganizationId string     `json:"organization_id"`
+	Id             string     `json:"id"`
+	Name           string     `json:"name"`
+	Description    string     `json:"description"`
+	Address        string     `json:"address"`
+	PropertyType   string     `json:"property_type"`
+	IsActive       bool       `json:"is_active"`
+	CreatedAt      time.Time  `json:"created_at"`
+	UpdatedAt      time.Time  `json:"updated_at"`
+	DeletedAt      *time.Time `json:"deleted_at,omitempty"`
 }
 
 // NewProperty creates a new Property instance.

@@ -4,17 +4,17 @@ import {
   LayoutDashboard, Building2, DoorOpen, Users, ShieldCheck,
   UserCog, Settings, Menu, X, Bell, LogOut, ChevronDown,
   CalendarCheck, FileText, Bed, Receipt, CreditCard, Wrench, Package,
-  Globe2, MessageCircle, Megaphone
+  Globe2, MessageCircle, Megaphone, Layers
 } from 'lucide-react';
 import { useAuth } from '../features/iam/context/AuthContext';
 
 // ─── Menu Configuration ────────────────────────────────────────────────────
-// Using a rich menu to navigate all the features.
 const MENU_CONFIG = [
   { label: 'Overview',       path: '/dashboard',                  icon: LayoutDashboard },
   { type: 'divider' as const, label: 'CORE' },
   { label: 'Organizations',  path: '/dashboard/organizations',    icon: Globe2,     requiredPermission: 'property:read' },
   { label: 'Properties',     path: '/dashboard/properties',       icon: Building2,  requiredPermission: 'property:read' },
+  { label: 'Buildings',      path: '/dashboard/buildings',        icon: Layers,     requiredPermission: 'property:read' },
   { label: 'Rooms & Units',  path: '/dashboard/rooms',            icon: DoorOpen,   requiredPermission: 'room:read'     },
   { label: 'Tenants',        path: '/dashboard/tenants',          icon: Users,      requiredPermission: 'tenant:read'   },
   

@@ -9,7 +9,7 @@ import type {
   RoomTypeQueryParams,
 } from "../types";
 
-const BASE_PATH = "/api/room_types";
+const BASE_PATH = "/room_types";
 export async function fetchRoomTypes(params?: RoomTypeQueryParams): Promise<RoomTypeListResponse> {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));

@@ -9,7 +9,7 @@ import type {
   FloorQueryParams,
 } from "../types";
 
-const BASE_PATH = "/api/floors";
+const BASE_PATH = "/floors";
 export async function fetchFloors(params?: FloorQueryParams): Promise<FloorListResponse> {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));

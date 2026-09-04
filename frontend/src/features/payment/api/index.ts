@@ -9,7 +9,7 @@ import type {
   PaymentQueryParams,
 } from "../types";
 
-const BASE_PATH = "/api/payments";
+const BASE_PATH = "/payments";
 export async function fetchPayments(params?: PaymentQueryParams): Promise<PaymentListResponse> {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));

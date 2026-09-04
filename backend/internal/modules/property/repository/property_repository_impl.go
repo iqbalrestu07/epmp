@@ -25,36 +25,56 @@ func NewPropertyRepositoryImpl(db *pgxpool.Pool) *PropertyRepositoryImpl {
 var _ PropertyRepository = (*PropertyRepositoryImpl)(nil)
 
 func (r *PropertyRepositoryImpl) Save(ctx context.Context, e *entity.Property) error {
+	var orgID interface{}
+	if e.OrganizationId != "" {
+		orgID = e.OrganizationId
+	}
+
 	if e.Id == "" {
-		// INSERT
-		err := r.db.QueryRow(ctx, `
-			INSERT INTO properties (organization_id, name, description, address, property_type, is_active)
-			VALUES ($1, $2, $3, $4, $5, $6)
-			RETURNING id`,
-			e.OrganizationId, e.Name, e.Description, e.Address, e.PropertyType, e.IsActive,
-		).Scan(&e.Id)
+		// INSERT — caller must pre-set e.Id with uid.New()
+		return fmt.Errorf("property repository: save: id must be pre-set by caller (use uid.New())")
+	}
+
+	// Check if record exists to decide INSERT vs UPDATE
+	var exists bool
+	err := r.db.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM properties WHERE id=$1)`, e.Id).Scan(&exists)
+	if err != nil {
+		return fmt.Errorf("property repository: save: check exists: %w", err)
+	}
+
+	if !exists {
+		// INSERT with caller-provided ULID
+		err = r.db.QueryRow(ctx, `
+			INSERT INTO properties (id, organization_id, name, description, address, property_type, is_active)
+			VALUES ($1, $2, $3, $4, $5, $6, $7)
+			RETURNING created_at, updated_at`,
+			e.Id, orgID, e.Name, e.Description, e.Address, e.PropertyType, e.IsActive,
+		).Scan(&e.CreatedAt, &e.UpdatedAt)
 		return err
 	}
 	// UPDATE
-	// Note: id is dynamically added as the last argument in Exec for UPDATE
-	_, err := r.db.Exec(ctx, `
+	_, err = r.db.Exec(ctx, `
 		UPDATE properties
 		SET    organization_id=$1, name=$2, description=$3, address=$4, property_type=$5, is_active=$6
 		WHERE  id=$7 AND deleted_at IS NULL`,
-		e.OrganizationId, e.Name, e.Description, e.Address, e.PropertyType, e.IsActive, e.Id,
+		orgID, e.Name, e.Description, e.Address, e.PropertyType, e.IsActive, e.Id,
 	)
 	return err
 }
 
 func (r *PropertyRepositoryImpl) FindByID(ctx context.Context, id string) (*entity.Property, error) {
 	e := &entity.Property{}
+	var orgID *string
 	err := r.db.QueryRow(ctx, `
-		SELECT organization_id, id, name, description, address, property_type, is_active, deleted_at
+		SELECT organization_id, id, name, description, address, property_type, is_active, created_at, updated_at, deleted_at
 		FROM   properties
 		WHERE  id = $1 AND deleted_at IS NULL`,
 		id,
-	).Scan(&e.OrganizationId, &e.Id, &e.Name, &e.Description, &e.Address, &e.PropertyType, &e.IsActive, &e.DeletedAt)
-	
+	).Scan(&orgID, &e.Id, &e.Name, &e.Description, &e.Address, &e.PropertyType, &e.IsActive, &e.CreatedAt, &e.UpdatedAt, &e.DeletedAt)
+	if orgID != nil {
+		e.OrganizationId = *orgID
+	}
+
 	if err != nil {
 		return nil, fmt.Errorf("property repository: find by id: %w", err)
 	}
@@ -63,7 +83,7 @@ func (r *PropertyRepositoryImpl) FindByID(ctx context.Context, id string) (*enti
 
 func (r *PropertyRepositoryImpl) FindAll(ctx context.Context, limit, offset int) ([]*entity.Property, error) {
 	rows, err := r.db.Query(ctx, `
-		SELECT organization_id, id, name, description, address, property_type, is_active, deleted_at
+		SELECT organization_id, id, name, description, address, property_type, is_active, created_at, updated_at, deleted_at
 		FROM   properties
 		WHERE  deleted_at IS NULL
 		ORDER BY created_at DESC
@@ -78,12 +98,26 @@ func (r *PropertyRepositoryImpl) FindAll(ctx context.Context, limit, offset int)
 	var list []*entity.Property
 	for rows.Next() {
 		e := &entity.Property{}
-		if err := rows.Scan(&e.OrganizationId, &e.Id, &e.Name, &e.Description, &e.Address, &e.PropertyType, &e.IsActive, &e.DeletedAt); err != nil {
+		var orgID *string
+		if err := rows.Scan(&orgID, &e.Id, &e.Name, &e.Description, &e.Address, &e.PropertyType, &e.IsActive, &e.CreatedAt, &e.UpdatedAt, &e.DeletedAt); err != nil {
 			return nil, err
+		}
+		if orgID != nil {
+			e.OrganizationId = *orgID
 		}
 		list = append(list, e)
 	}
 	return list, rows.Err()
+}
+
+// Count returns the total number of non-deleted properties.
+func (r *PropertyRepositoryImpl) Count(ctx context.Context) (int64, error) {
+	var count int64
+	err := r.db.QueryRow(ctx, `SELECT COUNT(*) FROM properties WHERE deleted_at IS NULL`).Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("property repository: count: %w", err)
+	}
+	return count, nil
 }
 
 func (r *PropertyRepositoryImpl) Delete(ctx context.Context, id string) error {

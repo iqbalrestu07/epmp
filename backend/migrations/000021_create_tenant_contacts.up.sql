@@ -12,4 +12,4 @@ CREATE TABLE tenant_contacts (
 CREATE TRIGGER set_updated_at
 BEFORE UPDATE ON tenant_contacts
 FOR EACH ROW
-EXECUTE FUNCTION trigger_set_updated_at();
+EXECUTE FUNCTION set_updated_at();

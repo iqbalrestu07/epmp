@@ -9,7 +9,7 @@ import type {
   OccupancyQueryParams,
 } from "../types";
 
-const BASE_PATH = "/api/occupancies";
+const BASE_PATH = "/occupancies";
 export async function fetchOccupancys(params?: OccupancyQueryParams): Promise<OccupancyListResponse> {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));

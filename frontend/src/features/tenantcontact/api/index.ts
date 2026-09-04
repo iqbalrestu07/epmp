@@ -9,7 +9,7 @@ import type {
   TenantContactQueryParams,
 } from "../types";
 
-const BASE_PATH = "/api/tenant_contacts";
+const BASE_PATH = "/tenant_contacts";
 export async function fetchTenantContacts(params?: TenantContactQueryParams): Promise<TenantContactListResponse> {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));

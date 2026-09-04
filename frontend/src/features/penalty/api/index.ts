@@ -9,7 +9,7 @@ import type {
   PenaltyQueryParams,
 } from "../types";
 
-const BASE_PATH = "/api/penalties";
+const BASE_PATH = "/penalties";
 export async function fetchPenaltys(params?: PenaltyQueryParams): Promise<PenaltyListResponse> {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));

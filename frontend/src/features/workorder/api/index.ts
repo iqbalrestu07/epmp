@@ -9,7 +9,7 @@ import type {
   WorkOrderQueryParams,
 } from "../types";
 
-const BASE_PATH = "/api/work_orders";
+const BASE_PATH = "/work_orders";
 export async function fetchWorkOrders(params?: WorkOrderQueryParams): Promise<WorkOrderListResponse> {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));

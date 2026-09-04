@@ -32,6 +32,6 @@ func NewModule(db *pgxpool.Pool, log zerolog.Logger) *Module {
 
 // RegisterRoutes registers all Adjustment routes on the given Echo instance.
 func (m *Module) RegisterRoutes(e *echo.Group) {
-	g := e.Group("/api/adjustments")
+	g := e.Group("/adjustments")
 	http.RegisterAdjustmentRoutes(g, m.Handler)
 }

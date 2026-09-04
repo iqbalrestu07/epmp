@@ -16,4 +16,4 @@ CREATE TABLE invoices (
 CREATE TRIGGER set_updated_at
 BEFORE UPDATE ON invoices
 FOR EACH ROW
-EXECUTE FUNCTION trigger_set_updated_at();
+EXECUTE FUNCTION set_updated_at();

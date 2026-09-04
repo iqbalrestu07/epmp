@@ -32,6 +32,6 @@ func NewModule(db *pgxpool.Pool, log zerolog.Logger) *Module {
 
 // RegisterRoutes registers all Invoice routes on the given Echo instance.
 func (m *Module) RegisterRoutes(e *echo.Group) {
-	g := e.Group("/api/invoices")
+	g := e.Group("/invoices")
 	http.RegisterInvoiceRoutes(g, m.Handler)
 }

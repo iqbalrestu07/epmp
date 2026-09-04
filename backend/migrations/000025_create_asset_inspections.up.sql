@@ -12,4 +12,4 @@ CREATE TABLE asset_inspections (
 CREATE TRIGGER set_updated_at
 BEFORE UPDATE ON asset_inspections
 FOR EACH ROW
-EXECUTE FUNCTION trigger_set_updated_at();
+EXECUTE FUNCTION set_updated_at();

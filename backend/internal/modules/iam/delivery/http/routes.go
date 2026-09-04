@@ -1,13 +1,14 @@
 package http
 
 import (
+	iamrepo "github.com/epmp/backend/internal/modules/iam/repository"
 	mw "github.com/epmp/backend/internal/pkg/middleware"
 	"github.com/labstack/echo/v4"
 )
 
 // RegisterIAMRoutes registers all IAM routes under the given API group.
 // Auth routes are public; user/role routes require authentication.
-func RegisterIAMRoutes(v1 *echo.Group, authH *AuthHandler, userH *UserHandler, roleH *RoleHandler, jwtSecret string) {
+func RegisterIAMRoutes(v1 *echo.Group, authH *AuthHandler, userH *UserHandler, roleH *RoleHandler, jwtSecret string, userRoleRepo iamrepo.UserRoleRepository) {
 	// ── Public auth routes ──────────────────────────────────────────────────
 	auth := v1.Group("/auth")
 	auth.POST("/register", authH.Register)
@@ -16,7 +17,7 @@ func RegisterIAMRoutes(v1 *echo.Group, authH *AuthHandler, userH *UserHandler, r
 	auth.POST("/logout", authH.Logout)
 
 	// ── Authenticated routes ────────────────────────────────────────────────
-	protected := v1.Group("", mw.AuthRequired(jwtSecret))
+	protected := v1.Group("", mw.AuthRequired(jwtSecret), mw.PermissionLoader(userRoleRepo))
 
 	// Current user profile
 	protected.GET("/auth/me", authH.Me)

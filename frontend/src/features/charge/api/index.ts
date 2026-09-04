@@ -9,7 +9,7 @@ import type {
   ChargeQueryParams,
 } from "../types";
 
-const BASE_PATH = "/api/charges";
+const BASE_PATH = "/charges";
 export async function fetchCharges(params?: ChargeQueryParams): Promise<ChargeListResponse> {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));

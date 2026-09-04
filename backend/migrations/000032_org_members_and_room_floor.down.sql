@@ -1,0 +1,5 @@
+-- Reverse migration 000032
+ALTER TABLE rooms ADD COLUMN IF NOT EXISTS floor INTEGER NOT NULL DEFAULT 1;
+ALTER TABLE rooms DROP COLUMN IF EXISTS floor_id;
+ALTER TABLE organizations DROP COLUMN IF EXISTS created_by;
+DROP TABLE IF EXISTS organization_members;

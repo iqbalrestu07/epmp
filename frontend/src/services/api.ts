@@ -1,4 +1,4 @@
-const BASE_URL = "/api";
+const BASE_URL = "/api/v1";
 
 export class ApiError extends Error {
   constructor(
