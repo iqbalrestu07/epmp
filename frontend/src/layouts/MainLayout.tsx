@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Building2, DoorOpen, Users, ShieldCheck,
   UserCog, Settings, Menu, X, Bell, LogOut, ChevronDown,
   CalendarCheck, FileText, Bed, Receipt, CreditCard, Wrench, Package,
-  Globe2, MessageCircle, Megaphone, Layers, Check
+  Globe2, MessageCircle, Megaphone, Layers, Check, Box
 } from 'lucide-react';
 import { useAuth } from '../features/iam/context/AuthContext';
 import { useOrg } from '../features/organization/context/OrgContext';
@@ -12,6 +12,7 @@ import { useOrg } from '../features/organization/context/OrgContext';
 // ─── Menu Configuration ────────────────────────────────────────────────────
 const MENU_CONFIG = [
   { label: 'Overview',       path: '/dashboard',                  icon: LayoutDashboard },
+  { label: '3D Explorer',      path: '/dashboard/explorer',                 icon: Box },
   { type: 'divider' as const, label: 'CORE' },
   { label: 'Organizations',  path: '/dashboard/organizations',    icon: Globe2,     requiredPermission: 'property:read' },
   { label: 'Properties',     path: '/dashboard/properties',       icon: Building2,  requiredPermission: 'property:read' },

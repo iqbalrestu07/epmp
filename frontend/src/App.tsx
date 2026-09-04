@@ -1,3 +1,4 @@
+import { InteractiveExplorerPage } from "./features/immersive-view/pages/InteractiveExplorerPage";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./features/iam/context/AuthContext";
 import { OrgProvider } from "./features/organization/context/OrgContext";
@@ -88,6 +89,7 @@ export default function App() {
           }
         >
           <Route index element={<DashboardPage />} />
+          <Route path="explorer" element={<InteractiveExplorerPage />} />
           
           {/* Core: Organization → Property → Building */}
           <Route path="organizations" element={<OrganizationListPage />} />

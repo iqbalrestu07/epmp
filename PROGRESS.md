@@ -118,26 +118,29 @@ All core modules now enforce organization-scoped filtering:
 | Module          | Status  |
 | --------------- | ------- |
 | Tenant          | ✅ DONE |
-| Reservation     | PENDING |
-| Contract        | PENDING |
-| Occupancy       | PENDING |
-| Invoice/Billing | PENDING |
-| Payment         | PENDING |
-| Deposit         | PENDING |
-| Charge          | PENDING |
-| Refund          | PENDING |
-| Adjustment      | PENDING |
-| Penalty         | PENDING |
-| Asset           | DONE    |
-| AssetAssignment | PENDING |
-| AssetInspection | PENDING |
-| WorkOrder       | PENDING |
-| Technician      | PENDING |
-| Supplier        | PENDING |
-| Zone            | PENDING |
-| Bed             | PENDING |
-| Facility        | PENDING |
-| RoomType        | PENDING |
+| Reservation     | ✅ DONE |
+| Contract        | ✅ DONE |
+| Occupancy       | ✅ DONE |
+| Invoice/Billing | ✅ DONE |
+| Payment         | ✅ DONE |
+| Deposit         | ✅ DONE |
+| Charge          | ✅ DONE |
+| Refund          | ✅ DONE |
+| Adjustment      | ✅ DONE |
+| Penalty         | ✅ DONE |
+| Asset           | ✅ DONE |
+| AssetAssignment | ✅ DONE |
+| AssetInspection | ✅ DONE |
+| WorkOrder       | ✅ DONE |
+| Technician      | ✅ DONE |
+| Supplier        | ✅ DONE |
+| Zone            | ✅ DONE |
+| Bed             | ✅ DONE |
+| Facility        | ✅ DONE |
+| RoomType        | ✅ DONE |
+| TenantContact   | ✅ DONE |
+| TenantDocument  | ✅ DONE |
+| TenantIdentity  | ✅ DONE |
 
 ### Frontend — Remaining
 
