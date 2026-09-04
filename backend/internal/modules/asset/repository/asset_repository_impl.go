@@ -25,35 +25,47 @@ func NewAssetRepositoryImpl(db *pgxpool.Pool) *AssetRepositoryImpl {
 var _ AssetRepository = (*AssetRepositoryImpl)(nil)
 
 func (r *AssetRepositoryImpl) Save(ctx context.Context, e *entity.Asset) error {
+	var orgID interface{}
+	if e.OrganizationId != "" {
+		orgID = e.OrganizationId
+	}
+
 	if e.Id == "" {
 		// INSERT
 		err := r.db.QueryRow(ctx, `
 			INSERT INTO assets (organization_id, property_id, name, category, status, purchase_price)
 			VALUES ($1, $2, $3, $4, $5, $6)
 			RETURNING id`,
-			e.OrganizationId, e.PropertyId, e.Name, e.Category, e.Status, e.PurchasePrice,
+			orgID, e.PropertyId, e.Name, e.Category, e.Status, e.PurchasePrice,
 		).Scan(&e.Id)
 		return err
 	}
 	// UPDATE
-	// Note: id is dynamically added as the last argument in Exec for UPDATE
 	_, err := r.db.Exec(ctx, `
 		UPDATE assets
 		SET    organization_id=$1, property_id=$2, name=$3, category=$4, status=$5, purchase_price=$6
 		WHERE  id=$7 AND deleted_at IS NULL`,
-		e.OrganizationId, e.PropertyId, e.Name, e.Category, e.Status, e.PurchasePrice, e.Id,
+		orgID, e.PropertyId, e.Name, e.Category, e.Status, e.PurchasePrice, e.Id,
 	)
 	return err
 }
 
-func (r *AssetRepositoryImpl) FindByID(ctx context.Context, id string) (*entity.Asset, error) {
+func (r *AssetRepositoryImpl) FindByID(ctx context.Context, id, orgID string) (*entity.Asset, error) {
 	e := &entity.Asset{}
-	err := r.db.QueryRow(ctx, `
+	var orgIDPtr *string
+	query := `
 		SELECT organization_id, id, property_id, name, category, status, purchase_price, deleted_at
 		FROM   assets
-		WHERE  id = $1 AND deleted_at IS NULL`,
-		id,
-	).Scan(&e.OrganizationId, &e.Id, &e.PropertyId, &e.Name, &e.Category, &e.Status, &e.PurchasePrice, &e.DeletedAt)
+		WHERE  id = $1 AND deleted_at IS NULL`
+	args := []interface{}{id}
+	if orgID != "" {
+		query += ` AND organization_id = $2`
+		args = append(args, orgID)
+	}
+	err := r.db.QueryRow(ctx, query, args...).Scan(&orgIDPtr, &e.Id, &e.PropertyId, &e.Name, &e.Category, &e.Status, &e.PurchasePrice, &e.DeletedAt)
+	if orgIDPtr != nil {
+		e.OrganizationId = *orgIDPtr
+	}
 	
 	if err != nil {
 		return nil, fmt.Errorf("asset repository: find by id: %w", err)
@@ -61,15 +73,34 @@ func (r *AssetRepositoryImpl) FindByID(ctx context.Context, id string) (*entity.
 	return e, nil
 }
 
-func (r *AssetRepositoryImpl) FindAll(ctx context.Context, limit, offset int) ([]*entity.Asset, error) {
-	rows, err := r.db.Query(ctx, `
+func (r *AssetRepositoryImpl) FindAll(ctx context.Context, limit, offset int, search, propertyID, orgID string) ([]*entity.Asset, error) {
+	query := `
 		SELECT organization_id, id, property_id, name, category, status, purchase_price, deleted_at
 		FROM   assets
-		WHERE  deleted_at IS NULL
-		ORDER BY created_at DESC
-		LIMIT $1 OFFSET $2`,
-		limit, offset,
-	)
+		WHERE  deleted_at IS NULL`
+	args := []interface{}{}
+	argIdx := 1
+
+	if search != "" {
+		query += fmt.Sprintf(` AND name ILIKE $%d`, argIdx)
+		args = append(args, "%"+search+"%")
+		argIdx++
+	}
+	if propertyID != "" {
+		query += fmt.Sprintf(` AND property_id = $%d`, argIdx)
+		args = append(args, propertyID)
+		argIdx++
+	}
+	if orgID != "" {
+		query += fmt.Sprintf(` AND organization_id = $%d`, argIdx)
+		args = append(args, orgID)
+		argIdx++
+	}
+
+	query += fmt.Sprintf(` ORDER BY id DESC LIMIT $%d OFFSET $%d`, argIdx, argIdx+1)
+	args = append(args, limit, offset)
+
+	rows, err := r.db.Query(ctx, query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("asset repository: find all: %w", err)
 	}
@@ -78,12 +109,44 @@ func (r *AssetRepositoryImpl) FindAll(ctx context.Context, limit, offset int) ([
 	var list []*entity.Asset
 	for rows.Next() {
 		e := &entity.Asset{}
-		if err := rows.Scan(&e.OrganizationId, &e.Id, &e.PropertyId, &e.Name, &e.Category, &e.Status, &e.PurchasePrice, &e.DeletedAt); err != nil {
+		var orgIDPtr *string
+		if err := rows.Scan(&orgIDPtr, &e.Id, &e.PropertyId, &e.Name, &e.Category, &e.Status, &e.PurchasePrice, &e.DeletedAt); err != nil {
 			return nil, err
+		}
+		if orgIDPtr != nil {
+			e.OrganizationId = *orgIDPtr
 		}
 		list = append(list, e)
 	}
 	return list, rows.Err()
+}
+
+func (r *AssetRepositoryImpl) Count(ctx context.Context, search, propertyID, orgID string) (int64, error) {
+	query := `SELECT COUNT(*) FROM assets WHERE deleted_at IS NULL`
+	args := []interface{}{}
+	argIdx := 1
+
+	if search != "" {
+		query += fmt.Sprintf(` AND name ILIKE $%d`, argIdx)
+		args = append(args, "%"+search+"%")
+		argIdx++
+	}
+	if propertyID != "" {
+		query += fmt.Sprintf(` AND property_id = $%d`, argIdx)
+		args = append(args, propertyID)
+		argIdx++
+	}
+	if orgID != "" {
+		query += fmt.Sprintf(` AND organization_id = $%d`, argIdx)
+		args = append(args, orgID)
+	}
+
+	var count int64
+	err := r.db.QueryRow(ctx, query, args...).Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("asset repository: count: %w", err)
+	}
+	return count, nil
 }
 
 func (r *AssetRepositoryImpl) Delete(ctx context.Context, id string) error {

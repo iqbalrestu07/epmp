@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./features/iam/context/AuthContext";
+import { OrgProvider } from "./features/organization/context/OrgContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import MainLayout from "./layouts/MainLayout";
@@ -16,6 +17,9 @@ import { PropertyDetailPage } from "./features/property/pages/PropertyDetailPage
 import { PropertyEditPage } from "./features/property/pages/PropertyEditPage";
 import PropertyInteractiveView from "./features/property/pages/PropertyInteractiveView";
 import { RoomListPage } from "./features/room/pages/RoomListPage";
+import { RoomCreatePage } from "./features/room/pages/RoomCreatePage";
+import { RoomDetailPage } from "./features/room/pages/RoomDetailPage";
+import { RoomEditPage } from "./features/room/pages/RoomEditPage";
 import { TenantListPage } from "./features/tenant/pages/TenantListPage";
 import { ReservationListPage } from "./features/reservation/pages/ReservationListPage";
 import { ContractListPage } from "./features/contract/pages/ContractListPage";
@@ -33,11 +37,17 @@ import { BuildingCreatePage } from "./features/building/pages/BuildingCreatePage
 import { BuildingDetailPage } from "./features/building/pages/BuildingDetailPage";
 import { BuildingEditPage } from "./features/building/pages/BuildingEditPage";
 import { FloorListPage } from "./features/floor/pages/FloorListPage";
+import { FloorCreatePage } from "./features/floor/pages/FloorCreatePage";
+import { FloorDetailPage } from "./features/floor/pages/FloorDetailPage";
+import { FloorEditPage } from "./features/floor/pages/FloorEditPage";
 import { ZoneListPage } from "./features/zone/pages/ZoneListPage";
 import { BedListPage } from "./features/bed/pages/BedListPage";
 import { FacilityListPage } from "./features/facility/pages/FacilityListPage";
 import { RoomTypeListPage } from "./features/roomtype/pages/RoomTypeListPage";
 import { AssetListPage } from "./features/asset/pages/AssetListPage";
+import { AssetCreatePage } from "./features/asset/pages/AssetCreatePage";
+import { AssetEditPage } from "./features/asset/pages/AssetEditPage";
+import { AssetDetailPage } from "./features/asset/pages/AssetDetailPage";
 import { AssetAssignmentListPage } from "./features/assetassignment/pages/AssetAssignmentListPage";
 import { AssetInspectionListPage } from "./features/assetinspection/pages/AssetInspectionListPage";
 import { WorkOrderListPage } from "./features/workorder/pages/WorkOrderListPage";
@@ -57,7 +67,8 @@ import UserListPage from "./features/iam/pages/UserListPage";
 export default function App() {
   return (
     <AuthProvider>
-      <Routes>
+      <OrgProvider>
+        <Routes>
         {/* Public Routes */}
         <Route path="/" element={<ImmersiveLanding />} />
 
@@ -93,8 +104,14 @@ export default function App() {
           <Route path="buildings/:id" element={<BuildingDetailPage />} />
           <Route path="buildings/:id/edit" element={<BuildingEditPage />} />
           <Route path="floors" element={<FloorListPage />} />
+          <Route path="floors/new" element={<FloorCreatePage />} />
+          <Route path="floors/:id" element={<FloorDetailPage />} />
+          <Route path="floors/:id/edit" element={<FloorEditPage />} />
           <Route path="zones" element={<ZoneListPage />} />
           <Route path="rooms" element={<RoomListPage />} />
+          <Route path="rooms/new" element={<RoomCreatePage />} />
+          <Route path="rooms/:id" element={<RoomDetailPage />} />
+          <Route path="rooms/:id/edit" element={<RoomEditPage />} />
           <Route path="room-types" element={<RoomTypeListPage />} />
           <Route path="beds" element={<BedListPage />} />
           <Route path="facilities" element={<FacilityListPage />} />
@@ -116,6 +133,9 @@ export default function App() {
 
           {/* Assets & Maintenance */}
           <Route path="assets" element={<AssetListPage />} />
+          <Route path="assets/new" element={<AssetCreatePage />} />
+          <Route path="assets/:id" element={<AssetDetailPage />} />
+          <Route path="assets/:id/edit" element={<AssetEditPage />} />
           <Route path="asset-assignments" element={<AssetAssignmentListPage />} />
           <Route path="asset-inspections" element={<AssetInspectionListPage />} />
           <Route path="work-orders" element={<WorkOrderListPage />} />
@@ -151,6 +171,7 @@ export default function App() {
         {/* Catch-all */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      </OrgProvider>
     </AuthProvider>
   );
 }

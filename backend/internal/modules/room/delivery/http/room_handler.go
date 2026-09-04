@@ -7,6 +7,7 @@ import (
 
 	"github.com/epmp/backend/internal/modules/room/dto"
 	"github.com/epmp/backend/internal/modules/room/service"
+	mw "github.com/epmp/backend/internal/pkg/middleware"
 	"github.com/epmp/backend/internal/pkg/response"
 
 	"github.com/labstack/echo/v4"
@@ -27,8 +28,18 @@ func (h *RoomHandler) Create(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return response.BadRequest(c, "invalid request body")
 	}
+	if req.Name == "" {
+		return response.BadRequest(c, "name is required")
+	}
+	if req.PropertyId == "" {
+		return response.BadRequest(c, "property_id is required")
+	}
+	orgID := mw.GetOrgID(c)
+	if orgID == "" {
+		return response.BadRequest(c, "X-Organization-ID header is required")
+	}
 
-	result, err := h.svc.Create(c.Request().Context(), &req)
+	result, err := h.svc.Create(c.Request().Context(), &req, orgID)
 	if err != nil {
 		return response.InternalError(c, err.Error())
 	}
@@ -38,8 +49,9 @@ func (h *RoomHandler) Create(c echo.Context) error {
 
 func (h *RoomHandler) GetByID(c echo.Context) error {
 	id := c.Param("id")
+	orgID := mw.GetOrgID(c)
 
-	result, err := h.svc.GetByID(c.Request().Context(), id)
+	result, err := h.svc.GetByID(c.Request().Context(), id, orgID)
 	if err != nil {
 		return response.NotFound(c, "Room not found")
 	}
@@ -56,8 +68,11 @@ func (h *RoomHandler) List(c echo.Context) error {
 	if perPage == 0 {
 		perPage = 20
 	}
+	search := c.QueryParam("search")
+	floorId := c.QueryParam("floor_id")
+	orgID := mw.GetOrgID(c)
 
-	result, err := h.svc.List(c.Request().Context(), page, perPage)
+	result, err := h.svc.List(c.Request().Context(), page, perPage, search, floorId, orgID)
 	if err != nil {
 		return response.InternalError(c, err.Error())
 	}
@@ -67,13 +82,14 @@ func (h *RoomHandler) List(c echo.Context) error {
 
 func (h *RoomHandler) Update(c echo.Context) error {
 	id := c.Param("id")
+	orgID := mw.GetOrgID(c)
 
 	var req dto.UpdateRoomRequest
 	if err := c.Bind(&req); err != nil {
 		return response.BadRequest(c, "invalid request body")
 	}
 
-	result, err := h.svc.Update(c.Request().Context(), id, &req)
+	result, err := h.svc.Update(c.Request().Context(), id, orgID, &req)
 	if err != nil {
 		return response.InternalError(c, err.Error())
 	}

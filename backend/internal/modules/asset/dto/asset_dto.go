@@ -6,7 +6,6 @@ import "time"
 
 // CreateAssetRequest is the DTO for creating a Asset.
 type CreateAssetRequest struct {
-	OrganizationId string `json:"organization_id"`
 	PropertyId string `json:"property_id"`
 	Name string `json:"name"`
 	Category string `json:"category"`
@@ -16,7 +15,6 @@ type CreateAssetRequest struct {
 
 // UpdateAssetRequest is the DTO for updating a Asset.
 type UpdateAssetRequest struct {
-	OrganizationId string `json:"organization_id"`
 	PropertyId string `json:"property_id"`
 	Name string `json:"name"`
 	Category string `json:"category"`

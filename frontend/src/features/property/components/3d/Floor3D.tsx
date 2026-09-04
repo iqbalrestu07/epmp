@@ -21,7 +21,7 @@ export function Floor3D({ floors, rooms, selectedFloorId, onFloorClick, onRoomCl
     <group>
       {sortedFloors.map((floor, idx) => {
         const y = idx * 1.2;
-        const floorRooms = rooms.filter((r) => r.floor === floor.floor_number);
+        const floorRooms = rooms.filter((r) => r.floor_id === floor.id);
         const isSelected = selectedFloorId === floor.id;
         const isHovered = hoveredFloor === floor.id;
 

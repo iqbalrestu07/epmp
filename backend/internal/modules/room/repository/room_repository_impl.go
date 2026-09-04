@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/epmp/backend/internal/modules/room/entity"
-	"github.com/epmp/backend/internal/pkg/uid"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -58,16 +57,20 @@ func (r *RoomRepositoryImpl) Save(ctx context.Context, e *entity.Room) error {
 	return err
 }
 
-func (r *RoomRepositoryImpl) FindByID(ctx context.Context, id string) (*entity.Room, error) {
+func (r *RoomRepositoryImpl) FindByID(ctx context.Context, id, orgID string) (*entity.Room, error) {
 	e := &entity.Room{}
 	var floorID *string
-	err := r.db.QueryRow(ctx, `
+	query := `
 		SELECT organization_id, id, property_id, floor_id, name, capacity, price, is_available,
 		       created_at, updated_at, deleted_at
 		FROM   rooms
-		WHERE  id = $1 AND deleted_at IS NULL`,
-		id,
-	).Scan(&e.OrganizationId, &e.Id, &e.PropertyId, &floorID, &e.Name, &e.Capacity, &e.Price, &e.IsAvailable,
+		WHERE  id = $1 AND deleted_at IS NULL`
+	args := []interface{}{id}
+	if orgID != "" {
+		query += ` AND organization_id = $2`
+		args = append(args, orgID)
+	}
+	err := r.db.QueryRow(ctx, query, args...).Scan(&e.OrganizationId, &e.Id, &e.PropertyId, &floorID, &e.Name, &e.Capacity, &e.Price, &e.IsAvailable,
 		&e.CreatedAt, &e.UpdatedAt, &e.DeletedAt)
 	if floorID != nil {
 		e.FloorId = *floorID
@@ -79,16 +82,35 @@ func (r *RoomRepositoryImpl) FindByID(ctx context.Context, id string) (*entity.R
 	return e, nil
 }
 
-func (r *RoomRepositoryImpl) FindAll(ctx context.Context, limit, offset int) ([]*entity.Room, error) {
-	rows, err := r.db.Query(ctx, `
+func (r *RoomRepositoryImpl) FindAll(ctx context.Context, limit, offset int, search, floorId, orgID string) ([]*entity.Room, error) {
+	query := `
 		SELECT organization_id, id, property_id, floor_id, name, capacity, price, is_available,
 		       created_at, updated_at, deleted_at
 		FROM   rooms
-		WHERE  deleted_at IS NULL
-		ORDER BY created_at DESC
-		LIMIT $1 OFFSET $2`,
-		limit, offset,
-	)
+		WHERE  deleted_at IS NULL`
+	args := []interface{}{}
+	argIdx := 1
+
+	if search != "" {
+		query += fmt.Sprintf(` AND name ILIKE $%d`, argIdx)
+		args = append(args, "%"+search+"%")
+		argIdx++
+	}
+	if floorId != "" {
+		query += fmt.Sprintf(` AND floor_id = $%d`, argIdx)
+		args = append(args, floorId)
+		argIdx++
+	}
+	if orgID != "" {
+		query += fmt.Sprintf(` AND organization_id = $%d`, argIdx)
+		args = append(args, orgID)
+		argIdx++
+	}
+
+	query += fmt.Sprintf(` ORDER BY created_at DESC LIMIT $%d OFFSET $%d`, argIdx, argIdx+1)
+	args = append(args, limit, offset)
+
+	rows, err := r.db.Query(ctx, query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("room repository: find all: %w", err)
 	}
@@ -116,5 +138,31 @@ func (r *RoomRepositoryImpl) Delete(ctx context.Context, id string) error {
 	return err
 }
 
-// newRoomID is a helper — kept for reference; call uid.New() directly in service.
-var _ = uid.New
+// Count returns the total number of non-deleted rooms.
+func (r *RoomRepositoryImpl) Count(ctx context.Context, search, floorId, orgID string) (int64, error) {
+	query := `SELECT COUNT(*) FROM rooms WHERE deleted_at IS NULL`
+	args := []interface{}{}
+	argIdx := 1
+
+	if search != "" {
+		query += fmt.Sprintf(` AND name ILIKE $%d`, argIdx)
+		args = append(args, "%"+search+"%")
+		argIdx++
+	}
+	if floorId != "" {
+		query += fmt.Sprintf(` AND floor_id = $%d`, argIdx)
+		args = append(args, floorId)
+		argIdx++
+	}
+	if orgID != "" {
+		query += fmt.Sprintf(` AND organization_id = $%d`, argIdx)
+		args = append(args, orgID)
+	}
+
+	var count int64
+	err := r.db.QueryRow(ctx, query, args...).Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("room repository: count: %w", err)
+	}
+	return count, nil
+}

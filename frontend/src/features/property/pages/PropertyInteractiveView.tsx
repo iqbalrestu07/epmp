@@ -265,12 +265,12 @@ export default function PropertyInteractiveView() {
                 {selectedFloor && (
                   <div className="bg-white rounded-2xl border shadow-sm p-5">
                     <h3 className="font-bold text-lg mb-1">{selectedFloor.name} Rooms</h3>
-                    {rooms.filter((r) => r.floor === selectedFloor.floor_number).length === 0 ? (
+                    {rooms.filter((r) => r.floor_id === selectedFloor.id).length === 0 ? (
                       <p className="text-sm text-gray-400">No rooms on this floor.</p>
                     ) : (
                       <div className="space-y-2">
                         {rooms
-                          .filter((r) => r.floor === selectedFloor.floor_number)
+                          .filter((r) => r.floor_id === selectedFloor.id)
                           .map((r) => (
                             <button
                               key={r.id}

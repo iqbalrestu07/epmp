@@ -8,13 +8,31 @@ Organization → Property → Building → Floor → Room
 
 ## Module Status
 
-| #   | Module       | Backend Tests   | Backend Fixes                     | Frontend Integration    | Status  |
-| --- | ------------ | --------------- | --------------------------------- | ----------------------- | ------- |
-| 1   | Property     | ✅ 8 tests pass | ✅ timestamps, search, pagination | ✅ real API, 3D view    | DONE    |
-| 2   | Organization | ✅ 8 tests pass | ✅ timestamps, search, pagination | ✅ real API, routes, UI | DONE    |
-| 3   | Building     | ✅ 9 tests pass | ✅ timestamps, search, pagination | ✅ real API, routes, UI | DONE    |
-| 4   | Floor        | TODO            | TODO                              | TODO                    | PENDING |
-| 5   | Room         | TODO            | TODO                              | TODO                    | PENDING |
+| #   | Module       | Backend Tests    | Backend Fixes                                  | Frontend Integration              | Status |
+| --- | ------------ | ---------------- | ---------------------------------------------- | --------------------------------- | ------ |
+| 1   | Property     | ✅ 8 tests pass  | ✅ timestamps, search, pagination, org-scoped  | ✅ real API, 3D view              | DONE   |
+| 2   | Organization | ✅ 8 tests pass  | ✅ timestamps, search, pagination, org_members | ✅ real API, routes, UI, switcher | DONE   |
+| 3   | Building     | ✅ 10 tests pass | ✅ timestamps, search, pagination, org-scoped  | ✅ real API, routes, UI           | DONE   |
+| 4   | Floor        | ✅ 10 tests pass | ✅ timestamps, search, pagination, org-scoped  | ✅ real API, routes, UI           | DONE   |
+| 5   | Room         | ✅ 10 tests pass | ✅ timestamps, search, pagination, org-scoped  | ✅ real API, routes, UI           | DONE   |
+| 6   | Tenant       | ✅ 10 tests pass | ✅ timestamps, search, pagination, org-scoped  | TODO                              | DONE   |
+
+## Org-Scoped Filtering Architecture
+
+All core modules now enforce organization-scoped filtering:
+
+- **Header**: `X-Organization-ID` extracted by `mw.GetOrgID(c)` middleware
+- **Repository**: `FindByID(id, orgID)`, `FindAll(limit, offset, search, parentId, orgID)`, `Count(search, parentId, orgID)`
+- **Service**: All methods accept `orgID` param, pass to repository
+- **Handler**: Extracts `orgID` from context, validates header on Create
+- **Request DTOs**: `organization_id` removed from Create/Update bodies (derived from context)
+- **Frontend**: `api.ts` injects `X-Organization-ID` header from localStorage; `OrgContext` manages org selection; org switcher dropdown in `MainLayout`
+
+### Org Switcher (Frontend)
+
+- `OrgContext.tsx` — fetches user's orgs from `/organizations/mine`, manages current org, persists to localStorage
+- `MainLayout.tsx` — dropdown in header showing org name, list of orgs with checkmark, "Create Organization" link
+- `api.ts` — `getStoredOrgId()`/`setStoredOrgId()` injects header on every API call
 
 ## Per-Module Checklist
 
@@ -24,11 +42,27 @@ Organization → Property → Building → Floor → Room
 - [x] Backend: Add search/filter to list API
 - [x] Backend: Add Count method for pagination
 - [x] Backend: Automated API integration tests
+- [x] Backend: org_members pivot table + ListMine endpoint
 - [x] Frontend: Connect to real API (remove mock/SDK defaults)
 - [x] Frontend: Improve form (checkbox for is_active, placeholders)
 - [x] Frontend: Improve table (hide raw IDs, status badges)
 - [x] Frontend: Fix all routes to /dashboard/organizations
 - [x] Frontend: Detail page with properties link
+- [x] Frontend: Org switcher in header
+- [x] Verify: tsc + build + backend tests pass
+
+### Property
+
+- [x] Backend: Fix created_at/updated_at in response
+- [x] Backend: Add search/filter to list API
+- [x] Backend: Add Count method for pagination
+- [x] Backend: Automated API integration tests
+- [x] Backend: Org-scoped filtering (FindByID, FindAll, Count)
+- [x] Frontend: Connect to real API (remove mock/SDK defaults)
+- [x] Frontend: Improve form (checkbox for is_active, placeholders)
+- [x] Frontend: Improve table (hide raw IDs, status badges)
+- [x] Frontend: Fix all routes to /dashboard/properties
+- [x] Frontend: Detail page with buildings link
 - [x] Verify: tsc + build + backend tests pass
 
 ### Building
@@ -37,6 +71,7 @@ Organization → Property → Building → Floor → Room
 - [x] Backend: Add search/filter to list API
 - [x] Backend: Add Count method for pagination
 - [x] Backend: Automated API integration tests
+- [x] Backend: Org-scoped filtering + property_id filter
 - [x] Frontend: Connect to real API
 - [x] Frontend: Improve form (select for property_id, validation)
 - [x] Frontend: Improve table (hide raw IDs, floor badges)
@@ -46,29 +81,71 @@ Organization → Property → Building → Floor → Room
 
 ### Floor
 
-- [ ] Backend: Fix created_at/updated_at in response
-- [ ] Backend: Add search/filter to list API
-- [ ] Backend: Add Count method for pagination
-- [ ] Backend: Automated API integration tests
-- [ ] Frontend: Connect to real API
-- [ ] Frontend: Improve form (select for building_id, checkbox for is_active)
-- [ ] Frontend: Improve table (hide raw IDs, show building name)
-- [ ] Frontend: Fix all routes to /dashboard/floors
-- [ ] Frontend: Add create/edit/detail pages
-- [ ] Verify: tsc + build + backend tests pass
+- [x] Backend: Fix created_at/updated_at in response
+- [x] Backend: Add search/filter to list API
+- [x] Backend: Add Count method for pagination
+- [x] Backend: Automated API integration tests (10 tests)
+- [x] Backend: Org-scoped filtering + building_id filter
+- [x] Frontend: Connect to real API
+- [x] Frontend: Improve form (select for building_id, checkbox for is_active)
+- [x] Frontend: Improve table (icons, status badges, action buttons)
+- [x] Frontend: Fix all routes to /dashboard/floors
+- [x] Frontend: Add create/edit/detail pages with breadcrumbs
+- [x] Frontend: Detail page with rooms link
+- [x] Verify: tsc + build + backend tests pass
 
 ### Room
 
-- [ ] Backend: Fix created_at/updated_at in response
-- [ ] Backend: Add search/filter to list API
-- [ ] Backend: Add Count method for pagination
-- [ ] Backend: Automated API integration tests
-- [ ] Frontend: Connect to real API
-- [ ] Frontend: Improve form (select for floor/property_id, checkbox for is_available)
-- [ ] Frontend: Improve table (hide raw IDs, show floor/property name, price, capacity)
-- [ ] Frontend: Fix all routes to /dashboard/rooms
-- [ ] Frontend: Add create/edit/detail pages
-- [ ] Verify: tsc + build + backend tests pass
+- [x] Backend: Fix created_at/updated_at in response
+- [x] Backend: Add search/filter to list API
+- [x] Backend: Add Count method for pagination
+- [x] Backend: Automated API integration tests (10 tests)
+- [x] Backend: Org-scoped filtering + floor_id filter
+- [x] Backend: floor→floor_id migration (ULID FK)
+- [x] Frontend: Connect to real API
+- [x] Frontend: Improve form (select for property/floor_id, checkbox for is_available)
+- [x] Frontend: Improve table (icons, price/capacity, status badges, action buttons)
+- [x] Frontend: Fix all routes to /dashboard/rooms
+- [x] Frontend: Add create/edit/detail pages with breadcrumbs
+- [x] Frontend: Detail page with related floor link
+- [x] Frontend: Fix Floor3D + PropertyInteractiveView (floor→floor_id)
+- [x] Verify: tsc + build + backend tests pass
+
+## Remaining Work
+
+### Backend — Org-Scoped Filtering for Remaining Modules
+
+| Module          | Status  |
+| --------------- | ------- |
+| Tenant          | ✅ DONE |
+| Reservation     | PENDING |
+| Contract        | PENDING |
+| Occupancy       | PENDING |
+| Invoice/Billing | PENDING |
+| Payment         | PENDING |
+| Deposit         | PENDING |
+| Charge          | PENDING |
+| Refund          | PENDING |
+| Adjustment      | PENDING |
+| Penalty         | PENDING |
+| Asset           | DONE    |
+| AssetAssignment | PENDING |
+| AssetInspection | PENDING |
+| WorkOrder       | PENDING |
+| Technician      | PENDING |
+| Supplier        | PENDING |
+| Zone            | PENDING |
+| Bed             | PENDING |
+| Facility        | PENDING |
+| RoomType        | PENDING |
+
+### Frontend — Remaining
+
+| Task                                      | Status  |
+| ----------------------------------------- | ------- |
+| Floor form: building select from API      | DONE    |
+| Room form: property/floor select from API | DONE    |
+| All remaining modules UI                  | PENDING |
 
 ## Notes
 
@@ -78,3 +155,7 @@ Organization → Property → Building → Floor → Room
 - Frontend routes: /dashboard/{module}
 - JWT test secret: "test-jwt-secret-for-integration-tests"
 - DB: postgres://postgres:postgres@localhost:5432/epmp?sslmode=disable
+- All IDs are ULID (TEXT), not UUID
+- 56 backend tests total (Property: 8, Organization: 8, Building: 10, Floor: 10, Room: 10, Tenant: 10)
+- Soft deletes via `deleted_at` column
+- `organization_id` always from context (X-Organization-ID header), never from request body

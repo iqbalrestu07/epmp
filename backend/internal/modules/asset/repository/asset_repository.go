@@ -14,10 +14,13 @@ type AssetRepository interface {
 	Save(ctx context.Context, e *entity.Asset) error
 
 	// FindByID retrieves a Asset by its primary key.
-	FindByID(ctx context.Context, id string) (*entity.Asset, error)
+	FindByID(ctx context.Context, id, orgID string) (*entity.Asset, error)
 
 	// FindAll retrieves a paginated list of Asset entities.
-	FindAll(ctx context.Context, limit, offset int) ([]*entity.Asset, error)
+	FindAll(ctx context.Context, limit, offset int, search, propertyID, orgID string) ([]*entity.Asset, error)
+
+	// Count returns the total number of records matching the filters.
+	Count(ctx context.Context, search, propertyID, orgID string) (int64, error)
 
 	// Delete removes a Asset by its primary key.
 	Delete(ctx context.Context, id string) error

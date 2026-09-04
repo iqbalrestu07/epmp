@@ -14,6 +14,7 @@ export class ApiError extends Error {
 // Token storage keys
 export const TOKEN_KEY = "epmp_access_token";
 export const REFRESH_TOKEN_KEY = "epmp_refresh_token";
+export const ORG_ID_KEY = "epmp_org_id";
 
 export function getStoredToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
@@ -27,6 +28,19 @@ export function setStoredTokens(accessToken: string, refreshToken: string): void
 export function clearStoredTokens(): void {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(REFRESH_TOKEN_KEY);
+  localStorage.removeItem(ORG_ID_KEY);
+}
+
+export function getStoredOrgId(): string | null {
+  return localStorage.getItem(ORG_ID_KEY);
+}
+
+export function setStoredOrgId(orgId: string): void {
+  localStorage.setItem(ORG_ID_KEY, orgId);
+}
+
+export function clearStoredOrgId(): void {
+  localStorage.removeItem(ORG_ID_KEY);
 }
 
 async function request<T>(
@@ -42,6 +56,11 @@ async function request<T>(
 
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const orgId = getStoredOrgId();
+  if (orgId) {
+    headers["X-Organization-ID"] = orgId;
   }
 
   const res = await fetch(`${BASE_URL}${path}`, {

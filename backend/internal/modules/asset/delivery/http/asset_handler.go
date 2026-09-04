@@ -4,9 +4,11 @@ package http
 
 import (
 	"strconv"
+	"math"
 
 	"github.com/epmp/backend/internal/modules/asset/dto"
 	"github.com/epmp/backend/internal/modules/asset/service"
+	mw "github.com/epmp/backend/internal/pkg/middleware"
 	"github.com/epmp/backend/internal/pkg/response"
 
 	"github.com/labstack/echo/v4"
@@ -28,7 +30,12 @@ func (h *AssetHandler) Create(c echo.Context) error {
 		return response.BadRequest(c, "invalid request body")
 	}
 
-	result, err := h.svc.Create(c.Request().Context(), &req)
+	orgID := mw.GetOrgID(c)
+	if orgID == "" {
+		return response.BadRequest(c, "X-Organization-ID header is required")
+	}
+
+	result, err := h.svc.Create(c.Request().Context(), orgID, &req)
 	if err != nil {
 		return response.InternalError(c, err.Error())
 	}
@@ -38,8 +45,9 @@ func (h *AssetHandler) Create(c echo.Context) error {
 
 func (h *AssetHandler) GetByID(c echo.Context) error {
 	id := c.Param("id")
+	orgID := mw.GetOrgID(c)
 
-	result, err := h.svc.GetByID(c.Request().Context(), id)
+	result, err := h.svc.GetByID(c.Request().Context(), id, orgID)
 	if err != nil {
 		return response.NotFound(c, "Asset not found")
 	}
@@ -56,10 +64,18 @@ func (h *AssetHandler) List(c echo.Context) error {
 	if perPage == 0 {
 		perPage = 20
 	}
+	
+	search := c.QueryParam("search")
+	propertyID := c.QueryParam("property_id")
+	orgID := mw.GetOrgID(c)
 
-	result, err := h.svc.List(c.Request().Context(), page, perPage)
+	result, err := h.svc.List(c.Request().Context(), page, perPage, search, propertyID, orgID)
 	if err != nil {
 		return response.InternalError(c, err.Error())
+	}
+	
+	if result.Total > 0 {
+		result.TotalPages = int(math.Ceil(float64(result.Total) / float64(perPage)))
 	}
 
 	return response.OK(c, result)
@@ -67,13 +83,14 @@ func (h *AssetHandler) List(c echo.Context) error {
 
 func (h *AssetHandler) Update(c echo.Context) error {
 	id := c.Param("id")
+	orgID := mw.GetOrgID(c)
 
 	var req dto.UpdateAssetRequest
 	if err := c.Bind(&req); err != nil {
 		return response.BadRequest(c, "invalid request body")
 	}
 
-	result, err := h.svc.Update(c.Request().Context(), id, &req)
+	result, err := h.svc.Update(c.Request().Context(), id, orgID, &req)
 	if err != nil {
 		return response.InternalError(c, err.Error())
 	}
@@ -83,8 +100,9 @@ func (h *AssetHandler) Update(c echo.Context) error {
 
 func (h *AssetHandler) Delete(c echo.Context) error {
 	id := c.Param("id")
+	orgID := mw.GetOrgID(c)
 
-	if err := h.svc.Delete(c.Request().Context(), id); err != nil {
+	if err := h.svc.Delete(c.Request().Context(), id, orgID); err != nil {
 		return response.InternalError(c, err.Error())
 	}
 

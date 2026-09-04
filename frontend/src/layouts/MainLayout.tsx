@@ -4,9 +4,10 @@ import {
   LayoutDashboard, Building2, DoorOpen, Users, ShieldCheck,
   UserCog, Settings, Menu, X, Bell, LogOut, ChevronDown,
   CalendarCheck, FileText, Bed, Receipt, CreditCard, Wrench, Package,
-  Globe2, MessageCircle, Megaphone, Layers
+  Globe2, MessageCircle, Megaphone, Layers, Check
 } from 'lucide-react';
 import { useAuth } from '../features/iam/context/AuthContext';
+import { useOrg } from '../features/organization/context/OrgContext';
 
 // ─── Menu Configuration ────────────────────────────────────────────────────
 const MENU_CONFIG = [
@@ -15,6 +16,7 @@ const MENU_CONFIG = [
   { label: 'Organizations',  path: '/dashboard/organizations',    icon: Globe2,     requiredPermission: 'property:read' },
   { label: 'Properties',     path: '/dashboard/properties',       icon: Building2,  requiredPermission: 'property:read' },
   { label: 'Buildings',      path: '/dashboard/buildings',        icon: Layers,     requiredPermission: 'property:read' },
+  { label: 'Floors',         path: '/dashboard/floors',           icon: Layers,     requiredPermission: 'property:read' },
   { label: 'Rooms & Units',  path: '/dashboard/rooms',            icon: DoorOpen,   requiredPermission: 'room:read'     },
   { label: 'Tenants',        path: '/dashboard/tenants',          icon: Users,      requiredPermission: 'tenant:read'   },
   
@@ -43,9 +45,11 @@ const MENU_CONFIG = [
 
 export default function MainLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [orgMenuOpen, setOrgMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout, hasPermission } = useAuth();
+  const { currentOrg, orgs, switchOrg } = useOrg();
 
   const handleLogout = async () => {
     await logout();
@@ -157,11 +161,67 @@ export default function MainLayout() {
           </div>
 
           <div className="flex items-center gap-4">
-            <button className="hidden md:flex items-center gap-2 bg-black/5 hover:bg-black/10 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-              <Building2 size={16} className="text-orange" />
-              <span className="max-w-40 truncate">{user?.organization_id ? 'Tenant Org' : 'Global Admin'}</span>
-              <ChevronDown size={16} className="text-black/50 ml-2" />
-            </button>
+            <div className="relative">
+              <button
+                onClick={() => setOrgMenuOpen(!orgMenuOpen)}
+                className="hidden md:flex items-center gap-2 bg-black/5 hover:bg-black/10 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              >
+                <Globe2 size={16} className="text-orange" />
+                <span className="max-w-40 truncate">{currentOrg?.name ?? 'No Organization'}</span>
+                <ChevronDown size={16} className="text-black/50 ml-1" />
+              </button>
+
+              {orgMenuOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setOrgMenuOpen(false)}
+                  />
+                  <div className="absolute right-0 top-full mt-2 z-50 w-64 bg-white rounded-xl shadow-lg border border-black/5 overflow-hidden">
+                    <div className="px-4 py-3 border-b border-black/5 text-xs font-bold text-black/40 tracking-wider">
+                      YOUR ORGANIZATIONS
+                    </div>
+                    <div className="max-h-64 overflow-y-auto">
+                      {orgs.length === 0 && (
+                        <div className="px-4 py-6 text-center text-sm text-black/40">
+                          No organizations yet.
+                          <button
+                            onClick={() => { navigate('/dashboard/organizations/new'); setOrgMenuOpen(false); }}
+                            className="block w-full mt-2 text-orange font-semibold hover:underline"
+                          >
+                            Create one →
+                          </button>
+                        </div>
+                      )}
+                      {orgs.map(org => (
+                        <button
+                          key={org.id}
+                          onClick={() => { switchOrg(org.id); setOrgMenuOpen(false); }}
+                          className="w-full flex items-center justify-between px-4 py-3 hover:bg-black/5 transition-colors text-left"
+                        >
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">{org.name}</p>
+                            <p className="text-xs text-black/40 truncate">{org.domain}</p>
+                          </div>
+                          {currentOrg?.id === org.id && (
+                            <Check size={16} className="text-orange flex-shrink-0 ml-2" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="border-t border-black/5">
+                      <button
+                        onClick={() => { navigate('/dashboard/organizations/new'); setOrgMenuOpen(false); }}
+                        className="w-full flex items-center gap-2 px-4 py-3 text-sm font-medium text-orange hover:bg-orange/5 transition-colors"
+                      >
+                        <Globe2 size={16} />
+                        Create Organization
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
 
             <button className="w-10 h-10 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center relative transition-colors">
               <Bell size={18} className="text-black/70" />
