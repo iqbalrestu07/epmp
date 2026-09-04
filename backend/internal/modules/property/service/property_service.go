@@ -9,6 +9,7 @@ import (
 	"github.com/epmp/backend/internal/modules/property/dto"
 	"github.com/epmp/backend/internal/modules/property/entity"
 	"github.com/epmp/backend/internal/modules/property/repository"
+	"github.com/epmp/backend/internal/pkg/uid"
 )
 
 // PropertyService implements the application layer for Property.
@@ -21,9 +22,10 @@ func NewPropertyService(repo repository.PropertyRepository) *PropertyService {
 	return &PropertyService{repo: repo}
 }
 
-func (s *PropertyService) Create(ctx context.Context, req *dto.CreatePropertyRequest) (*dto.PropertyResponse, error) {
+func (s *PropertyService) Create(ctx context.Context, req *dto.CreatePropertyRequest, orgID string) (*dto.PropertyResponse, error) {
 	e := entity.NewProperty()
-	e.OrganizationId = req.OrganizationId
+	e.Id = uid.New()
+	e.OrganizationId = orgID
 	e.Name = req.Name
 	e.Description = req.Description
 	e.Address = req.Address
@@ -37,15 +39,15 @@ func (s *PropertyService) Create(ctx context.Context, req *dto.CreatePropertyReq
 	return s.toResponse(e), nil
 }
 
-func (s *PropertyService) GetByID(ctx context.Context, id string) (*dto.PropertyResponse, error) {
-	e, err := s.repo.FindByID(ctx, id)
+func (s *PropertyService) GetByID(ctx context.Context, id, orgID string) (*dto.PropertyResponse, error) {
+	e, err := s.repo.FindByID(ctx, id, orgID)
 	if err != nil {
 		return nil, fmt.Errorf("property service: get by id: %w", err)
 	}
 	return s.toResponse(e), nil
 }
 
-func (s *PropertyService) List(ctx context.Context, page, perPage int) (*dto.PropertyListResponse, error) {
+func (s *PropertyService) List(ctx context.Context, page, perPage int, search, orgID string) (*dto.PropertyListResponse, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -54,12 +56,12 @@ func (s *PropertyService) List(ctx context.Context, page, perPage int) (*dto.Pro
 	}
 	offset := (page - 1) * perPage
 
-	items, err := s.repo.FindAll(ctx, perPage, offset)
+	items, err := s.repo.FindAll(ctx, perPage, offset, search, orgID)
 	if err != nil {
 		return nil, fmt.Errorf("property service: list: %w", err)
 	}
 
-	total, err := s.repo.Count(ctx)
+	total, err := s.repo.Count(ctx, search, orgID)
 	if err != nil {
 		return nil, fmt.Errorf("property service: list: count: %w", err)
 	}
@@ -80,12 +82,11 @@ func (s *PropertyService) List(ctx context.Context, page, perPage int) (*dto.Pro
 	}, nil
 }
 
-func (s *PropertyService) Update(ctx context.Context, id string, req *dto.UpdatePropertyRequest) (*dto.PropertyResponse, error) {
-	e, err := s.repo.FindByID(ctx, id)
+func (s *PropertyService) Update(ctx context.Context, id, orgID string, req *dto.UpdatePropertyRequest) (*dto.PropertyResponse, error) {
+	e, err := s.repo.FindByID(ctx, id, orgID)
 	if err != nil {
 		return nil, fmt.Errorf("property service: update: find: %w", err)
 	}
-	e.OrganizationId = req.OrganizationId
 	e.Name = req.Name
 	e.Description = req.Description
 	e.Address = req.Address
@@ -96,7 +97,11 @@ func (s *PropertyService) Update(ctx context.Context, id string, req *dto.Update
 		return nil, fmt.Errorf("property service: update: save: %w", err)
 	}
 
-	return s.toResponse(e), nil
+	updated, err := s.repo.FindByID(ctx, id, orgID)
+	if err != nil {
+		return s.toResponse(e), nil
+	}
+	return s.toResponse(updated), nil
 }
 
 func (s *PropertyService) Delete(ctx context.Context, id string) error {

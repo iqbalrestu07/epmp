@@ -12,13 +12,16 @@ type FloorRepository interface {
 	Save(ctx context.Context, e *entity.Floor) error
 
 	// FindByID retrieves a Floor by its primary key.
-	FindByID(ctx context.Context, id string) (*entity.Floor, error)
+	// If orgID is non-empty, the result must belong to that organization.
+	FindByID(ctx context.Context, id, orgID string) (*entity.Floor, error)
 
 	// FindAll retrieves a paginated list of Floor entities.
-	FindAll(ctx context.Context, limit, offset int, search string, buildingId string) ([]*entity.Floor, error)
+	// If orgID is non-empty, results are filtered to that organization.
+	FindAll(ctx context.Context, limit, offset int, search, buildingId, orgID string) ([]*entity.Floor, error)
 
 	// Count returns the total number of non-deleted floors.
-	Count(ctx context.Context, search string, buildingId string) (int64, error)
+	// If orgID is non-empty, count is filtered to that organization.
+	Count(ctx context.Context, search, buildingId, orgID string) (int64, error)
 
 	// Delete removes a Floor by its primary key.
 	Delete(ctx context.Context, id string) error

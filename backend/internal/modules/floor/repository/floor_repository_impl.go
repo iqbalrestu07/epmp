@@ -43,14 +43,18 @@ func (r *FloorRepositoryImpl) Save(ctx context.Context, e *entity.Floor) error {
 	return err
 }
 
-func (r *FloorRepositoryImpl) FindByID(ctx context.Context, id string) (*entity.Floor, error) {
+func (r *FloorRepositoryImpl) FindByID(ctx context.Context, id, orgID string) (*entity.Floor, error) {
 	e := &entity.Floor{}
-	err := r.db.QueryRow(ctx, `
+	query := `
 		SELECT id, organization_id, building_id, name, floor_number, is_active, created_at, updated_at, deleted_at
 		FROM   floors
-		WHERE  id = $1 AND deleted_at IS NULL`,
-		id,
-	).Scan(&e.Id, &e.OrganizationId, &e.BuildingId, &e.Name, &e.FloorNumber, &e.IsActive, &e.CreatedAt, &e.UpdatedAt, &e.DeletedAt)
+		WHERE  id = $1 AND deleted_at IS NULL`
+	args := []interface{}{id}
+	if orgID != "" {
+		query += ` AND organization_id = $2`
+		args = append(args, orgID)
+	}
+	err := r.db.QueryRow(ctx, query, args...).Scan(&e.Id, &e.OrganizationId, &e.BuildingId, &e.Name, &e.FloorNumber, &e.IsActive, &e.CreatedAt, &e.UpdatedAt, &e.DeletedAt)
 
 	if err != nil {
 		return nil, fmt.Errorf("floor repository: find by id: %w", err)
@@ -58,7 +62,7 @@ func (r *FloorRepositoryImpl) FindByID(ctx context.Context, id string) (*entity.
 	return e, nil
 }
 
-func (r *FloorRepositoryImpl) FindAll(ctx context.Context, limit, offset int, search string, buildingId string) ([]*entity.Floor, error) {
+func (r *FloorRepositoryImpl) FindAll(ctx context.Context, limit, offset int, search string, buildingId, orgID string) ([]*entity.Floor, error) {
 	query := `
 		SELECT id, organization_id, building_id, name, floor_number, is_active, created_at, updated_at, deleted_at
 		FROM   floors
@@ -74,6 +78,11 @@ func (r *FloorRepositoryImpl) FindAll(ctx context.Context, limit, offset int, se
 	if buildingId != "" {
 		query += fmt.Sprintf(` AND building_id = $%d`, argIdx)
 		args = append(args, buildingId)
+		argIdx++
+	}
+	if orgID != "" {
+		query += fmt.Sprintf(` AND organization_id = $%d`, argIdx)
+		args = append(args, orgID)
 		argIdx++
 	}
 
@@ -97,7 +106,7 @@ func (r *FloorRepositoryImpl) FindAll(ctx context.Context, limit, offset int, se
 	return list, rows.Err()
 }
 
-func (r *FloorRepositoryImpl) Count(ctx context.Context, search string, buildingId string) (int64, error) {
+func (r *FloorRepositoryImpl) Count(ctx context.Context, search string, buildingId, orgID string) (int64, error) {
 	query := `SELECT COUNT(*) FROM floors WHERE deleted_at IS NULL`
 	args := []interface{}{}
 	argIdx := 1
@@ -110,6 +119,11 @@ func (r *FloorRepositoryImpl) Count(ctx context.Context, search string, building
 	if buildingId != "" {
 		query += fmt.Sprintf(` AND building_id = $%d`, argIdx)
 		args = append(args, buildingId)
+		argIdx++
+	}
+	if orgID != "" {
+		query += fmt.Sprintf(` AND organization_id = $%d`, argIdx)
+		args = append(args, orgID)
 	}
 
 	var count int64

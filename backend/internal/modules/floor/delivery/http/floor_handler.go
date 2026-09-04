@@ -7,6 +7,7 @@ import (
 
 	"github.com/epmp/backend/internal/modules/floor/dto"
 	"github.com/epmp/backend/internal/modules/floor/service"
+	mw "github.com/epmp/backend/internal/pkg/middleware"
 	"github.com/epmp/backend/internal/pkg/response"
 
 	"github.com/labstack/echo/v4"
@@ -34,7 +35,9 @@ func (h *FloorHandler) Create(c echo.Context) error {
 		return response.BadRequest(c, "building_id is required")
 	}
 
-	result, err := h.svc.Create(c.Request().Context(), &req)
+	orgID := mw.GetOrgID(c)
+
+	result, err := h.svc.Create(c.Request().Context(), &req, orgID)
 	if err != nil {
 		return response.InternalError(c, err.Error())
 	}
@@ -44,8 +47,9 @@ func (h *FloorHandler) Create(c echo.Context) error {
 
 func (h *FloorHandler) GetByID(c echo.Context) error {
 	id := c.Param("id")
+	orgID := mw.GetOrgID(c)
 
-	result, err := h.svc.GetByID(c.Request().Context(), id)
+	result, err := h.svc.GetByID(c.Request().Context(), id, orgID)
 	if err != nil {
 		return response.NotFound(c, "Floor not found")
 	}
@@ -64,8 +68,9 @@ func (h *FloorHandler) List(c echo.Context) error {
 	}
 	search := c.QueryParam("search")
 	buildingId := c.QueryParam("building_id")
+	orgID := mw.GetOrgID(c)
 
-	result, err := h.svc.List(c.Request().Context(), page, perPage, search, buildingId)
+	result, err := h.svc.List(c.Request().Context(), page, perPage, search, buildingId, orgID)
 	if err != nil {
 		return response.InternalError(c, err.Error())
 	}
@@ -75,13 +80,14 @@ func (h *FloorHandler) List(c echo.Context) error {
 
 func (h *FloorHandler) Update(c echo.Context) error {
 	id := c.Param("id")
+	orgID := mw.GetOrgID(c)
 
 	var req dto.UpdateFloorRequest
 	if err := c.Bind(&req); err != nil {
 		return response.BadRequest(c, "invalid request body")
 	}
 
-	result, err := h.svc.Update(c.Request().Context(), id, &req)
+	result, err := h.svc.Update(c.Request().Context(), id, orgID, &req)
 	if err != nil {
 		return response.InternalError(c, err.Error())
 	}

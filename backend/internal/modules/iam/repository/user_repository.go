@@ -21,14 +21,24 @@ func NewUserRepository(db *pgxpool.Pool) *pgUserRepository {
 
 func (r *pgUserRepository) Save(ctx context.Context, u *entity.User) error {
 	if u.ID == "" {
-		// INSERT
+		return fmt.Errorf("user repository: save: id must be pre-set by caller (use uid.New())")
+	}
+
+	// Check if record exists
+	var exists bool
+	if err := r.db.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM users WHERE id=$1)`, u.ID).Scan(&exists); err != nil {
+		return fmt.Errorf("user repository: save: check exists: %w", err)
+	}
+
+	if !exists {
+		// INSERT with caller-provided ULID
 		row := r.db.QueryRow(ctx, `
-			INSERT INTO users (email, password_hash, name, is_active)
-			VALUES ($1, $2, $3, $4)
-			RETURNING id, created_at, updated_at`,
-			u.Email, u.PasswordHash, u.Name, u.IsActive,
+			INSERT INTO users (id, email, password_hash, name, is_active)
+			VALUES ($1, $2, $3, $4, $5)
+			RETURNING created_at, updated_at`,
+			u.ID, u.Email, u.PasswordHash, u.Name, u.IsActive,
 		)
-		return row.Scan(&u.ID, &u.CreatedAt, &u.UpdatedAt)
+		return row.Scan(&u.CreatedAt, &u.UpdatedAt)
 	}
 	// UPDATE
 	_, err := r.db.Exec(ctx, `

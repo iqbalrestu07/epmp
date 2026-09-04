@@ -7,6 +7,7 @@ import (
 	"github.com/epmp/backend/internal/modules/organization/dto"
 	"github.com/epmp/backend/internal/modules/organization/entity"
 	"github.com/epmp/backend/internal/modules/organization/repository"
+	"github.com/epmp/backend/internal/pkg/uid"
 )
 
 // OrganizationService implements the application layer for Organization.
@@ -19,14 +20,27 @@ func NewOrganizationService(repo repository.OrganizationRepository) *Organizatio
 	return &OrganizationService{repo: repo}
 }
 
-func (s *OrganizationService) Create(ctx context.Context, req *dto.CreateOrganizationRequest) (*dto.OrganizationResponse, error) {
+// Create creates a new organization and automatically assigns the creator as owner.
+// createdBy must be the authenticated user's ID from JWT context.
+func (s *OrganizationService) Create(ctx context.Context, req *dto.CreateOrganizationRequest, createdBy string) (*dto.OrganizationResponse, error) {
 	e := entity.NewOrganization()
+	e.Id = uid.New()
 	e.Name = req.Name
 	e.Domain = req.Domain
 	e.IsActive = req.IsActive
+	e.CreatedBy = createdBy
 
 	if err := s.repo.Save(ctx, e); err != nil {
 		return nil, fmt.Errorf("organization service: create: %w", err)
+	}
+
+	// Auto-assign creator as owner in organization_members
+	member := entity.NewOrganizationMember(e.Id, createdBy, entity.OrgRoleOwner)
+	member.Id = uid.New()
+	if err := s.repo.SaveMember(ctx, member); err != nil {
+		// Non-fatal: log but don't fail the org creation
+		// In production, wrap in a transaction
+		return nil, fmt.Errorf("organization service: create: assign owner: %w", err)
 	}
 
 	return s.toResponse(e), nil
@@ -78,6 +92,19 @@ func (s *OrganizationService) List(ctx context.Context, page, perPage int, searc
 	}, nil
 }
 
+// ListByUser returns all organizations where the given user is a member.
+func (s *OrganizationService) ListByUser(ctx context.Context, userID string) ([]*dto.OrganizationResponse, error) {
+	items, err := s.repo.FindByUserID(ctx, userID)
+	if err != nil {
+		return nil, fmt.Errorf("organization service: list by user: %w", err)
+	}
+	result := make([]*dto.OrganizationResponse, 0, len(items))
+	for _, e := range items {
+		result = append(result, s.toResponse(e))
+	}
+	return result, nil
+}
+
 func (s *OrganizationService) Update(ctx context.Context, id string, req *dto.UpdateOrganizationRequest) (*dto.OrganizationResponse, error) {
 	e, err := s.repo.FindByID(ctx, id)
 	if err != nil {
@@ -112,6 +139,7 @@ func (s *OrganizationService) toResponse(e *entity.Organization) *dto.Organizati
 		Name:      e.Name,
 		Domain:    e.Domain,
 		IsActive:  e.IsActive,
+		CreatedBy: e.CreatedBy,
 		CreatedAt: e.CreatedAt,
 		UpdatedAt: e.UpdatedAt,
 	}

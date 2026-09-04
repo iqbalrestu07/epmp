@@ -32,14 +32,12 @@ CREATE TRIGGER trg_org_members_updated_at
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- 2. Add created_by to organizations
+-- 2. created_by already added in migration 000032
 -- ─────────────────────────────────────────────────────────────────────────────
-ALTER TABLE organizations ADD COLUMN IF NOT EXISTS created_by TEXT REFERENCES users(id);
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- 3. Add floor_id to rooms
+-- 3. floor_id already added in migration 000032; just add the index
 -- ─────────────────────────────────────────────────────────────────────────────
-ALTER TABLE rooms ADD COLUMN IF NOT EXISTS floor_id TEXT REFERENCES floors(id);
 
 CREATE INDEX IF NOT EXISTS idx_rooms_floor_id ON rooms (floor_id);
 

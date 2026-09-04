@@ -62,17 +62,21 @@ func (r *PropertyRepositoryImpl) Save(ctx context.Context, e *entity.Property) e
 	return err
 }
 
-func (r *PropertyRepositoryImpl) FindByID(ctx context.Context, id string) (*entity.Property, error) {
+func (r *PropertyRepositoryImpl) FindByID(ctx context.Context, id, orgID string) (*entity.Property, error) {
 	e := &entity.Property{}
-	var orgID *string
-	err := r.db.QueryRow(ctx, `
+	var orgIDPtr *string
+	query := `
 		SELECT organization_id, id, name, description, address, property_type, is_active, created_at, updated_at, deleted_at
 		FROM   properties
-		WHERE  id = $1 AND deleted_at IS NULL`,
-		id,
-	).Scan(&orgID, &e.Id, &e.Name, &e.Description, &e.Address, &e.PropertyType, &e.IsActive, &e.CreatedAt, &e.UpdatedAt, &e.DeletedAt)
-	if orgID != nil {
-		e.OrganizationId = *orgID
+		WHERE  id = $1 AND deleted_at IS NULL`
+	args := []interface{}{id}
+	if orgID != "" {
+		query += ` AND organization_id = $2`
+		args = append(args, orgID)
+	}
+	err := r.db.QueryRow(ctx, query, args...).Scan(&orgIDPtr, &e.Id, &e.Name, &e.Description, &e.Address, &e.PropertyType, &e.IsActive, &e.CreatedAt, &e.UpdatedAt, &e.DeletedAt)
+	if orgIDPtr != nil {
+		e.OrganizationId = *orgIDPtr
 	}
 
 	if err != nil {
@@ -81,15 +85,29 @@ func (r *PropertyRepositoryImpl) FindByID(ctx context.Context, id string) (*enti
 	return e, nil
 }
 
-func (r *PropertyRepositoryImpl) FindAll(ctx context.Context, limit, offset int) ([]*entity.Property, error) {
-	rows, err := r.db.Query(ctx, `
+func (r *PropertyRepositoryImpl) FindAll(ctx context.Context, limit, offset int, search, orgID string) ([]*entity.Property, error) {
+	query := `
 		SELECT organization_id, id, name, description, address, property_type, is_active, created_at, updated_at, deleted_at
 		FROM   properties
-		WHERE  deleted_at IS NULL
-		ORDER BY created_at DESC
-		LIMIT $1 OFFSET $2`,
-		limit, offset,
-	)
+		WHERE  deleted_at IS NULL`
+	args := []interface{}{}
+	argIdx := 1
+
+	if search != "" {
+		query += fmt.Sprintf(` AND name ILIKE $%d`, argIdx)
+		args = append(args, "%"+search+"%")
+		argIdx++
+	}
+	if orgID != "" {
+		query += fmt.Sprintf(` AND organization_id = $%d`, argIdx)
+		args = append(args, orgID)
+		argIdx++
+	}
+
+	query += fmt.Sprintf(` ORDER BY created_at DESC LIMIT $%d OFFSET $%d`, argIdx, argIdx+1)
+	args = append(args, limit, offset)
+
+	rows, err := r.db.Query(ctx, query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("property repository: find all: %w", err)
 	}
@@ -98,12 +116,12 @@ func (r *PropertyRepositoryImpl) FindAll(ctx context.Context, limit, offset int)
 	var list []*entity.Property
 	for rows.Next() {
 		e := &entity.Property{}
-		var orgID *string
-		if err := rows.Scan(&orgID, &e.Id, &e.Name, &e.Description, &e.Address, &e.PropertyType, &e.IsActive, &e.CreatedAt, &e.UpdatedAt, &e.DeletedAt); err != nil {
+		var orgIDPtr *string
+		if err := rows.Scan(&orgIDPtr, &e.Id, &e.Name, &e.Description, &e.Address, &e.PropertyType, &e.IsActive, &e.CreatedAt, &e.UpdatedAt, &e.DeletedAt); err != nil {
 			return nil, err
 		}
-		if orgID != nil {
-			e.OrganizationId = *orgID
+		if orgIDPtr != nil {
+			e.OrganizationId = *orgIDPtr
 		}
 		list = append(list, e)
 	}
@@ -111,9 +129,23 @@ func (r *PropertyRepositoryImpl) FindAll(ctx context.Context, limit, offset int)
 }
 
 // Count returns the total number of non-deleted properties.
-func (r *PropertyRepositoryImpl) Count(ctx context.Context) (int64, error) {
+func (r *PropertyRepositoryImpl) Count(ctx context.Context, search, orgID string) (int64, error) {
+	query := `SELECT COUNT(*) FROM properties WHERE deleted_at IS NULL`
+	args := []interface{}{}
+	argIdx := 1
+
+	if search != "" {
+		query += fmt.Sprintf(` AND name ILIKE $%d`, argIdx)
+		args = append(args, "%"+search+"%")
+		argIdx++
+	}
+	if orgID != "" {
+		query += fmt.Sprintf(` AND organization_id = $%d`, argIdx)
+		args = append(args, orgID)
+	}
+
 	var count int64
-	err := r.db.QueryRow(ctx, `SELECT COUNT(*) FROM properties WHERE deleted_at IS NULL`).Scan(&count)
+	err := r.db.QueryRow(ctx, query, args...).Scan(&count)
 	if err != nil {
 		return 0, fmt.Errorf("property repository: count: %w", err)
 	}

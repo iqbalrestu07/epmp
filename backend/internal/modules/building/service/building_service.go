@@ -19,9 +19,9 @@ func NewBuildingService(repo repository.BuildingRepository) *BuildingService {
 	return &BuildingService{repo: repo}
 }
 
-func (s *BuildingService) Create(ctx context.Context, req *dto.CreateBuildingRequest) (*dto.BuildingResponse, error) {
+func (s *BuildingService) Create(ctx context.Context, req *dto.CreateBuildingRequest, orgID string) (*dto.BuildingResponse, error) {
 	e := entity.NewBuilding()
-	e.OrganizationId = req.OrganizationId
+	e.OrganizationId = orgID
 	e.PropertyId = req.PropertyId
 	e.Name = req.Name
 	e.TotalFloors = req.TotalFloors
@@ -33,15 +33,15 @@ func (s *BuildingService) Create(ctx context.Context, req *dto.CreateBuildingReq
 	return s.toResponse(e), nil
 }
 
-func (s *BuildingService) GetByID(ctx context.Context, id string) (*dto.BuildingResponse, error) {
-	e, err := s.repo.FindByID(ctx, id)
+func (s *BuildingService) GetByID(ctx context.Context, id, orgID string) (*dto.BuildingResponse, error) {
+	e, err := s.repo.FindByID(ctx, id, orgID)
 	if err != nil {
 		return nil, fmt.Errorf("building service: get by id: %w", err)
 	}
 	return s.toResponse(e), nil
 }
 
-func (s *BuildingService) List(ctx context.Context, page, perPage int, search string, propertyId string) (*dto.BuildingListResponse, error) {
+func (s *BuildingService) List(ctx context.Context, page, perPage int, search string, propertyId, orgID string) (*dto.BuildingListResponse, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -50,12 +50,12 @@ func (s *BuildingService) List(ctx context.Context, page, perPage int, search st
 	}
 	offset := (page - 1) * perPage
 
-	items, err := s.repo.FindAll(ctx, perPage, offset, search, propertyId)
+	items, err := s.repo.FindAll(ctx, perPage, offset, search, propertyId, orgID)
 	if err != nil {
 		return nil, fmt.Errorf("building service: list: %w", err)
 	}
 
-	total, err := s.repo.Count(ctx, search, propertyId)
+	total, err := s.repo.Count(ctx, search, propertyId, orgID)
 	if err != nil {
 		return nil, fmt.Errorf("building service: list: count: %w", err)
 	}
@@ -79,12 +79,11 @@ func (s *BuildingService) List(ctx context.Context, page, perPage int, search st
 	}, nil
 }
 
-func (s *BuildingService) Update(ctx context.Context, id string, req *dto.UpdateBuildingRequest) (*dto.BuildingResponse, error) {
-	e, err := s.repo.FindByID(ctx, id)
+func (s *BuildingService) Update(ctx context.Context, id, orgID string, req *dto.UpdateBuildingRequest) (*dto.BuildingResponse, error) {
+	e, err := s.repo.FindByID(ctx, id, orgID)
 	if err != nil {
 		return nil, fmt.Errorf("building service: update: find: %w", err)
 	}
-	e.OrganizationId = req.OrganizationId
 	e.PropertyId = req.PropertyId
 	e.Name = req.Name
 	e.TotalFloors = req.TotalFloors
@@ -93,7 +92,7 @@ func (s *BuildingService) Update(ctx context.Context, id string, req *dto.Update
 		return nil, fmt.Errorf("building service: update: save: %w", err)
 	}
 
-	updated, err := s.repo.FindByID(ctx, id)
+	updated, err := s.repo.FindByID(ctx, id, orgID)
 	if err != nil {
 		return s.toResponse(e), nil
 	}

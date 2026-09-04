@@ -23,6 +23,7 @@ type testEnv struct {
 	server *httptest.Server
 	db     *pgxpool.Pool
 	token  string
+	orgID  string
 }
 
 // responseEnvelope is the standard JSON response wrapper.
@@ -97,10 +98,14 @@ func setupTestEnv(t *testing.T) *testEnv {
 	// Register or login a test user to get a token
 	token := getTestToken(t, server)
 
+	// Create a test organization and get its ID
+	orgID := createTestOrg(t, server, token)
+
 	env := &testEnv{
 		server: server,
 		db:     db,
 		token:  token,
+		orgID:  orgID,
 	}
 
 	t.Cleanup(func() {
@@ -131,6 +136,33 @@ func getTestToken(t *testing.T, server *httptest.Server) string {
 		return parseToken(t, resp2.Body)
 	}
 	return parseToken(t, resp.Body)
+}
+
+// createTestOrg creates a test organization and returns its ID.
+func createTestOrg(t *testing.T, server *httptest.Server, token string) string {
+	t.Helper()
+
+	orgName := fmt.Sprintf("Test Org %d", time.Now().UnixNano())
+	body := fmt.Sprintf(`{"name":"%s","domain":"%d.test","is_active":true}`, orgName, time.Now().UnixNano())
+
+	resp := doRequest(t, server, "POST", "/api/v1/organizations", body, token)
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusCreated {
+		t.Fatalf("failed to create test org: expected 201, got %d", resp.StatusCode)
+	}
+
+	var env responseEnvelope
+	var org struct {
+		ID string `json:"id"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&env); err != nil {
+		t.Fatalf("failed to decode org response: %v", err)
+	}
+	if err := json.Unmarshal(env.Data, &org); err != nil {
+		t.Fatalf("failed to unmarshal org data: %v", err)
+	}
+	return org.ID
 }
 
 func parseToken(t *testing.T, body io.Reader) string {
@@ -174,10 +206,39 @@ func doRequest(t *testing.T, server *httptest.Server, method, path, body, token 
 	return resp
 }
 
-// doAuthRequest performs an authenticated HTTP request.
+// doRequestWithOrg performs an HTTP request with X-Organization-ID header.
+func doRequestWithOrg(t *testing.T, server *httptest.Server, method, path, body, token, orgID string) *http.Response {
+	t.Helper()
+
+	var reqBody io.Reader
+	if body != "" {
+		reqBody = bytes.NewBufferString(body)
+	}
+
+	req, err := http.NewRequest(method, server.URL+path, reqBody)
+	if err != nil {
+		t.Fatalf("failed to create request: %v", err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	if token != "" {
+		req.Header.Set("Authorization", "Bearer "+token)
+	}
+	if orgID != "" {
+		req.Header.Set("X-Organization-ID", orgID)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("failed to do request: %v", err)
+	}
+	return resp
+}
+
+// doAuthRequest performs an authenticated HTTP request with org context.
 func (env *testEnv) doAuthRequest(t *testing.T, method, path, body string) *http.Response {
 	t.Helper()
-	return doRequest(t, env.server, method, path, body, env.token)
+	return doRequestWithOrg(t, env.server, method, path, body, env.token, env.orgID)
 }
 
 // parseProperty parses a property response envelope.

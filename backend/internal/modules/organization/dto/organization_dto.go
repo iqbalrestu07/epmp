@@ -20,10 +20,11 @@ type UpdateOrganizationRequest struct {
 
 // OrganizationResponse is the DTO for returning a Organization.
 type OrganizationResponse struct {
-	Id string `json:"id"`
-	Name string `json:"name"`
-	Domain string `json:"domain"`
-	IsActive bool `json:"is_active"`
+	Id        string    `json:"id"`
+	Name      string    `json:"name"`
+	Domain    string    `json:"domain"`
+	IsActive  bool      `json:"is_active"`
+	CreatedBy string    `json:"created_by,omitempty"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }

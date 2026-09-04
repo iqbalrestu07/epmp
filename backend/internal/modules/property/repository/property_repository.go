@@ -14,13 +14,16 @@ type PropertyRepository interface {
 	Save(ctx context.Context, e *entity.Property) error
 
 	// FindByID retrieves a Property by its primary key.
-	FindByID(ctx context.Context, id string) (*entity.Property, error)
+	// If orgID is non-empty, the result must belong to that organization.
+	FindByID(ctx context.Context, id, orgID string) (*entity.Property, error)
 
 	// FindAll retrieves a paginated list of Property entities.
-	FindAll(ctx context.Context, limit, offset int) ([]*entity.Property, error)
+	// If orgID is non-empty, results are filtered to that organization.
+	FindAll(ctx context.Context, limit, offset int, search, orgID string) ([]*entity.Property, error)
 
 	// Count returns the total number of non-deleted Properties.
-	Count(ctx context.Context) (int64, error)
+	// If orgID is non-empty, count is filtered to that organization.
+	Count(ctx context.Context, search, orgID string) (int64, error)
 
 	// Delete removes a Property by its primary key.
 	Delete(ctx context.Context, id string) error

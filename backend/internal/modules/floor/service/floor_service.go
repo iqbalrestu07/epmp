@@ -19,9 +19,9 @@ func NewFloorService(repo repository.FloorRepository) *FloorService {
 	return &FloorService{repo: repo}
 }
 
-func (s *FloorService) Create(ctx context.Context, req *dto.CreateFloorRequest) (*dto.FloorResponse, error) {
+func (s *FloorService) Create(ctx context.Context, req *dto.CreateFloorRequest, orgID string) (*dto.FloorResponse, error) {
 	e := entity.NewFloor()
-	e.OrganizationId = req.OrganizationId
+	e.OrganizationId = orgID
 	e.BuildingId = req.BuildingId
 	e.Name = req.Name
 	e.FloorNumber = req.FloorNumber
@@ -34,15 +34,15 @@ func (s *FloorService) Create(ctx context.Context, req *dto.CreateFloorRequest) 
 	return s.toResponse(e), nil
 }
 
-func (s *FloorService) GetByID(ctx context.Context, id string) (*dto.FloorResponse, error) {
-	e, err := s.repo.FindByID(ctx, id)
+func (s *FloorService) GetByID(ctx context.Context, id, orgID string) (*dto.FloorResponse, error) {
+	e, err := s.repo.FindByID(ctx, id, orgID)
 	if err != nil {
 		return nil, fmt.Errorf("floor service: get by id: %w", err)
 	}
 	return s.toResponse(e), nil
 }
 
-func (s *FloorService) List(ctx context.Context, page, perPage int, search string, buildingId string) (*dto.FloorListResponse, error) {
+func (s *FloorService) List(ctx context.Context, page, perPage int, search string, buildingId, orgID string) (*dto.FloorListResponse, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -51,12 +51,12 @@ func (s *FloorService) List(ctx context.Context, page, perPage int, search strin
 	}
 	offset := (page - 1) * perPage
 
-	items, err := s.repo.FindAll(ctx, perPage, offset, search, buildingId)
+	items, err := s.repo.FindAll(ctx, perPage, offset, search, buildingId, orgID)
 	if err != nil {
 		return nil, fmt.Errorf("floor service: list: %w", err)
 	}
 
-	total, err := s.repo.Count(ctx, search, buildingId)
+	total, err := s.repo.Count(ctx, search, buildingId, orgID)
 	if err != nil {
 		return nil, fmt.Errorf("floor service: list: count: %w", err)
 	}
@@ -80,12 +80,11 @@ func (s *FloorService) List(ctx context.Context, page, perPage int, search strin
 	}, nil
 }
 
-func (s *FloorService) Update(ctx context.Context, id string, req *dto.UpdateFloorRequest) (*dto.FloorResponse, error) {
-	e, err := s.repo.FindByID(ctx, id)
+func (s *FloorService) Update(ctx context.Context, id, orgID string, req *dto.UpdateFloorRequest) (*dto.FloorResponse, error) {
+	e, err := s.repo.FindByID(ctx, id, orgID)
 	if err != nil {
 		return nil, fmt.Errorf("floor service: update: find: %w", err)
 	}
-	e.OrganizationId = req.OrganizationId
 	e.BuildingId = req.BuildingId
 	e.Name = req.Name
 	e.FloorNumber = req.FloorNumber
@@ -95,7 +94,7 @@ func (s *FloorService) Update(ctx context.Context, id string, req *dto.UpdateFlo
 		return nil, fmt.Errorf("floor service: update: save: %w", err)
 	}
 
-	updated, err := s.repo.FindByID(ctx, id)
+	updated, err := s.repo.FindByID(ctx, id, orgID)
 	if err != nil {
 		return s.toResponse(e), nil
 	}

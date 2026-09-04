@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/epmp/backend/internal/modules/organization/entity"
-
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -24,13 +23,27 @@ var _ OrganizationRepository = (*OrganizationRepositoryImpl)(nil)
 
 func (r *OrganizationRepositoryImpl) Save(ctx context.Context, e *entity.Organization) error {
 	if e.Id == "" {
-		// INSERT
+		return fmt.Errorf("organization repository: save: id must be pre-set by caller (use uid.New())")
+	}
+
+	var exists bool
+	if err := r.db.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM organizations WHERE id=$1)`, e.Id).Scan(&exists); err != nil {
+		return fmt.Errorf("organization repository: save: check exists: %w", err)
+	}
+
+	var createdBy interface{}
+	if e.CreatedBy != "" {
+		createdBy = e.CreatedBy
+	}
+
+	if !exists {
+		// INSERT with caller-provided ULID
 		err := r.db.QueryRow(ctx, `
-			INSERT INTO organizations (name, domain, is_active)
-			VALUES ($1, $2, $3)
-			RETURNING id, created_at, updated_at`,
-			e.Name, e.Domain, e.IsActive,
-		).Scan(&e.Id, &e.CreatedAt, &e.UpdatedAt)
+			INSERT INTO organizations (id, name, domain, is_active, created_by)
+			VALUES ($1, $2, $3, $4, $5)
+			RETURNING created_at, updated_at`,
+			e.Id, e.Name, e.Domain, e.IsActive, createdBy,
+		).Scan(&e.CreatedAt, &e.UpdatedAt)
 		return err
 	}
 	// UPDATE
@@ -45,12 +58,16 @@ func (r *OrganizationRepositoryImpl) Save(ctx context.Context, e *entity.Organiz
 
 func (r *OrganizationRepositoryImpl) FindByID(ctx context.Context, id string) (*entity.Organization, error) {
 	e := &entity.Organization{}
+	var createdBy *string
 	err := r.db.QueryRow(ctx, `
-		SELECT id, name, domain, is_active, created_at, updated_at, deleted_at
+		SELECT id, name, domain, is_active, created_by, created_at, updated_at, deleted_at
 		FROM   organizations
 		WHERE  id = $1 AND deleted_at IS NULL`,
 		id,
-	).Scan(&e.Id, &e.Name, &e.Domain, &e.IsActive, &e.CreatedAt, &e.UpdatedAt, &e.DeletedAt)
+	).Scan(&e.Id, &e.Name, &e.Domain, &e.IsActive, &createdBy, &e.CreatedAt, &e.UpdatedAt, &e.DeletedAt)
+	if createdBy != nil {
+		e.CreatedBy = *createdBy
+	}
 
 	if err != nil {
 		return nil, fmt.Errorf("organization repository: find by id: %w", err)
@@ -60,7 +77,7 @@ func (r *OrganizationRepositoryImpl) FindByID(ctx context.Context, id string) (*
 
 func (r *OrganizationRepositoryImpl) FindAll(ctx context.Context, limit, offset int, search string) ([]*entity.Organization, error) {
 	query := `
-		SELECT id, name, domain, is_active, created_at, updated_at, deleted_at
+		SELECT id, name, domain, is_active, created_by, created_at, updated_at, deleted_at
 		FROM   organizations
 		WHERE  deleted_at IS NULL`
 	args := []interface{}{}
@@ -84,8 +101,45 @@ func (r *OrganizationRepositoryImpl) FindAll(ctx context.Context, limit, offset 
 	var list []*entity.Organization
 	for rows.Next() {
 		e := &entity.Organization{}
-		if err := rows.Scan(&e.Id, &e.Name, &e.Domain, &e.IsActive, &e.CreatedAt, &e.UpdatedAt, &e.DeletedAt); err != nil {
+		var createdBy *string
+		if err := rows.Scan(&e.Id, &e.Name, &e.Domain, &e.IsActive, &createdBy, &e.CreatedAt, &e.UpdatedAt, &e.DeletedAt); err != nil {
 			return nil, err
+		}
+		if createdBy != nil {
+			e.CreatedBy = *createdBy
+		}
+		list = append(list, e)
+	}
+	return list, rows.Err()
+}
+
+// FindByUserID returns all organizations where the user is a member.
+func (r *OrganizationRepositoryImpl) FindByUserID(ctx context.Context, userID string) ([]*entity.Organization, error) {
+	rows, err := r.db.Query(ctx, `
+		SELECT o.id, o.name, o.domain, o.is_active, o.created_by, o.created_at, o.updated_at, o.deleted_at
+		FROM   organizations o
+		INNER JOIN organization_members om ON om.organization_id = o.id
+		WHERE  om.user_id = $1
+		  AND  om.is_active = true
+		  AND  om.deleted_at IS NULL
+		  AND  o.deleted_at IS NULL
+		ORDER  BY o.created_at DESC`,
+		userID,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("organization repository: find by user id: %w", err)
+	}
+	defer rows.Close()
+
+	var list []*entity.Organization
+	for rows.Next() {
+		e := &entity.Organization{}
+		var createdBy *string
+		if err := rows.Scan(&e.Id, &e.Name, &e.Domain, &e.IsActive, &createdBy, &e.CreatedAt, &e.UpdatedAt, &e.DeletedAt); err != nil {
+			return nil, err
+		}
+		if createdBy != nil {
+			e.CreatedBy = *createdBy
 		}
 		list = append(list, e)
 	}
@@ -113,4 +167,43 @@ func (r *OrganizationRepositoryImpl) Delete(ctx context.Context, id string) erro
 	_, err := r.db.Exec(ctx, `
 		UPDATE organizations SET deleted_at = now() WHERE id = $1 AND deleted_at IS NULL`, id)
 	return err
+}
+
+// SaveMember inserts or updates an organization_members record.
+func (r *OrganizationRepositoryImpl) SaveMember(ctx context.Context, m *entity.OrganizationMember) error {
+	if m.Id == "" {
+		return fmt.Errorf("organization repository: save member: id must be pre-set by caller")
+	}
+	_, err := r.db.Exec(ctx, `
+		INSERT INTO organization_members (id, organization_id, user_id, role, invited_by, is_active)
+		VALUES ($1, $2, $3, $4, $5, $6)
+		ON CONFLICT (organization_id, user_id)
+		DO UPDATE SET role=$4, is_active=$6, updated_at=now()`,
+		m.Id, m.OrganizationId, m.UserId, string(m.Role), m.InvitedBy, m.IsActive,
+	)
+	return err
+}
+
+// FindMembersByOrgID returns all active members of an organization.
+func (r *OrganizationRepositoryImpl) FindMembersByOrgID(ctx context.Context, orgID string) ([]*entity.OrganizationMember, error) {
+	rows, err := r.db.Query(ctx, `
+		SELECT id, organization_id, user_id, role, invited_by, joined_at, is_active, created_at, updated_at, deleted_at
+		FROM   organization_members
+		WHERE  organization_id = $1 AND is_active = true AND deleted_at IS NULL`,
+		orgID,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("organization repository: find members: %w", err)
+	}
+	defer rows.Close()
+
+	var list []*entity.OrganizationMember
+	for rows.Next() {
+		m := &entity.OrganizationMember{}
+		if err := rows.Scan(&m.Id, &m.OrganizationId, &m.UserId, &m.Role, &m.InvitedBy, &m.JoinedAt, &m.IsActive, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
+			return nil, err
+		}
+		list = append(list, m)
+	}
+	return list, rows.Err()
 }
