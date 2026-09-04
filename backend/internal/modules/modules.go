@@ -21,6 +21,7 @@ import (
 	"github.com/epmp/backend/internal/modules/charge"
 	"github.com/epmp/backend/internal/modules/contract"
 	"github.com/epmp/backend/internal/modules/deposit"
+	"github.com/epmp/backend/internal/modules/floor"
 	"github.com/epmp/backend/internal/modules/iam"
 	"github.com/epmp/backend/internal/modules/occupancy"
 	"github.com/epmp/backend/internal/modules/organization"
@@ -64,6 +65,7 @@ func Register(e *echo.Echo, db *pgxpool.Pool, log zerolog.Logger, jwtSecret stri
 	penalty.NewModule(db, log).RegisterRoutes(protected)
 
 		building.NewModule(db, log).RegisterRoutes(protected)
+	floor.NewModule(db, log).RegisterRoutes(protected)
 	zone.NewModule(db, log).RegisterRoutes(protected)
 	bed.NewModule(db, log).RegisterRoutes(protected)
 	facility.NewModule(db, log).RegisterRoutes(protected)

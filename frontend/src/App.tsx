@@ -26,6 +26,7 @@ import { AdjustmentListPage } from "./features/adjustment/pages/AdjustmentListPa
 import { PenaltyListPage } from "./features/penalty/pages/PenaltyListPage";
 
 import { BuildingListPage } from "./features/building/pages/BuildingListPage";
+import { FloorListPage } from "./features/floor/pages/FloorListPage";
 import { ZoneListPage } from "./features/zone/pages/ZoneListPage";
 import { BedListPage } from "./features/bed/pages/BedListPage";
 import { FacilityListPage } from "./features/facility/pages/FacilityListPage";
@@ -37,6 +38,9 @@ import { WorkOrderListPage } from "./features/workorder/pages/WorkOrderListPage"
 import { TechnicianListPage } from "./features/technician/pages/TechnicianListPage";
 import { SupplierListPage } from "./features/supplier/pages/SupplierListPage";
 import { OrganizationListPage } from "./features/organization/pages/OrganizationListPage";
+
+import { MessagingSettingsPage } from "./features/communication/pages/MessagingSettingsPage";
+import { BlastMessagePage } from "./features/communication/pages/BlastMessagePage";
 
 import RBACPage from "./features/iam/pages/RBACPage";
 import UserListPage from "./features/iam/pages/UserListPage";
@@ -70,6 +74,7 @@ export default function App() {
           <Route path="properties" element={<PropertyListPage />} />
           <Route path="properties/interactive" element={<PropertyInteractiveView />} />
           <Route path="buildings" element={<BuildingListPage />} />
+          <Route path="floors" element={<FloorListPage />} />
           <Route path="zones" element={<ZoneListPage />} />
           <Route path="rooms" element={<RoomListPage />} />
           <Route path="room-types" element={<RoomTypeListPage />} />
@@ -98,6 +103,10 @@ export default function App() {
           <Route path="work-orders" element={<WorkOrderListPage />} />
           <Route path="technicians" element={<TechnicianListPage />} />
           <Route path="suppliers" element={<SupplierListPage />} />
+
+          {/* Communication */}
+          <Route path="messaging/devices" element={<MessagingSettingsPage />} />
+          <Route path="messaging/blast" element={<BlastMessagePage />} />
 
           {/* Management */}
           <Route

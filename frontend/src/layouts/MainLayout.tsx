@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Building2, DoorOpen, Users, ShieldCheck,
   UserCog, Settings, Menu, X, Bell, LogOut, ChevronDown,
   CalendarCheck, FileText, Bed, Receipt, CreditCard, Wrench, Package,
-  Globe2
+  Globe2, MessageCircle, Megaphone
 } from 'lucide-react';
 import { useAuth } from '../features/iam/context/AuthContext';
 
@@ -30,6 +30,10 @@ const MENU_CONFIG = [
   { type: 'divider' as const, label: 'MAINTENANCE & ASSETS' },
   { label: 'Work Orders',    path: '/dashboard/work-orders',      icon: Wrench },
   { label: 'Assets',         path: '/dashboard/assets',           icon: Package },
+
+  { type: 'divider' as const, label: 'COMMUNICATION' },
+  { label: 'Blast Message',  path: '/dashboard/messaging/blast',  icon: Megaphone },
+  { label: 'Msg Settings',   path: '/dashboard/messaging/devices',icon: MessageCircle },
 
   { type: 'divider' as const, label: 'SYSTEM' },
   { label: 'Roles & Perms',  path: '/dashboard/management/rbac',  icon: ShieldCheck, requiredPermission: 'role:read'   },
