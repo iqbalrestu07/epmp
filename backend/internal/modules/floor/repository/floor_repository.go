@@ -23,6 +23,9 @@ type FloorRepository interface {
 	// If orgID is non-empty, count is filtered to that organization.
 	Count(ctx context.Context, search, buildingId, orgID string) (int64, error)
 
+	// CountByBuildingID returns the number of non-deleted floors for a specific building.
+	CountByBuildingID(ctx context.Context, buildingID string) (int64, error)
+
 	// Delete removes a Floor by its primary key.
 	Delete(ctx context.Context, id string) error
 }

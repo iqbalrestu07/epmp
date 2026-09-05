@@ -12,6 +12,8 @@ type CreateRoomRequest struct {
 	Capacity       int     `json:"capacity"`
 	Price          float64 `json:"price"`
 	IsAvailable    bool    `json:"is_available"`
+	Status         string  `json:"status,omitempty"`
+	Currency       string  `json:"currency,omitempty"`
 }
 
 // UpdateRoomRequest is the DTO for updating a Room.
@@ -24,6 +26,8 @@ type UpdateRoomRequest struct {
 	Capacity       int     `json:"capacity"`
 	Price          float64 `json:"price"`
 	IsAvailable    bool    `json:"is_available"`
+	Status         string  `json:"status,omitempty"`
+	Currency       string  `json:"currency,omitempty"`
 }
 
 // RoomResponse is the DTO for returning a Room.
@@ -37,6 +41,8 @@ type RoomResponse struct {
 	Capacity       int       `json:"capacity"`
 	Price          float64   `json:"price"`
 	IsAvailable    bool      `json:"is_available"`
+	Status         string    `json:"status"`
+	Currency       string    `json:"currency"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 }

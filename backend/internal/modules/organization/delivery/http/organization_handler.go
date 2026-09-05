@@ -114,3 +114,55 @@ func (h *OrganizationHandler) Delete(c echo.Context) error {
 
 	return response.NoContent(c)
 }
+
+func (h *OrganizationHandler) ListMembers(c echo.Context) error {
+	orgID := mw.GetOrgID(c)
+	if orgID == "" {
+		return response.BadRequest(c, "X-Organization-ID header is required")
+	}
+
+	members, err := h.svc.ListMembers(c.Request().Context(), orgID)
+	if err != nil {
+		return response.InternalError(c, err.Error())
+	}
+
+	return response.OK(c, members)
+}
+
+func (h *OrganizationHandler) AddMember(c echo.Context) error {
+	orgID := mw.GetOrgID(c)
+	if orgID == "" {
+		return response.BadRequest(c, "X-Organization-ID header is required")
+	}
+
+	var req dto.AddOrganizationMemberRequest
+	if err := c.Bind(&req); err != nil {
+		return response.BadRequest(c, "invalid request body")
+	}
+
+	invitedBy := mw.GetUserID(c)
+	member, err := h.svc.AddMember(c.Request().Context(), orgID, &req, invitedBy)
+	if err != nil {
+		return response.InternalError(c, err.Error())
+	}
+
+	return response.Created(c, member)
+}
+
+func (h *OrganizationHandler) RemoveMember(c echo.Context) error {
+	orgID := mw.GetOrgID(c)
+	if orgID == "" {
+		return response.BadRequest(c, "X-Organization-ID header is required")
+	}
+	userID := c.Param("userId")
+	if userID == "" {
+		return response.BadRequest(c, "userId is required")
+	}
+
+	if err := h.svc.RemoveMember(c.Request().Context(), orgID, userID); err != nil {
+		return response.InternalError(c, err.Error())
+	}
+
+	return response.NoContent(c)
+}
+

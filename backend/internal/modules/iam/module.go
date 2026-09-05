@@ -1,6 +1,8 @@
 package iam
 
 import (
+	"time"
+
 	iamhttp "github.com/epmp/backend/internal/modules/iam/delivery/http"
 	"github.com/epmp/backend/internal/modules/iam/repository"
 	iamrepo "github.com/epmp/backend/internal/modules/iam/repository"
@@ -21,7 +23,7 @@ type Module struct {
 }
 
 // NewModule creates and wires all IAM dependencies.
-func NewModule(db *pgxpool.Pool, log zerolog.Logger, jwtSecret string) *Module {
+func NewModule(db *pgxpool.Pool, log zerolog.Logger, jwtSecret string, accessTTL, refreshTTL time.Duration) *Module {
 	// Repositories
 	userRepo := iamrepo.NewUserRepository(db)
 	roleRepo := iamrepo.NewRoleRepository(db)
@@ -30,7 +32,7 @@ func NewModule(db *pgxpool.Pool, log zerolog.Logger, jwtSecret string) *Module {
 	refreshTokenRepo := iamrepo.NewRefreshTokenRepository(db)
 
 	// Services
-	authSvc := service.NewAuthService(userRepo, userRoleRepo, refreshTokenRepo, roleRepo, jwtSecret)
+	authSvc := service.NewAuthService(userRepo, userRoleRepo, refreshTokenRepo, roleRepo, jwtSecret, accessTTL, refreshTTL)
 	userSvc := service.NewUserService(userRepo, userRoleRepo)
 	roleSvc := service.NewRoleService(roleRepo, permissionRepo)
 
@@ -39,7 +41,11 @@ func NewModule(db *pgxpool.Pool, log zerolog.Logger, jwtSecret string) *Module {
 	userH := iamhttp.NewUserHandler(userSvc)
 	roleH := iamhttp.NewRoleHandler(roleSvc)
 
-	log.Info().Str("module", "iam").Msg("module initialized")
+	log.Info().
+		Str("module", "iam").
+		Dur("access_ttl", accessTTL).
+		Dur("refresh_ttl", refreshTTL).
+		Msg("module initialized")
 
 	return &Module{
 		AuthHandler:  authH,

@@ -260,23 +260,38 @@ function FloorGroup({ floor, rooms, position, height, explodedView, isSelected }
         const radius = 4.2;
         const rx = Math.cos(angle) * radius;
         const rz = Math.sin(angle) * radius;
-        const isAvailable = r.is_available;
+        const roomColor = r.status === 'Occupied'
+          ? '#ef4444' // Red
+          : r.status === 'Reserved'
+          ? '#f59e0b' // Amber/Yellow
+          : r.status === 'Maintenance'
+          ? '#64748b' // Slate
+          : '#22c55e'; // Green
+
+        const badgeDotClass = r.status === 'Occupied'
+          ? 'bg-red-500'
+          : r.status === 'Reserved'
+          ? 'bg-amber-500'
+          : r.status === 'Maintenance'
+          ? 'bg-slate-400'
+          : 'bg-green-500';
 
         return (
           <group key={r.id} position={[rx, height/2, rz]}>
             <mesh castShadow>
               <boxGeometry args={[1, height - 0.2, 1]} />
               <meshStandardMaterial 
-                color={isAvailable ? "#22c55e" : "#ef4444"} 
-                emissive={isAvailable ? "#22c55e" : "#ef4444"}
+                color={roomColor} 
+                emissive={roomColor}
                 emissiveIntensity={isSelected ? 0.4 : 0.1}
               />
             </mesh>
             {isSelected && explodedView > 0.8 && (
               <Html position={[0, height/2 + 0.5, 0]} center zIndexRange={[90, 0]}>
-                <div className="bg-white/90 backdrop-blur text-slate-800 text-[10px] px-1.5 py-0.5 rounded shadow border border-slate-200 whitespace-nowrap font-medium">
-                  {r.name}
-                  <span className={`ml-1 w-2 h-2 inline-block rounded-full ${isAvailable ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                <div className="bg-white/95 backdrop-blur text-slate-800 text-[10px] px-2 py-0.5 rounded shadow border border-slate-200 whitespace-nowrap font-semibold flex items-center gap-1.5">
+                  <span className={`w-2 h-2 inline-block rounded-full ${badgeDotClass}`}></span>
+                  <span>{r.name}</span>
+                  <span className="text-[9px] text-slate-400">({r.status || 'Available'})</span>
                 </div>
               </Html>
             )}

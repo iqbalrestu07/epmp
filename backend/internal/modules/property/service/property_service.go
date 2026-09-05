@@ -111,6 +111,22 @@ func (s *PropertyService) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
+func (s *PropertyService) ListStaff(ctx context.Context, propertyID, orgID string) ([]*dto.PropertyStaffResponse, error) {
+	return s.repo.FindStaffByPropertyID(ctx, propertyID, orgID)
+}
+
+func (s *PropertyService) AssignStaff(ctx context.Context, orgID, propertyID, userID, roleID string) (*dto.PropertyStaffResponse, error) {
+	if propertyID == "" || userID == "" || roleID == "" {
+		return nil, fmt.Errorf("propertyId, userId, and roleId are required")
+	}
+	return s.repo.AssignStaff(ctx, orgID, propertyID, userID, roleID)
+}
+
+func (s *PropertyService) RemoveStaff(ctx context.Context, propertyID, userID, roleID, orgID string) error {
+	return s.repo.RemoveStaff(ctx, propertyID, userID, roleID, orgID)
+}
+
+
 func (s *PropertyService) toResponse(e *entity.Property) *dto.PropertyResponse {
 	return &dto.PropertyResponse{
 		OrganizationId: e.OrganizationId,

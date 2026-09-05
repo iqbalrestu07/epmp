@@ -40,23 +40,33 @@ func (r *RoomRepositoryImpl) Save(ctx context.Context, e *entity.Room) error {
 	if e.RoomTypeId != "" {
 		roomTypeID = e.RoomTypeId
 	}
+	if e.Status == "" {
+		if e.IsAvailable {
+			e.Status = "Available"
+		} else {
+			e.Status = "Occupied"
+		}
+	}
+	if e.Currency == "" {
+		e.Currency = "IDR"
+	}
 
 	if !exists {
 		// INSERT with caller-provided ULID
 		err := r.db.QueryRow(ctx, `
-			INSERT INTO rooms (id, organization_id, property_id, floor_id, room_type_id, name, capacity, price, is_available)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+			INSERT INTO rooms (id, organization_id, property_id, floor_id, room_type_id, name, capacity, price, is_available, status, currency)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 			RETURNING created_at, updated_at`,
-			e.Id, e.OrganizationId, e.PropertyId, floorID, roomTypeID, e.Name, e.Capacity, e.Price, e.IsAvailable,
+			e.Id, e.OrganizationId, e.PropertyId, floorID, roomTypeID, e.Name, e.Capacity, e.Price, e.IsAvailable, e.Status, e.Currency,
 		).Scan(&e.CreatedAt, &e.UpdatedAt)
 		return err
 	}
 	// UPDATE
 	_, err := r.db.Exec(ctx, `
 		UPDATE rooms
-		SET    organization_id=$1, property_id=$2, floor_id=$3, room_type_id=$4, name=$5, capacity=$6, price=$7, is_available=$8
-		WHERE  id=$9 AND deleted_at IS NULL`,
-		e.OrganizationId, e.PropertyId, floorID, roomTypeID, e.Name, e.Capacity, e.Price, e.IsAvailable, e.Id,
+		SET    organization_id=$1, property_id=$2, floor_id=$3, room_type_id=$4, name=$5, capacity=$6, price=$7, is_available=$8, status=$9, currency=$10
+		WHERE  id=$11 AND deleted_at IS NULL`,
+		e.OrganizationId, e.PropertyId, floorID, roomTypeID, e.Name, e.Capacity, e.Price, e.IsAvailable, e.Status, e.Currency, e.Id,
 	)
 	return err
 }
@@ -66,7 +76,7 @@ func (r *RoomRepositoryImpl) FindByID(ctx context.Context, id, orgID string) (*e
 	var floorID *string
 	var roomTypeID *string
 	query := `
-		SELECT organization_id, id, property_id, floor_id, room_type_id, name, capacity, price, is_available,
+		SELECT organization_id, id, property_id, floor_id, room_type_id, name, capacity, price, is_available, status, currency,
 		       created_at, updated_at, deleted_at
 		FROM   rooms
 		WHERE  id = $1 AND deleted_at IS NULL`
@@ -75,7 +85,7 @@ func (r *RoomRepositoryImpl) FindByID(ctx context.Context, id, orgID string) (*e
 		query += ` AND organization_id = $2`
 		args = append(args, orgID)
 	}
-	err := r.db.QueryRow(ctx, query, args...).Scan(&e.OrganizationId, &e.Id, &e.PropertyId, &floorID, &roomTypeID, &e.Name, &e.Capacity, &e.Price, &e.IsAvailable,
+	err := r.db.QueryRow(ctx, query, args...).Scan(&e.OrganizationId, &e.Id, &e.PropertyId, &floorID, &roomTypeID, &e.Name, &e.Capacity, &e.Price, &e.IsAvailable, &e.Status, &e.Currency,
 		&e.CreatedAt, &e.UpdatedAt, &e.DeletedAt)
 	if floorID != nil {
 		e.FloorId = *floorID
@@ -92,7 +102,7 @@ func (r *RoomRepositoryImpl) FindByID(ctx context.Context, id, orgID string) (*e
 
 func (r *RoomRepositoryImpl) FindAll(ctx context.Context, limit, offset int, search, floorId, propertyId, buildingId, orgID string) ([]*entity.Room, error) {
 	query := `
-		SELECT organization_id, id, property_id, floor_id, room_type_id, name, capacity, price, is_available,
+		SELECT organization_id, id, property_id, floor_id, room_type_id, name, capacity, price, is_available, status, currency,
 		       created_at, updated_at, deleted_at
 		FROM   rooms
 		WHERE  deleted_at IS NULL`
@@ -139,7 +149,7 @@ func (r *RoomRepositoryImpl) FindAll(ctx context.Context, limit, offset int, sea
 		e := &entity.Room{}
 		var floorID *string
 		var roomTypeID *string
-		if err := rows.Scan(&e.OrganizationId, &e.Id, &e.PropertyId, &floorID, &roomTypeID, &e.Name, &e.Capacity, &e.Price, &e.IsAvailable,
+		if err := rows.Scan(&e.OrganizationId, &e.Id, &e.PropertyId, &floorID, &roomTypeID, &e.Name, &e.Capacity, &e.Price, &e.IsAvailable, &e.Status, &e.Currency,
 			&e.CreatedAt, &e.UpdatedAt, &e.DeletedAt); err != nil {
 			return nil, err
 		}

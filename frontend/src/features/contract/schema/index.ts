@@ -14,6 +14,7 @@ export const contractSchema = z.object({
   end_date: z.string().min(1, "End date is required"),
   monthly_rent: z.coerce.number().min(0, "Monthly rent must be >= 0"),
   deposit_amount: z.coerce.number().min(0, "Deposit amount must be >= 0"),
+  currency: z.string().default("IDR").optional(),
   terms: z.string().optional(),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),

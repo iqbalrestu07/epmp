@@ -7,6 +7,8 @@ export interface Room {
   capacity: number;
   price: number;
   is_available: boolean;
+  status?: 'Available' | 'Reserved' | 'Occupied' | 'Maintenance' | string;
+  currency?: string;
   property_id: string;
   deleted_at?: string;
   created_at: string;
@@ -29,6 +31,8 @@ export interface CreateRoomRequest {
   capacity: number;
   price: number;
   is_available: boolean;
+  status?: string;
+  currency?: string;
 }
 
 export interface UpdateRoomRequest {
@@ -39,6 +43,8 @@ export interface UpdateRoomRequest {
   capacity?: number;
   price?: number;
   is_available?: boolean;
+  status?: string;
+  currency?: string;
 }
 
 export interface RoomQueryParams {

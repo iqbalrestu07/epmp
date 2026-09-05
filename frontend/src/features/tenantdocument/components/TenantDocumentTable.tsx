@@ -34,12 +34,19 @@ export function TenantDocumentTable({ data, onRowClick }: TenantDocumentTablePro
       },
     }),
     columnHelper.accessor("document_type", {
-      header: "DocumentType",
-      cell: (info) => info.getValue(),
+      header: "Document Type",
+      cell: (info) => <span className="font-medium text-slate-800">{info.getValue()}</span>,
     }),
     columnHelper.accessor("file_url", {
-      header: "FileUrl",
-      cell: (info) => info.getValue(),
+      header: "File URL",
+      cell: (info) => {
+        const url = info.getValue() as string;
+        return url ? (
+          <a href={url} target="_blank" rel="noreferrer" className="text-orange hover:underline text-xs">
+            Buka Dokumen ↗
+          </a>
+        ) : <span className="text-slate-400">—</span>;
+      },
     }),
   ];
 

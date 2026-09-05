@@ -73,7 +73,7 @@ export function BuildingForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="total_floors">Total Floors</Label>
+        <Label htmlFor="total_floors">Total Floors (Planned Capacity)</Label>
         <Input
           id="total_floors"
           type="number"
@@ -83,6 +83,7 @@ export function BuildingForm({
         {errors.total_floors && (
           <p className="text-xs text-red-600 mt-1">{errors.total_floors.message}</p>
         )}
+        <p className="text-xs text-slate-400">Maximum number of floors allowed. Actual floors are created in the Floors module.</p>
       </div>
 
       <Button type="submit" disabled={isSubmitting} className="bg-orange hover:bg-orange/90 text-white w-full sm:w-auto">

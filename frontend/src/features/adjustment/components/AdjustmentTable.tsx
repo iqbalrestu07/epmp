@@ -9,8 +9,10 @@ import {
 import type { Adjustment } from "../types";
 import { useInvoices } from "../../billing/hooks";
 
-const columnHelper = createColumnHelper<Adjustment>();
+import { formatDate } from "@/utils/date";
+import { formatCurrency } from "@/utils/currency";
 
+const columnHelper = createColumnHelper<Adjustment>();
 
 interface AdjustmentTableProps {
   data: Adjustment[];
@@ -21,33 +23,58 @@ export function AdjustmentTable({ data, onRowClick }: AdjustmentTableProps) {
   const { data: invoicesData } = useInvoices({ per_page: 100 });
   const invoicesMap = new Map(
     (Array.isArray(invoicesData?.data) ? invoicesData.data : Array.isArray(invoicesData) ? invoicesData : [])
-      .map((item: any) => [item.id, `#` + item.id.slice(0, 8)])
+      .map((item: any) => [item.id, `Invoice #${item.id.slice(0, 8)}`])
   );
 
   const columns = [
     columnHelper.accessor("invoice_id", {
-      header: "Invoice",
+      header: "Tagihan (Invoice)",
       cell: (info) => {
         const id = info.getValue() as string;
         if (!id) return <span className="text-slate-400">—</span>;
-        return invoicesMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+        return (
+          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700">
+            {invoicesMap.get(id) || `#${id.slice(0, 8)}`}
+          </span>
+        );
       },
     }),
     columnHelper.accessor("adjustment_type", {
-      header: "AdjustmentType",
-      cell: (info) => info.getValue(),
+      header: "Adjustment Type",
+      cell: (info) => {
+        const val = info.getValue() || "Discount";
+        const isDiscount = val.toLowerCase().includes("discount") || val.toLowerCase().includes("keringanan");
+        return (
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+            isDiscount ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-700'
+          }`}>
+            {val}
+          </span>
+        );
+      },
     }),
     columnHelper.accessor("amount", {
-      header: "Amount",
-      cell: (info) => info.getValue(),
+      header: "Nominal Penyesuaian",
+      cell: (info) => {
+        const val = info.getValue();
+        const row = info.row.original;
+        return (
+          <span className="font-bold text-slate-900">
+            {formatCurrency(val, (row as any).currency || "IDR")}
+          </span>
+        );
+      },
     }),
     columnHelper.accessor("adjustment_date", {
-      header: "AdjustmentDate",
-      cell: (info) => info.getValue(),
+      header: "Adjustment Date",
+      cell: (info) => {
+        const val = info.getValue() as string;
+        return <span className="text-slate-700">{formatDate(val)}</span>;
+      },
     }),
     columnHelper.accessor("reason", {
-      header: "Reason",
-      cell: (info) => info.getValue(),
+      header: "Alasan",
+      cell: (info) => <span className="text-xs text-slate-500">{info.getValue() || "—"}</span>,
     }),
   ];
 

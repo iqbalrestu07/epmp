@@ -1,60 +1,105 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Building2, DoorOpen, Users, ShieldCheck,
-  UserCog, Settings, Menu, X, Bell, LogOut, ChevronDown,
+  UserCog, Settings, Menu, X, Bell, LogOut, ChevronDown, ChevronRight,
   CalendarCheck, FileText, Bed, Receipt, CreditCard, Wrench, Package,
   Globe2, MessageCircle, Megaphone, Layers, Check, Box
 } from 'lucide-react';
 import { useAuth } from '../features/iam/context/AuthContext';
 import { useOrg } from '../features/organization/context/OrgContext';
 
-// ─── Menu Configuration ────────────────────────────────────────────────────
-const MENU_CONFIG = [
-  { label: 'Overview',       path: '/dashboard',                  icon: LayoutDashboard },
-  { label: '3D Explorer',      path: '/dashboard/explorer',                 icon: Box },
-  { type: 'divider' as const, label: 'CORE' },
-  { label: 'Organizations',  path: '/dashboard/organizations',    icon: Globe2 },
-  { label: 'Properties',     path: '/dashboard/properties',       icon: Building2 },
-  { label: 'Buildings',      path: '/dashboard/buildings',        icon: Layers },
-  { label: 'Floors',         path: '/dashboard/floors',           icon: Layers },
-  { label: 'Zones',          path: '/dashboard/zones',            icon: Layers },
-  { label: 'Rooms & Units',  path: '/dashboard/rooms',            icon: DoorOpen },
-  { label: 'Room Types',     path: '/dashboard/room-types',       icon: DoorOpen },
-  { label: 'Beds',           path: '/dashboard/beds',             icon: Bed },
-  { label: 'Facilities',     path: '/dashboard/facilities',       icon: Building2 },
-  { label: 'Tenants',        path: '/dashboard/tenants',          icon: Users },
-  
-  { type: 'divider' as const, label: 'OPERATIONS' },
-  { label: 'Reservations',   path: '/dashboard/reservations',     icon: CalendarCheck },
-  { label: 'Contracts',      path: '/dashboard/contracts',        icon: FileText },
-  { label: 'Occupancies',    path: '/dashboard/occupancies',      icon: Bed },
-  
-  { type: 'divider' as const, label: 'FINANCE' },
-  { label: 'Invoices',       path: '/dashboard/invoices',         icon: Receipt },
-  { label: 'Payments',       path: '/dashboard/payments',         icon: CreditCard },
-  { label: 'Deposits',       path: '/dashboard/deposits',         icon: CreditCard },
-  { label: 'Charges',        path: '/dashboard/charges',          icon: Receipt },
-  { label: 'Refunds',        path: '/dashboard/refunds',          icon: CreditCard },
-  { label: 'Adjustments',    path: '/dashboard/adjustments',      icon: Receipt },
-  { label: 'Penalties',      path: '/dashboard/penalties',        icon: Receipt },
-  
-  { type: 'divider' as const, label: 'MAINTENANCE & ASSETS' },
-  { label: 'Work Orders',    path: '/dashboard/work-orders',      icon: Wrench },
-  { label: 'Assets',         path: '/dashboard/assets',           icon: Package },
-  { label: 'Asset Assignments', path: '/dashboard/asset-assignments', icon: Package },
-  { label: 'Asset Inspections', path: '/dashboard/asset-inspections', icon: Package },
-  { label: 'Technicians',    path: '/dashboard/technicians',      icon: Wrench },
-  { label: 'Suppliers',      path: '/dashboard/suppliers',        icon: Package },
+// ─── Menu Groups Configuration ──────────────────────────────────────────────
+interface MenuItem {
+  label: string;
+  path: string;
+  icon: React.ElementType;
+  requiredPermission?: string;
+}
 
-  { type: 'divider' as const, label: 'COMMUNICATION' },
-  { label: 'Blast Message',  path: '/dashboard/messaging/blast',  icon: Megaphone },
-  { label: 'Msg Settings',   path: '/dashboard/messaging/devices',icon: MessageCircle },
+interface MenuGroup {
+  id: string;
+  label: string;
+  items: MenuItem[];
+}
 
-  { type: 'divider' as const, label: 'SYSTEM' },
-  { label: 'Roles & Perms',  path: '/dashboard/management/rbac',  icon: ShieldCheck, requiredPermission: 'role:read'   },
-  { label: 'User Accounts',  path: '/dashboard/management/users', icon: UserCog,    requiredPermission: 'user:read'    },
-  { label: 'Settings',       path: '/dashboard/settings',         icon: Settings    },
+const MENU_GROUPS: MenuGroup[] = [
+  {
+    id: 'main',
+    label: 'Utama',
+    items: [
+      { label: 'Overview', path: '/dashboard', icon: LayoutDashboard },
+      { label: '3D Explorer', path: '/explorer', icon: Box },
+      { label: 'Direktori Hunian (Roster)', path: '/roster', icon: Bed },
+    ],
+  },
+  {
+    id: 'property',
+    label: 'Properti & Ruang',
+    items: [
+      { label: 'Properti', path: '/properties', icon: Building2 },
+      { label: 'Gedung', path: '/buildings', icon: Layers },
+      { label: 'Lantai', path: '/floors', icon: Layers },
+      { label: 'Zona', path: '/zones', icon: Layers },
+      { label: 'Kamar & Unit', path: '/rooms', icon: DoorOpen },
+      { label: 'Tipe Kamar', path: '/room-types', icon: DoorOpen },
+      { label: 'Tempat Tidur', path: '/beds', icon: Bed },
+      { label: 'Fasilitas', path: '/facilities', icon: Building2 },
+    ],
+  },
+  {
+    id: 'tenancy',
+    label: 'Penyewa & Sewa',
+    items: [
+      { label: 'Daftar Penyewa', path: '/tenants', icon: Users },
+      { label: 'Reservasi', path: '/reservations', icon: CalendarCheck },
+      { label: 'Kontrak Sewa', path: '/contracts', icon: FileText },
+      { label: 'Data Hunian', path: '/occupancies', icon: Bed },
+    ],
+  },
+  {
+    id: 'finance',
+    label: 'Billing & Keuangan',
+    items: [
+      { label: 'Tagihan (Invoices)', path: '/invoices', icon: Receipt },
+      { label: 'Pembayaran', path: '/payments', icon: CreditCard },
+      { label: 'Deposit / Jaminan', path: '/deposits', icon: CreditCard },
+      { label: 'Biaya Tambahan', path: '/charges', icon: Receipt },
+      { label: 'Pengembalian (Refund)', path: '/refunds', icon: CreditCard },
+      { label: 'Penyesuaian (Adjustment)', path: '/adjustments', icon: Receipt },
+      { label: 'Denda Keterlambatan', path: '/penalties', icon: Receipt },
+    ],
+  },
+  {
+    id: 'maintenance',
+    label: 'Aset & Pemeliharaan',
+    items: [
+      { label: 'Tiket Perbaikan', path: '/work-orders', icon: Wrench },
+      { label: 'Master Aset', path: '/assets', icon: Package },
+      { label: 'Penugasan Aset', path: '/asset-assignments', icon: Package },
+      { label: 'Inspeksi Aset', path: '/asset-inspections', icon: Package },
+      { label: 'Teknisi', path: '/technicians', icon: Wrench },
+      { label: 'Pemasok / Vendor', path: '/suppliers', icon: Package },
+    ],
+  },
+  {
+    id: 'communication',
+    label: 'Komunikasi',
+    items: [
+      { label: 'Blast Message (WA)', path: '/messaging/blast', icon: Megaphone },
+      { label: 'Pengaturan Gateway', path: '/messaging/devices', icon: MessageCircle },
+    ],
+  },
+  {
+    id: 'system',
+    label: 'Sistem & Pengaturan',
+    items: [
+      { label: 'Organisasi', path: '/organizations', icon: Globe2 },
+      { label: 'Role & Akses (RBAC)', path: '/management/rbac', icon: ShieldCheck, requiredPermission: 'role:read' },
+      { label: 'Akun Pengguna', path: '/management/users', icon: UserCog, requiredPermission: 'user:read' },
+      { label: 'Pengaturan Sistem', path: '/settings', icon: Settings },
+    ],
+  },
 ];
 
 export default function MainLayout() {
@@ -65,16 +110,60 @@ export default function MainLayout() {
   const { user, logout, hasPermission } = useAuth();
   const { currentOrg, orgs, switchOrg } = useOrg();
 
+  const isItemActive = (itemPath: string, currentPath: string) => {
+    if (itemPath === '/dashboard') {
+      return currentPath === '/dashboard' || currentPath === '/overview' || currentPath === '/';
+    }
+    const cleanItem = itemPath.replace(/^\/dashboard/, '');
+    const cleanCurrent = currentPath.replace(/^\/dashboard/, '');
+    return cleanCurrent === cleanItem || cleanCurrent.startsWith(cleanItem + '/');
+  };
+
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => {
+    try {
+      const saved = localStorage.getItem('epmp_sidebar_groups');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (e) {}
+
+    // Default: Buka semua grup agar pengguna langsung melihat seluruh menu tanpa harus klik satu-satu
+    const initial: Record<string, boolean> = {};
+    MENU_GROUPS.forEach(group => {
+      initial[group.id] = true;
+    });
+    return initial;
+  });
+
+  useEffect(() => {
+    MENU_GROUPS.forEach(group => {
+      if (group.items.some(item => isItemActive(item.path, location.pathname))) {
+        setOpenGroups(prev => {
+          if (prev[group.id]) return prev;
+          const next = { ...prev, [group.id]: true };
+          try {
+            localStorage.setItem('epmp_sidebar_groups', JSON.stringify(next));
+          } catch (e) {}
+          return next;
+        });
+      }
+    });
+  }, [location.pathname]);
+
+  const toggleGroup = (groupId: string) => {
+    setOpenGroups(prev => {
+      const next = { ...prev, [groupId]: !prev[groupId] };
+      try {
+        localStorage.setItem('epmp_sidebar_groups', JSON.stringify(next));
+      } catch (e) {}
+      return next;
+    });
+  };
+
   const handleLogout = async () => {
     await logout();
     navigate('/auth/signin', { replace: true });
   };
-
-  const visibleMenu = MENU_CONFIG.filter(item => {
-    if (item.type === 'divider') return true;
-    if (!item.requiredPermission) return true;
-    return hasPermission(item.requiredPermission);
-  });
 
   const getInitials = (name: string) =>
     name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) ?? 'U';
@@ -87,15 +176,15 @@ export default function MainLayout() {
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-slate-1000 lg:hidden"
+          className="fixed inset-0 z-40 bg-slate-900/80 backdrop-blur-sm lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
-      <aside className={`fixed top-0 left-0 z-50 h-screen w-72 bg-[#0b0b0c] text-white flex flex-col transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 lg:static`}>
+      {/* Sidebar - Sticky on desktop so it never hangs on long dashboard pages */}
+      <aside className={`fixed top-0 left-0 z-50 h-screen w-72 bg-[#0b0b0c] text-white flex flex-col overflow-hidden transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen lg:shrink-0`}>
         {/* Logo */}
-        <div className="h-16 flex items-center justify-between px-6 border-b border-white/10">
+        <div className="h-16 flex items-center justify-between px-6 border-b border-white/10 shrink-0">
           <div className="flex items-center gap-3 text-xs tracking-[0.2em] uppercase text-orange font-bold">
             <span className="w-4 h-px bg-orange" />
             EPMP SaaS
@@ -105,42 +194,67 @@ export default function MainLayout() {
           </button>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-6 px-4 flex flex-col gap-1 custom-scrollbar">
-          {visibleMenu.map((item, idx) => {
-            if (item.type === 'divider') {
-              return (
-                <div key={idx} className="mt-6 mb-2 px-4 text-[10px] font-bold text-white/40 tracking-wider">
-                  {item.label}
-                </div>
-              );
-            }
+        {/* Navigation Accordion - min-h-0 and shrink-0 on items prevents any flex squishing or overlapping */}
+        <nav className="flex-1 min-h-0 overflow-y-auto py-4 px-3 flex flex-col gap-2 custom-scrollbar">
+          {MENU_GROUPS.map((group) => {
+            const visibleItems = group.items.filter(item => {
+              if (!item.requiredPermission) return true;
+              return hasPermission(item.requiredPermission);
+            });
 
-            const Icon = item.icon as React.ElementType;
-            const isActive =
-              location.pathname === item.path ||
-              (item.path !== '/dashboard' && location.pathname.startsWith(item.path!));
+            if (visibleItems.length === 0) return null;
+
+            const isOpen = !!openGroups[group.id];
+            const hasActiveChild = visibleItems.some(item => isItemActive(item.path, location.pathname));
 
             return (
-              <NavLink
-                key={idx}
-                to={item.path || '#'}
-                onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-                  isActive
-                    ? 'bg-orange text-slate-900 font-semibold shadow-[0_4px_12px_rgba(255,102,0,0.3)]'
-                    : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                <Icon size={18} className={isActive ? 'text-slate-900' : 'text-orange'} />
-                {item.label}
-              </NavLink>
+              <div key={group.id} className="rounded-xl shrink-0 bg-white/[0.02] border border-white/5 transition-colors">
+                <button
+                  type="button"
+                  onClick={() => toggleGroup(group.id)}
+                  className={`w-full flex items-center shrink-0 justify-between px-3.5 py-2.5 text-xs font-semibold tracking-wide uppercase transition-colors select-none ${
+                    hasActiveChild ? 'text-orange' : 'text-white/60 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    {group.label}
+                  </span>
+                  <div className="text-white/40">
+                    {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                  </div>
+                </button>
+
+                {isOpen && (
+                  <div className="flex flex-col gap-1 px-2 pb-2 pt-0.5">
+                    {visibleItems.map((item, idx) => {
+                      const Icon = item.icon;
+                      const active = isItemActive(item.path, location.pathname);
+
+                      return (
+                        <NavLink
+                          key={idx}
+                          to={item.path}
+                          onClick={() => setSidebarOpen(false)}
+                          className={`flex items-center shrink-0 gap-2.5 px-3 py-2 rounded-lg text-sm transition-all duration-150 ${
+                            active
+                              ? 'bg-orange text-slate-900 font-semibold shadow-[0_2px_8px_rgba(255,102,0,0.3)]'
+                              : 'text-white/70 hover:bg-white/10 hover:text-white'
+                          }`}
+                        >
+                          <Icon size={16} className={active ? 'text-slate-900' : 'text-orange'} />
+                          <span className="truncate">{item.label}</span>
+                        </NavLink>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             );
           })}
         </nav>
 
         {/* User Footer */}
-        <div className="p-4 border-t border-white/10">
+        <div className="p-4 border-t border-white/10 shrink-0 bg-[#0b0b0c]">
           <div className="flex items-center gap-3 bg-white/5 p-3 rounded-xl">
             <div className="w-10 h-10 rounded-full bg-orange flex items-center justify-center text-slate-900 font-bold text-sm flex-shrink-0">
               {user ? getInitials(user.name) : 'U'}

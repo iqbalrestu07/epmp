@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	"github.com/epmp/backend/internal/modules/organization/dto"
 	"github.com/epmp/backend/internal/modules/organization/entity"
 )
 
@@ -31,4 +32,14 @@ type OrganizationRepository interface {
 
 	// FindMembersByOrgID returns all active members of an organization.
 	FindMembersByOrgID(ctx context.Context, orgID string) ([]*entity.OrganizationMember, error)
+
+	// FindMembersWithUserByOrgID returns active members with user details.
+	FindMembersWithUserByOrgID(ctx context.Context, orgID string) ([]*dto.OrganizationMemberResponse, error)
+
+	// AddMemberByEmail adds an existing user or creates a new user and joins them to the organization.
+	AddMemberByEmail(ctx context.Context, orgID string, email, name, password, role, invitedBy string) (*dto.OrganizationMemberResponse, error)
+
+	// DeleteMember removes a member from an organization.
+	DeleteMember(ctx context.Context, orgID, userID string) error
 }
+

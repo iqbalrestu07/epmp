@@ -34,16 +34,20 @@ export function TenantContactTable({ data, onRowClick }: TenantContactTableProps
       },
     }),
     columnHelper.accessor("contact_type", {
-      header: "ContactType",
+      header: "Contact Type",
       cell: (info) => info.getValue(),
     }),
     columnHelper.accessor("contact_value", {
-      header: "ContactValue",
+      header: "Contact Value",
       cell: (info) => info.getValue(),
     }),
     columnHelper.accessor("is_primary", {
-      header: "IsPrimary",
-      cell: (info) => info.getValue(),
+      header: "Is Primary",
+      cell: (info) => (info.getValue() ? (
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-700">Utama</span>
+      ) : (
+        <span className="text-slate-400 text-xs">Sekunder</span>
+      )),
     }),
   ];
 

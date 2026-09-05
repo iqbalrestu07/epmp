@@ -139,3 +139,13 @@ func (r *FloorRepositoryImpl) Delete(ctx context.Context, id string) error {
 		UPDATE floors SET deleted_at = now() WHERE id = $1 AND deleted_at IS NULL`, id)
 	return err
 }
+
+func (r *FloorRepositoryImpl) CountByBuildingID(ctx context.Context, buildingID string) (int64, error) {
+	var count int64
+	err := r.db.QueryRow(ctx, `
+		SELECT COUNT(*) FROM floors WHERE building_id = $1 AND deleted_at IS NULL`, buildingID).Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("floor repository: count by building: %w", err)
+	}
+	return count, nil
+}

@@ -81,7 +81,9 @@ func setupTenantTestEnv(t *testing.T) *tenantTestEnv {
 	e.HidePort = true
 
 	jwtSecret := "test-jwt-secret-for-integration-tests"
-	if err := modules.Register(e, db, log, jwtSecret); err != nil {
+	accessTTL := 2 * time.Hour
+	refreshTTL := 30 * 24 * time.Hour
+	if err := modules.Register(e, db, log, jwtSecret, accessTTL, refreshTTL); err != nil {
 		t.Fatalf("failed to register modules: %v", err)
 	}
 

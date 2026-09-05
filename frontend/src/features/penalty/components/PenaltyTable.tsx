@@ -9,8 +9,10 @@ import {
 import type { Penalty } from "../types";
 import { useInvoices } from "../../billing/hooks";
 
-const columnHelper = createColumnHelper<Penalty>();
+import { formatDate } from "@/utils/date";
+import { formatCurrency } from "@/utils/currency";
 
+const columnHelper = createColumnHelper<Penalty>();
 
 interface PenaltyTableProps {
   data: Penalty[];
@@ -21,33 +23,58 @@ export function PenaltyTable({ data, onRowClick }: PenaltyTableProps) {
   const { data: invoicesData } = useInvoices({ per_page: 100 });
   const invoicesMap = new Map(
     (Array.isArray(invoicesData?.data) ? invoicesData.data : Array.isArray(invoicesData) ? invoicesData : [])
-      .map((item: any) => [item.id, `#` + item.id.slice(0, 8)])
+      .map((item: any) => [item.id, `Invoice #${item.id.slice(0, 8)}`])
   );
 
   const columns = [
     columnHelper.accessor("invoice_id", {
-      header: "Invoice",
+      header: "Tagihan (Invoice)",
       cell: (info) => {
         const id = info.getValue() as string;
         if (!id) return <span className="text-slate-400">—</span>;
-        return invoicesMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+        return (
+          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-50 text-red-700">
+            {invoicesMap.get(id) || `#${id.slice(0, 8)}`}
+          </span>
+        );
       },
     }),
     columnHelper.accessor("amount", {
-      header: "Amount",
-      cell: (info) => info.getValue(),
+      header: "Nominal Denda",
+      cell: (info) => {
+        const val = info.getValue();
+        const row = info.row.original;
+        return (
+          <span className="font-bold text-red-600">
+            {formatCurrency(val, (row as any).currency || "IDR")}
+          </span>
+        );
+      },
     }),
     columnHelper.accessor("status", {
       header: "Status",
-      cell: (info) => info.getValue(),
+      cell: (info) => {
+        const val = (info.getValue() as string) || "Applied";
+        const isPaid = val.toLowerCase() === "paid";
+        return (
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+            isPaid ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
+          }`}>
+            {val}
+          </span>
+        );
+      },
     }),
     columnHelper.accessor("penalty_date", {
-      header: "PenaltyDate",
-      cell: (info) => info.getValue(),
+      header: "Penalty Date",
+      cell: (info) => {
+        const val = info.getValue() as string;
+        return <span className="text-slate-700">{formatDate(val)}</span>;
+      },
     }),
     columnHelper.accessor("description", {
-      header: "Description",
-      cell: (info) => info.getValue(),
+      header: "Keterangan",
+      cell: (info) => <span className="text-xs text-slate-500">{info.getValue() || "Denda Keterlambatan"}</span>,
     }),
   ];
 

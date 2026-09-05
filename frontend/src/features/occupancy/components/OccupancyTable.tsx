@@ -10,6 +10,7 @@ import type { Occupancy } from "../types";
 import { useContracts } from "../../contract/hooks";
 import { useRooms } from "../../room/hooks";
 import { useTenants } from "../../tenant/hooks";
+import { formatDateTime } from "@/utils/date";
 
 const columnHelper = createColumnHelper<Occupancy>();
 
@@ -63,19 +64,29 @@ export function OccupancyTable({ data, onRowClick }: OccupancyTableProps) {
     }),
     columnHelper.accessor("status", {
       header: "Status",
-      cell: (info) => info.getValue(),
+      cell: (info) => {
+        const val = (info.getValue() as string) || "Active";
+        const isActive = val.toLowerCase() === "active" || val.toLowerCase() === "checked_in";
+        return (
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+            isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700'
+          }`}>
+            {val}
+          </span>
+        );
+      },
     }),
     columnHelper.accessor("check_in_time", {
-      header: "CheckInTime",
-      cell: (info) => info.getValue(),
+      header: "Check-in Time",
+      cell: (info) => <span className="text-slate-700">{formatDateTime(info.getValue() as string)}</span>,
     }),
     columnHelper.accessor("check_out_time", {
-      header: "CheckOutTime",
-      cell: (info) => info.getValue(),
+      header: "Check-out Time",
+      cell: (info) => <span className="text-slate-700">{formatDateTime(info.getValue() as string)}</span>,
     }),
     columnHelper.accessor("notes", {
-      header: "Notes",
-      cell: (info) => info.getValue(),
+      header: "Catatan",
+      cell: (info) => <span className="text-xs text-slate-500">{info.getValue() || "—"}</span>,
     }),
   ];
 

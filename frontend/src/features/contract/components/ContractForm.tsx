@@ -13,6 +13,7 @@ import {
 import { useTenants } from "../../tenant/hooks";
 import { usePropertys } from "../../property/hooks";
 import { useRooms } from "../../room/hooks";
+import { CurrencySelect } from "@/components/ui/CurrencySelect";
 
 interface ContractFormProps {
   onSubmit: (data: CreateContractFormData) => void;
@@ -153,9 +154,18 @@ export function ContractForm({
         </div>
       </div>
 
+      <div className="space-y-2">
+        <Label htmlFor="currency">Contract Currency</Label>
+        <CurrencySelect
+          id="currency"
+          {...register("currency")}
+          className="w-full"
+        />
+      </div>
+
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="monthly_rent">Monthly Rent (Rp)</Label>
+          <Label htmlFor="monthly_rent">Monthly Rent</Label>
           <Input
             id="monthly_rent"
             type="number"
@@ -169,7 +179,7 @@ export function ContractForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="deposit_amount">Deposit Amount (Rp)</Label>
+          <Label htmlFor="deposit_amount">Deposit Amount</Label>
           <Input
             id="deposit_amount"
             type="number"

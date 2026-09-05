@@ -9,6 +9,9 @@ import (
 // RegisterPropertyRoutes registers all Property routes on the given Echo group.
 func RegisterPropertyRoutes(g *echo.Group, h *PropertyHandler) {
 	g.POST("", h.Create)
+	g.GET("/:id/staff", h.ListStaff)
+	g.POST("/:id/staff", h.AssignStaff)
+	g.DELETE("/:id/staff/:userId/roles/:roleId", h.RemoveStaff)
 	g.GET("/:id", h.GetByID)
 	g.GET("", h.List)
 	g.PUT("/:id", h.Update)

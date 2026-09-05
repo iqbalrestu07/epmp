@@ -7,6 +7,7 @@ export const propertySchema = z.object({
   description: z.string().optional(),
   address: z.string().optional(),
   property_type: z.enum(["boarding_house", "apartment", "villa", "warehouse"]),
+  currency: z.string().default("IDR").optional(),
   is_active: z.boolean(),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),

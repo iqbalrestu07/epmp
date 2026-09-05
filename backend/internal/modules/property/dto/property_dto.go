@@ -45,3 +45,21 @@ type PropertyListResponse struct {
 	PerPage    int                 `json:"per_page"`
 	TotalPages int                 `json:"total_pages"`
 }
+
+type PropertyStaffResponse struct {
+	Id         string    `json:"id"`
+	PropertyId string    `json:"property_id"`
+	UserId     string    `json:"user_id"`
+	UserName   string    `json:"user_name"`
+	UserEmail  string    `json:"user_email"`
+	RoleId     string    `json:"role_id"`
+	RoleName   string    `json:"role_name"`
+	IsSystem   bool      `json:"is_system"`
+	CreatedAt  time.Time `json:"created_at"`
+}
+
+type AssignPropertyStaffRequest struct {
+	UserId string `json:"user_id"`
+	RoleId string `json:"role_id"`
+}
+

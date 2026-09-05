@@ -9,6 +9,7 @@ export const roomSchema = z.object({
   room_type_id: z.string().optional().nullable(),
   capacity: z.coerce.number().int().min(1, "Capacity must be at least 1"),
   price: z.coerce.number().min(0, "Price must be >= 0"),
+  currency: z.string().default("IDR").optional(),
   is_available: z.boolean(),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),

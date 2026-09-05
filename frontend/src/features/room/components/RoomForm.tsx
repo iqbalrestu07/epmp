@@ -10,6 +10,7 @@ import {
 import { usePropertys } from "../../property/hooks";
 import { useFloors } from "../../floor/hooks";
 import { useRoomTypes } from "../../roomtype/hooks";
+import { CurrencySelect } from "@/components/ui/CurrencySelect";
 
 interface RoomFormProps {
   onSubmit: (data: CreateRoomFormData) => void;
@@ -110,18 +111,21 @@ export function RoomForm({
             if (found && typeof found.base_price === 'number') {
               setValue("price", found.base_price);
             }
+            if (found && found.currency) {
+              setValue("currency", found.currency);
+            }
           }}
           className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 text-slate-800"
         >
           <option value="">Select Room Type (Optional template)…</option>
           {roomTypes.map((rt) => (
             <option key={rt.id} value={rt.id}>
-              {rt.name} {rt.base_price ? `· Base: Rp ${rt.base_price.toLocaleString()}` : ''}
+              {rt.name} {rt.base_price ? `· Base: ${rt.currency || 'IDR'} ${rt.base_price.toLocaleString()}` : ''}
             </option>
           ))}
         </select>
         <p className="text-xs text-slate-500">
-          Selecting a Room Type auto-fills the default Base Price into the Price field below (can still be customized per room).
+          Selecting a Room Type auto-fills the default Base Price and Currency into the fields below (can still be customized per room).
         </p>
       </div>
 
@@ -152,14 +156,21 @@ export function RoomForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="price">Price</Label>
-          <Input
-            id="price"
-            type="number"
-            step="0.01"
-            placeholder="0.00"
-            {...register("price", { valueAsNumber: true })}
-          />
+          <Label htmlFor="price">Price & Currency</Label>
+          <div className="flex gap-2">
+            <CurrencySelect
+              {...register("currency")}
+              className="w-28 shrink-0 text-xs"
+            />
+            <Input
+              id="price"
+              type="number"
+              step="any"
+              placeholder="0"
+              className="flex-1"
+              {...register("price", { valueAsNumber: true })}
+            />
+          </div>
           {errors.price && (
             <p className="text-xs text-red-600 mt-1">{errors.price.message}</p>
           )}

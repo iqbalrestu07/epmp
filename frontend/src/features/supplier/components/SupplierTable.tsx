@@ -19,16 +19,16 @@ const columns = [  columnHelper.accessor("id", {
     cell: (info) => info.getValue(),
   }),
   columnHelper.accessor("contact_person", {
-    header: "ContactPerson",
-    cell: (info) => info.getValue(),
+    header: "Contact Person",
+    cell: (info) => info.getValue() || "—",
   }),
   columnHelper.accessor("phone", {
-    header: "Phone",
-    cell: (info) => info.getValue(),
+    header: "Telepon",
+    cell: (info) => info.getValue() || "—",
   }),
   columnHelper.accessor("service_type", {
-    header: "ServiceType",
-    cell: (info) => info.getValue(),
+    header: "Service Type",
+    cell: (info) => info.getValue() || "—",
   }),
 ];
 

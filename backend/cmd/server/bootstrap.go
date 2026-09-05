@@ -48,7 +48,7 @@ func bootstrap(ctx context.Context, cfg *configs.Config) (*App, func(), error) {
 	})
 
 	// Init modules
-	if err := modules.Register(e, db, log, cfg.JWTSecret); err != nil {
+	if err := modules.Register(e, db, log, cfg.JWTSecret, cfg.AccessTokenTTL, cfg.RefreshTokenTTL); err != nil {
 		log.Error().Err(err).Msg("failed to register modules")
 		return nil, nil, err
 	}

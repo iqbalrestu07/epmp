@@ -10,8 +10,10 @@ import type { Refund } from "../types";
 import { usePayments } from "../../payment/hooks";
 import { useTenants } from "../../tenant/hooks";
 
-const columnHelper = createColumnHelper<Refund>();
+import { formatDate } from "@/utils/date";
+import { formatCurrency } from "@/utils/currency";
 
+const columnHelper = createColumnHelper<Refund>();
 
 interface RefundTableProps {
   data: Refund[];
@@ -23,7 +25,7 @@ export function RefundTable({ data, onRowClick }: RefundTableProps) {
   const { data: tenantsData } = useTenants({ per_page: 100 });
   const paymentsMap = new Map(
     (Array.isArray(paymentsData?.data) ? paymentsData.data : Array.isArray(paymentsData) ? paymentsData : [])
-      .map((item: any) => [item.id, `#` + item.id.slice(0, 8)])
+      .map((item: any) => [item.id, `Pembayaran #${item.id.slice(0, 8)}`])
   );
   const tenantsMap = new Map(
     (Array.isArray(tenantsData?.data) ? tenantsData.data : Array.isArray(tenantsData) ? tenantsData : [])
@@ -31,37 +33,65 @@ export function RefundTable({ data, onRowClick }: RefundTableProps) {
   );
 
   const columns = [
-    columnHelper.accessor("payment_id", {
-      header: "Payment",
+    columnHelper.accessor("tenant_id", {
+      header: "Penyewa (Tenant)",
       cell: (info) => {
         const id = info.getValue() as string;
         if (!id) return <span className="text-slate-400">—</span>;
-        return paymentsMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+        const name = tenantsMap.get(id);
+        return (
+          <div>
+            <span className="font-semibold text-slate-800">{name || 'Penyewa'}</span>
+            <p className="text-[11px] text-slate-400 font-mono">#{id.slice(0, 8)}</p>
+          </div>
+        );
       },
     }),
-    columnHelper.accessor("tenant_id", {
-      header: "Tenant",
+    columnHelper.accessor("payment_id", {
+      header: "Pembayaran Terkait",
       cell: (info) => {
         const id = info.getValue() as string;
         if (!id) return <span className="text-slate-400">—</span>;
-        return tenantsMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+        return (
+          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700">
+            {paymentsMap.get(id) || `#${id.slice(0, 8)}`}
+          </span>
+        );
       },
     }),
     columnHelper.accessor("amount", {
-      header: "Amount",
-      cell: (info) => info.getValue(),
+      header: "Jumlah Pengembalian",
+      cell: (info) => {
+        const val = info.getValue();
+        const row = info.row.original;
+        return (
+          <span className="font-bold text-slate-900">
+            {formatCurrency(val, (row as any).currency || "IDR")}
+          </span>
+        );
+      },
     }),
     columnHelper.accessor("status", {
       header: "Status",
-      cell: (info) => info.getValue(),
+      cell: (info) => {
+        const val = (info.getValue() as string) || "Processed";
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+            {val}
+          </span>
+        );
+      },
     }),
     columnHelper.accessor("refund_date", {
-      header: "RefundDate",
-      cell: (info) => info.getValue(),
+      header: "Refund Date",
+      cell: (info) => {
+        const val = info.getValue() as string;
+        return <span className="text-slate-700">{formatDate(val)}</span>;
+      },
     }),
     columnHelper.accessor("reason", {
-      header: "Reason",
-      cell: (info) => info.getValue(),
+      header: "Alasan",
+      cell: (info) => <span className="text-xs text-slate-500">{info.getValue() || "—"}</span>,
     }),
   ];
 

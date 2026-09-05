@@ -34,6 +34,8 @@ func NewAuthService(
 	refreshTokenRepo repository.RefreshTokenRepository,
 	roleRepo repository.RoleRepository,
 	jwtSecret string,
+	accessTTL time.Duration,
+	refreshTTL time.Duration,
 ) *AuthService {
 	return &AuthService{
 		userRepo:         userRepo,
@@ -41,8 +43,8 @@ func NewAuthService(
 		refreshTokenRepo: refreshTokenRepo,
 		roleRepo:         roleRepo,
 		jwtSecret:        jwtSecret,
-		accessTTL:        60 * time.Minute,
-		refreshTTL:       7 * 24 * time.Hour,
+		accessTTL:        accessTTL,
+		refreshTTL:       refreshTTL,
 	}
 }
 

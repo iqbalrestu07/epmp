@@ -10,8 +10,10 @@ import type { Charge } from "../types";
 import { useContracts } from "../../contract/hooks";
 import { useInvoices } from "../../billing/hooks";
 
-const columnHelper = createColumnHelper<Charge>();
+import { formatDate } from "@/utils/date";
+import { formatCurrency } from "@/utils/currency";
 
+const columnHelper = createColumnHelper<Charge>();
 
 interface ChargeTableProps {
   data: Charge[];
@@ -23,49 +25,78 @@ export function ChargeTable({ data, onRowClick }: ChargeTableProps) {
   const { data: invoicesData } = useInvoices({ per_page: 100 });
   const contractsMap = new Map(
     (Array.isArray(contractsData?.data) ? contractsData.data : Array.isArray(contractsData) ? contractsData : [])
-      .map((item: any) => [item.id, `#` + item.id.slice(0, 8)])
+      .map((item: any) => [item.id, `Kontrak #${item.id.slice(0, 8)}`])
   );
   const invoicesMap = new Map(
     (Array.isArray(invoicesData?.data) ? invoicesData.data : Array.isArray(invoicesData) ? invoicesData : [])
-      .map((item: any) => [item.id, `#` + item.id.slice(0, 8)])
+      .map((item: any) => [item.id, `Invoice #${item.id.slice(0, 8)}`])
   );
 
   const columns = [
     columnHelper.accessor("contract_id", {
-      header: "Contract",
+      header: "Kontrak",
       cell: (info) => {
         const id = info.getValue() as string;
         if (!id) return <span className="text-slate-400">—</span>;
-        return contractsMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+        return (
+          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700">
+            {contractsMap.get(id) || `#${id.slice(0, 8)}`}
+          </span>
+        );
       },
     }),
     columnHelper.accessor("invoice_id", {
-      header: "Invoice",
+      header: "Tagihan (Invoice)",
       cell: (info) => {
         const id = info.getValue() as string;
         if (!id) return <span className="text-slate-400">—</span>;
-        return invoicesMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+        return (
+          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700">
+            {invoicesMap.get(id) || `#${id.slice(0, 8)}`}
+          </span>
+        );
       },
     }),
     columnHelper.accessor("charge_type", {
-      header: "ChargeType",
-      cell: (info) => info.getValue(),
+      header: "Charge Type",
+      cell: (info) => <span className="font-medium text-slate-800">{info.getValue() || "Lainnya"}</span>,
     }),
     columnHelper.accessor("amount", {
-      header: "Amount",
-      cell: (info) => info.getValue(),
+      header: "Nominal",
+      cell: (info) => {
+        const val = info.getValue();
+        const row = info.row.original;
+        return (
+          <span className="font-bold text-slate-900">
+            {formatCurrency(val, (row as any).currency || "IDR")}
+          </span>
+        );
+      },
     }),
     columnHelper.accessor("status", {
       header: "Status",
-      cell: (info) => info.getValue(),
+      cell: (info) => {
+        const val = (info.getValue() as string) || "Pending";
+        const isBilled = val.toLowerCase() === "billed" || val.toLowerCase() === "paid";
+        return (
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+            isBilled ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+          }`}>
+            {val}
+          </span>
+        );
+      },
     }),
     columnHelper.accessor("charge_date", {
-      header: "ChargeDate",
-      cell: (info) => info.getValue(),
+      header: "Charge Date",
+      cell: (info) => {
+        const val = info.getValue() as string;
+        return <span className="text-slate-700">{formatDate(val)}</span>;
+      },
     }),
     columnHelper.accessor("notes", {
-      header: "Notes",
-      cell: (info) => info.getValue(),
+      header: "Catatan",
+      cell: (info) => <span className="text-xs text-slate-500">{info.getValue() || "—"}</span>,
     }),
   ];
 

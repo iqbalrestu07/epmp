@@ -8,6 +8,7 @@ export const invoiceSchema = z.object({
   contract_id: z.string().min(1, "Contract is required"),
   tenant_id: z.string().min(1, "Tenant is required"),
   amount: z.coerce.number().min(0, "Amount must be >= 0"),
+  currency: z.string().default("IDR").optional(),
   status: z.enum(["Unpaid", "Paid", "Overdue", "Cancelled"]),
   due_date: z.string().min(1, "Due date is required"),
   paid_date: z.string().optional(),

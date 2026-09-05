@@ -5,9 +5,10 @@ package repository
 import (
 	"context"
 	"fmt"
+	"time"
 
+	"github.com/epmp/backend/internal/modules/property/dto"
 	"github.com/epmp/backend/internal/modules/property/entity"
-
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -157,3 +158,73 @@ func (r *PropertyRepositoryImpl) Delete(ctx context.Context, id string) error {
 		UPDATE properties SET deleted_at = now() WHERE id = $1 AND deleted_at IS NULL`, id)
 	return err
 }
+
+func (r *PropertyRepositoryImpl) FindStaffByPropertyID(ctx context.Context, propertyID, orgID string) ([]*dto.PropertyStaffResponse, error) {
+	rows, err := r.db.Query(ctx, `
+		SELECT pur.id, pur.property_id, pur.user_id, COALESCE(u.name, ''), COALESCE(u.email, ''),
+		       pur.role_id, COALESCE(ro.name, ''), COALESCE(ro.is_system, false), pur.created_at
+		FROM   property_user_roles pur
+		JOIN   users u ON u.id = pur.user_id
+		JOIN   roles ro ON ro.id = pur.role_id
+		WHERE  pur.property_id = $1 AND pur.organization_id = $2
+		ORDER  BY pur.created_at DESC`,
+		propertyID, orgID,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("property repository: find staff: %w", err)
+	}
+	defer rows.Close()
+
+	var list []*dto.PropertyStaffResponse
+	for rows.Next() {
+		s := &dto.PropertyStaffResponse{}
+		if err := rows.Scan(&s.Id, &s.PropertyId, &s.UserId, &s.UserName, &s.UserEmail, &s.RoleId, &s.RoleName, &s.IsSystem, &s.CreatedAt); err != nil {
+			return nil, err
+		}
+		list = append(list, s)
+	}
+	return list, rows.Err()
+}
+
+func (r *PropertyRepositoryImpl) AssignStaff(ctx context.Context, orgID, propertyID, userID, roleID string) (*dto.PropertyStaffResponse, error) {
+	var id string
+	var createdAt time.Time
+	err := r.db.QueryRow(ctx, `
+		INSERT INTO property_user_roles (organization_id, property_id, user_id, role_id)
+		VALUES ($1, $2, $3, $4)
+		ON CONFLICT (property_id, user_id, role_id)
+		DO UPDATE SET updated_at = now()
+		RETURNING id, created_at`,
+		orgID, propertyID, userID, roleID,
+	).Scan(&id, &createdAt)
+	if err != nil {
+		return nil, fmt.Errorf("property repository: assign staff: %w", err)
+	}
+
+	var userName, userEmail, roleName string
+	var isSystem bool
+	_ = r.db.QueryRow(ctx, `SELECT name, email FROM users WHERE id = $1`, userID).Scan(&userName, &userEmail)
+	_ = r.db.QueryRow(ctx, `SELECT name, is_system FROM roles WHERE id = $1`, roleID).Scan(&roleName, &isSystem)
+
+	return &dto.PropertyStaffResponse{
+		Id:         id,
+		PropertyId: propertyID,
+		UserId:     userID,
+		UserName:   userName,
+		UserEmail:  userEmail,
+		RoleId:     roleID,
+		RoleName:   roleName,
+		IsSystem:   isSystem,
+		CreatedAt:  createdAt,
+	}, nil
+}
+
+func (r *PropertyRepositoryImpl) RemoveStaff(ctx context.Context, propertyID, userID, roleID, orgID string) error {
+	_, err := r.db.Exec(ctx, `
+		DELETE FROM property_user_roles
+		WHERE property_id = $1 AND user_id = $2 AND role_id = $3 AND organization_id = $4`,
+		propertyID, userID, roleID, orgID,
+	)
+	return err
+}
+

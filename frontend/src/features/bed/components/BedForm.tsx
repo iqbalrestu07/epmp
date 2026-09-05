@@ -11,6 +11,7 @@ import {
 } from "../schema";
 
 import { useRooms } from "../../room/hooks";
+import { STANDARD_BED_TYPES } from "../utils/bedTypes";
 
 interface BedFormProps {
   onSubmit: (data: CreateBedFormData) => void;
@@ -26,6 +27,7 @@ export function BedForm({
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<CreateBedFormData>({
     resolver: zodResolver(createBedSchema),
@@ -41,16 +43,16 @@ export function BedForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="room_id">Room</Label>
+        <Label htmlFor="room_id">Kamar / Unit (Room)</Label>
         <select
           id="room_id"
           {...register("room_id")}
           className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 text-slate-800"
         >
-          <option value="">Select a room…</option>
+          <option value="">Pilih Kamar…</option>
           {rooms.map((r) => (
             <option key={r.id} value={r.id}>
-              {r.name} (Cap: {r.capacity})
+              {r.name} (Kapasitas: {r.capacity})
             </option>
           ))}
         </select>
@@ -58,11 +60,36 @@ export function BedForm({
           <p className="text-xs text-red-600 mt-1">{errors.room_id.message}</p>
         )}
       </div>
+
       <div className="space-y-2">
-        <Label htmlFor="name">Bed Label / Name</Label>
+        <Label htmlFor="bed_template">Template Ukuran & Tipe Bed (Opsional)</Label>
+        <select
+          id="bed_template"
+          onChange={(e) => {
+            const tmpl = STANDARD_BED_TYPES.find((b) => b.id === e.target.value);
+            if (tmpl) {
+              setValue("name", `${tmpl.name} (${tmpl.dimensions})`);
+            }
+          }}
+          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 text-slate-800 font-medium"
+        >
+          <option value="">Pilih Template Ukuran Bed (Single, Queen, King, dll)…</option>
+          {STANDARD_BED_TYPES.map((b) => (
+            <option key={b.id} value={b.id}>
+              {b.name} · {b.dimensions} — {b.description}
+            </option>
+          ))}
+        </select>
+        <p className="text-xs text-slate-500">
+          Memilih template akan otomatis mengisi nama & dimensi tempat tidur pada kolom di bawah.
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="name">Nama / Label Bed</Label>
         <Input
           id="name"
-          placeholder="e.g. Bed A, Bunk 1, King Bed"
+          placeholder="Contoh: Queen Bed (160 x 200 cm), Bed A, atau King Bed Utama"
           {...register("name")}
         />
         {errors.name && (
@@ -76,9 +103,8 @@ export function BedForm({
           {...register("status")}
           className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 text-slate-800"
         >
-          <option value="available">Available</option>
-          <option value="occupied">Occupied</option>
-          <option value="maintenance">Maintenance</option>
+          <option value="Available">Available</option>
+          <option value="Occupied">Occupied</option>
         </select>
         {errors.status && (
           <p className="text-xs text-red-600 mt-1">{errors.status.message}</p>

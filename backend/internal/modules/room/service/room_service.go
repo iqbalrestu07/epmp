@@ -31,6 +31,18 @@ func (s *RoomService) Create(ctx context.Context, req *dto.CreateRoomRequest, or
 	e.Capacity = req.Capacity
 	e.Price = req.Price
 	e.IsAvailable = req.IsAvailable
+	if req.Status != "" {
+		e.Status = req.Status
+	} else if req.IsAvailable {
+		e.Status = "Available"
+	} else {
+		e.Status = "Occupied"
+	}
+	if req.Currency != "" {
+		e.Currency = req.Currency
+	} else {
+		e.Currency = "IDR"
+	}
 
 	if err := s.repo.Save(ctx, e); err != nil {
 		return nil, fmt.Errorf("room service: create: %w", err)
@@ -97,6 +109,12 @@ func (s *RoomService) Update(ctx context.Context, id, orgID string, req *dto.Upd
 	e.Capacity = req.Capacity
 	e.Price = req.Price
 	e.IsAvailable = req.IsAvailable
+	if req.Status != "" {
+		e.Status = req.Status
+	}
+	if req.Currency != "" {
+		e.Currency = req.Currency
+	}
 
 	if err := s.repo.Save(ctx, e); err != nil {
 		return nil, fmt.Errorf("room service: update: save: %w", err)
@@ -127,6 +145,8 @@ func (s *RoomService) toResponse(e *entity.Room) *dto.RoomResponse {
 		Capacity:       e.Capacity,
 		Price:          e.Price,
 		IsAvailable:    e.IsAvailable,
+		Status:         e.Status,
+		Currency:       e.Currency,
 		CreatedAt:      e.CreatedAt,
 		UpdatedAt:      e.UpdatedAt,
 	}

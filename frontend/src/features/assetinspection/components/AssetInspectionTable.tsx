@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-table";
 import type { AssetInspection } from "../types";
 import { useAssets } from "../../asset/hooks";
+import { formatDate } from "@/utils/date";
 
 const columnHelper = createColumnHelper<AssetInspection>();
 
@@ -34,12 +35,22 @@ export function AssetInspectionTable({ data, onRowClick }: AssetInspectionTableP
       },
     }),
     columnHelper.accessor("inspection_date", {
-      header: "InspectionDate",
-      cell: (info) => info.getValue(),
+      header: "Inspection Date",
+      cell: (info) => <span className="text-slate-700">{formatDate(info.getValue() as string)}</span>,
     }),
     columnHelper.accessor("condition", {
-      header: "Condition",
-      cell: (info) => info.getValue(),
+      header: "Kondisi",
+      cell: (info) => {
+        const val = (info.getValue() as string) || "Good";
+        const isGood = val.toLowerCase() === "good" || val.toLowerCase() === "baik";
+        return (
+          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+            isGood ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+          }`}>
+            {val}
+          </span>
+        );
+      },
     }),
     columnHelper.accessor("notes", {
       header: "Notes",

@@ -7,6 +7,7 @@ import {
   createPropertySchema,
   type CreatePropertyFormData,
 } from "../schema";
+import { CurrencySelect } from "@/components/ui/CurrencySelect";
 
 interface PropertyFormProps {
   onSubmit: (data: CreatePropertyFormData) => void;
@@ -68,7 +69,7 @@ export function PropertyForm({
           {...register("property_type")}
           className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 text-slate-800"
         >
-          <option value="boarding_house">Boarding House</option>
+          <option value="boarding_house">Boarding House (Kos)</option>
           <option value="apartment">Apartment</option>
           <option value="villa">Villa</option>
           <option value="warehouse">Warehouse</option>
@@ -76,6 +77,18 @@ export function PropertyForm({
         {errors.property_type && (
           <p className="text-xs text-red-600 mt-1">{errors.property_type.message}</p>
         )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="currency">Default Operating Currency</Label>
+        <CurrencySelect
+          id="currency"
+          {...register("currency")}
+          className="w-full"
+        />
+        <p className="text-xs text-slate-500">
+          The primary currency used for rooms, contracts, and invoices under this property.
+        </p>
       </div>
       <div className="flex items-center space-x-2">
         <input

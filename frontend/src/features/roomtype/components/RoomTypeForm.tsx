@@ -9,6 +9,7 @@ import {
   createRoomTypeSchema,
   type CreateRoomTypeFormData,
 } from "../schema";
+import { CurrencySelect } from "@/components/ui/CurrencySelect";
 
 interface RoomTypeFormProps {
   onSubmit: (data: CreateRoomTypeFormData) => void;
@@ -53,15 +54,22 @@ export function RoomTypeForm({
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="base_price">Base Price (Rp)</Label>
-        <Input
-          id="base_price"
-          type="number"
-          step="any"
-          min="0"
-          placeholder="e.g. 500000"
-          {...register("base_price", { valueAsNumber: true })}
-        />
+        <Label htmlFor="base_price">Base Price & Currency</Label>
+        <div className="flex gap-2">
+          <CurrencySelect
+            {...register("currency")}
+            className="w-48 shrink-0"
+          />
+          <Input
+            id="base_price"
+            type="number"
+            step="any"
+            min="0"
+            placeholder="e.g. 500000"
+            className="flex-1"
+            {...register("base_price", { valueAsNumber: true })}
+          />
+        </div>
         <p className="text-xs text-slate-500">
           Template default rate for rooms assigned to this type. Can still be customized per room.
         </p>

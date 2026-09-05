@@ -6,10 +6,12 @@ import {
   flexRender,
   createColumnHelper,
 } from "@tanstack/react-table";
-import type { Reservation } from "../types";
+import { type Reservation } from "../types";
 import { useTenants } from "../../tenant/hooks";
 import { usePropertys } from "../../property/hooks";
 import { useRooms } from "../../room/hooks";
+import { formatDate } from "@/utils/date";
+import { formatCurrency } from "@/utils/currency";
 
 const columnHelper = createColumnHelper<Reservation>();
 
@@ -63,23 +65,36 @@ export function ReservationTable({ data, onRowClick }: ReservationTableProps) {
     }),
     columnHelper.accessor("status", {
       header: "Status",
-      cell: (info) => info.getValue(),
+      cell: (info) => {
+        const val = (info.getValue() as string) || "Pending";
+        const isConfirmed = val.toLowerCase() === "confirmed";
+        return (
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+            isConfirmed ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+          }`}>
+            {val}
+          </span>
+        );
+      },
     }),
     columnHelper.accessor("check_in_date", {
-      header: "CheckInDate",
-      cell: (info) => info.getValue(),
+      header: "Check-in Date",
+      cell: (info) => <span className="text-slate-700">{formatDate(info.getValue() as string)}</span>,
     }),
     columnHelper.accessor("check_out_date", {
-      header: "CheckOutDate",
-      cell: (info) => info.getValue(),
+      header: "Check-out Date",
+      cell: (info) => <span className="text-slate-700">{formatDate(info.getValue() as string)}</span>,
     }),
     columnHelper.accessor("booking_fee", {
-      header: "BookingFee",
-      cell: (info) => info.getValue(),
+      header: "Booking Fee",
+      cell: (info) => {
+        const val = info.getValue();
+        return val ? <span className="font-semibold text-slate-800">{formatCurrency(val, "IDR")}</span> : <span className="text-slate-400">—</span>;
+      },
     }),
     columnHelper.accessor("notes", {
-      header: "Notes",
-      cell: (info) => info.getValue(),
+      header: "Catatan",
+      cell: (info) => <span className="text-xs text-slate-500">{info.getValue() || "—"}</span>,
     }),
   ];
 

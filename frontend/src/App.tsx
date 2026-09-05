@@ -79,6 +79,7 @@ import { OccupancyListPage } from "./features/occupancy/pages/OccupancyListPage"
 import { OccupancyCreatePage } from "./features/occupancy/pages/OccupancyCreatePage";
 import { OccupancyDetailPage } from "./features/occupancy/pages/OccupancyDetailPage";
 import { OccupancyEditPage } from "./features/occupancy/pages/OccupancyEditPage";
+import { TenantRosterPage } from "./features/occupancy/pages/TenantRosterPage";
 
 // Finance
 import { InvoiceListPage } from "./features/billing/pages/InvoiceListPage";
@@ -144,6 +145,187 @@ import { BlastMessagePage } from "./features/communication/pages/BlastMessagePag
 import RBACPage from "./features/iam/pages/RBACPage";
 import UserListPage from "./features/iam/pages/UserListPage";
 
+// Settings
+import { SettingsPage } from "./features/settings/pages/SettingsPage";
+
+function getModuleRoutes() {
+  return (
+    <>
+      <Route path="overview" element={<DashboardPage />} />
+      <Route path="explorer" element={<InteractiveExplorerPage />} />
+      <Route path="roster" element={<TenantRosterPage />} />
+
+      {/* Organizations */}
+      <Route path="organizations" element={<OrganizationListPage />} />
+      <Route path="organizations/new" element={<OrganizationCreatePage />} />
+      <Route path="organizations/:id" element={<OrganizationDetailPage />} />
+      <Route path="organizations/:id/edit" element={<OrganizationEditPage />} />
+
+      {/* Properties */}
+      <Route path="properties" element={<PropertyListPage />} />
+      <Route path="properties/new" element={<PropertyCreatePage />} />
+      <Route path="properties/interactive" element={<PropertyInteractiveView />} />
+      <Route path="properties/:id" element={<PropertyDetailPage />} />
+      <Route path="properties/:id/edit" element={<PropertyEditPage />} />
+
+      {/* Buildings */}
+      <Route path="buildings" element={<BuildingListPage />} />
+      <Route path="buildings/new" element={<BuildingCreatePage />} />
+      <Route path="buildings/:id" element={<BuildingDetailPage />} />
+      <Route path="buildings/:id/edit" element={<BuildingEditPage />} />
+
+      {/* Floors */}
+      <Route path="floors" element={<FloorListPage />} />
+      <Route path="floors/new" element={<FloorCreatePage />} />
+      <Route path="floors/:id" element={<FloorDetailPage />} />
+      <Route path="floors/:id/edit" element={<FloorEditPage />} />
+
+      {/* Zones */}
+      <Route path="zones" element={<ZoneListPage />} />
+      <Route path="zones/new" element={<ZoneCreatePage />} />
+      <Route path="zones/:id" element={<ZoneDetailPage />} />
+      <Route path="zones/:id/edit" element={<ZoneEditPage />} />
+
+      {/* Rooms */}
+      <Route path="rooms" element={<RoomListPage />} />
+      <Route path="rooms/new" element={<RoomCreatePage />} />
+      <Route path="rooms/:id" element={<RoomDetailPage />} />
+      <Route path="rooms/:id/edit" element={<RoomEditPage />} />
+
+      {/* Room Types */}
+      <Route path="room-types" element={<RoomTypeListPage />} />
+      <Route path="room-types/new" element={<RoomTypeCreatePage />} />
+      <Route path="room-types/:id" element={<RoomTypeDetailPage />} />
+      <Route path="room-types/:id/edit" element={<RoomTypeEditPage />} />
+
+      {/* Beds */}
+      <Route path="beds" element={<BedListPage />} />
+      <Route path="beds/new" element={<BedCreatePage />} />
+      <Route path="beds/:id" element={<BedDetailPage />} />
+      <Route path="beds/:id/edit" element={<BedEditPage />} />
+
+      {/* Facilities */}
+      <Route path="facilities" element={<FacilityListPage />} />
+      <Route path="facilities/new" element={<FacilityCreatePage />} />
+      <Route path="facilities/:id" element={<FacilityDetailPage />} />
+      <Route path="facilities/:id/edit" element={<FacilityEditPage />} />
+
+      {/* Tenants */}
+      <Route path="tenants" element={<TenantListPage />} />
+      <Route path="tenants/new" element={<TenantCreatePage />} />
+      <Route path="tenants/:id" element={<TenantDetailPage />} />
+      <Route path="tenants/:id/edit" element={<TenantEditPage />} />
+
+      {/* Operations */}
+      <Route path="reservations" element={<ReservationListPage />} />
+      <Route path="reservations/new" element={<ReservationCreatePage />} />
+      <Route path="reservations/:id" element={<ReservationDetailPage />} />
+      <Route path="reservations/:id/edit" element={<ReservationEditPage />} />
+
+      <Route path="contracts" element={<ContractListPage />} />
+      <Route path="contracts/new" element={<ContractCreatePage />} />
+      <Route path="contracts/:id" element={<ContractDetailPage />} />
+      <Route path="contracts/:id/edit" element={<ContractEditPage />} />
+
+      <Route path="occupancies" element={<OccupancyListPage />} />
+      <Route path="occupancies/new" element={<OccupancyCreatePage />} />
+      <Route path="occupancies/:id" element={<OccupancyDetailPage />} />
+      <Route path="occupancies/:id/edit" element={<OccupancyEditPage />} />
+
+      {/* Finance */}
+      <Route path="invoices" element={<InvoiceListPage />} />
+      <Route path="invoices/new" element={<InvoiceCreatePage />} />
+      <Route path="invoices/:id" element={<InvoiceDetailPage />} />
+      <Route path="invoices/:id/edit" element={<InvoiceEditPage />} />
+
+      <Route path="payments" element={<PaymentListPage />} />
+      <Route path="payments/new" element={<PaymentCreatePage />} />
+      <Route path="payments/:id" element={<PaymentDetailPage />} />
+      <Route path="payments/:id/edit" element={<PaymentEditPage />} />
+
+      <Route path="deposits" element={<DepositListPage />} />
+      <Route path="deposits/new" element={<DepositCreatePage />} />
+      <Route path="deposits/:id" element={<DepositDetailPage />} />
+      <Route path="deposits/:id/edit" element={<DepositEditPage />} />
+
+      <Route path="charges" element={<ChargeListPage />} />
+      <Route path="charges/new" element={<ChargeCreatePage />} />
+      <Route path="charges/:id" element={<ChargeDetailPage />} />
+      <Route path="charges/:id/edit" element={<ChargeEditPage />} />
+
+      <Route path="refunds" element={<RefundListPage />} />
+      <Route path="refunds/new" element={<RefundCreatePage />} />
+      <Route path="refunds/:id" element={<RefundDetailPage />} />
+      <Route path="refunds/:id/edit" element={<RefundEditPage />} />
+
+      <Route path="adjustments" element={<AdjustmentListPage />} />
+      <Route path="adjustments/new" element={<AdjustmentCreatePage />} />
+      <Route path="adjustments/:id" element={<AdjustmentDetailPage />} />
+      <Route path="adjustments/:id/edit" element={<AdjustmentEditPage />} />
+
+      <Route path="penalties" element={<PenaltyListPage />} />
+      <Route path="penalties/new" element={<PenaltyCreatePage />} />
+      <Route path="penalties/:id" element={<PenaltyDetailPage />} />
+      <Route path="penalties/:id/edit" element={<PenaltyEditPage />} />
+
+      {/* Assets & Maintenance */}
+      <Route path="assets" element={<AssetListPage />} />
+      <Route path="assets/new" element={<AssetCreatePage />} />
+      <Route path="assets/:id" element={<AssetDetailPage />} />
+      <Route path="assets/:id/edit" element={<AssetEditPage />} />
+
+      <Route path="asset-assignments" element={<AssetAssignmentListPage />} />
+      <Route path="asset-assignments/new" element={<AssetAssignmentCreatePage />} />
+      <Route path="asset-assignments/:id" element={<AssetAssignmentDetailPage />} />
+      <Route path="asset-assignments/:id/edit" element={<AssetAssignmentEditPage />} />
+
+      <Route path="asset-inspections" element={<AssetInspectionListPage />} />
+      <Route path="asset-inspections/new" element={<AssetInspectionCreatePage />} />
+      <Route path="asset-inspections/:id" element={<AssetInspectionDetailPage />} />
+      <Route path="asset-inspections/:id/edit" element={<AssetInspectionEditPage />} />
+
+      <Route path="work-orders" element={<WorkOrderListPage />} />
+      <Route path="work-orders/new" element={<WorkOrderCreatePage />} />
+      <Route path="work-orders/:id" element={<WorkOrderDetailPage />} />
+      <Route path="work-orders/:id/edit" element={<WorkOrderEditPage />} />
+
+      <Route path="technicians" element={<TechnicianListPage />} />
+      <Route path="technicians/new" element={<TechnicianCreatePage />} />
+      <Route path="technicians/:id" element={<TechnicianDetailPage />} />
+      <Route path="technicians/:id/edit" element={<TechnicianEditPage />} />
+
+      <Route path="suppliers" element={<SupplierListPage />} />
+      <Route path="suppliers/new" element={<SupplierCreatePage />} />
+      <Route path="suppliers/:id" element={<SupplierDetailPage />} />
+      <Route path="suppliers/:id/edit" element={<SupplierEditPage />} />
+
+      {/* Communication */}
+      <Route path="messaging/devices" element={<MessagingSettingsPage />} />
+      <Route path="messaging/blast" element={<BlastMessagePage />} />
+
+      {/* Management */}
+      <Route
+        path="management/rbac"
+        element={
+          <ProtectedRoute permission="role:read">
+            <RBACPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="management/users"
+        element={
+          <ProtectedRoute permission="user:read">
+            <UserListPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route path="settings" element={<SettingsPage />} />
+    </>
+  );
+}
+
 function AppRoutes() {
   const location = useLocation();
   return (
@@ -158,7 +340,19 @@ function AppRoutes() {
             <Route path="signup" element={<SignUpPage />} />
           </Route>
 
-          {/* Protected App Routes */}
+          {/* Clean App Routes: direct access via /properties, /rooms, /contracts, /roster, etc. */}
+          <Route
+            element={
+              <ProtectedRoute>
+                <MainLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="dashboard" element={<DashboardPage />} />
+            {getModuleRoutes()}
+          </Route>
+
+          {/* Dashboard Compatibility Routes: /dashboard/properties, /dashboard/rooms, etc. */}
           <Route
             path="/dashboard"
             element={
@@ -168,180 +362,12 @@ function AppRoutes() {
             }
           >
             <Route index element={<DashboardPage />} />
-            <Route path="explorer" element={<InteractiveExplorerPage />} />
-
-            {/* Organizations */}
-            <Route path="organizations" element={<OrganizationListPage />} />
-            <Route path="organizations/new" element={<OrganizationCreatePage />} />
-            <Route path="organizations/:id" element={<OrganizationDetailPage />} />
-            <Route path="organizations/:id/edit" element={<OrganizationEditPage />} />
-
-            {/* Properties */}
-            <Route path="properties" element={<PropertyListPage />} />
-            <Route path="properties/new" element={<PropertyCreatePage />} />
-            <Route path="properties/interactive" element={<PropertyInteractiveView />} />
-            <Route path="properties/:id" element={<PropertyDetailPage />} />
-            <Route path="properties/:id/edit" element={<PropertyEditPage />} />
-
-            {/* Buildings */}
-            <Route path="buildings" element={<BuildingListPage />} />
-            <Route path="buildings/new" element={<BuildingCreatePage />} />
-            <Route path="buildings/:id" element={<BuildingDetailPage />} />
-            <Route path="buildings/:id/edit" element={<BuildingEditPage />} />
-
-            {/* Floors */}
-            <Route path="floors" element={<FloorListPage />} />
-            <Route path="floors/new" element={<FloorCreatePage />} />
-            <Route path="floors/:id" element={<FloorDetailPage />} />
-            <Route path="floors/:id/edit" element={<FloorEditPage />} />
-
-            {/* Zones */}
-            <Route path="zones" element={<ZoneListPage />} />
-            <Route path="zones/new" element={<ZoneCreatePage />} />
-            <Route path="zones/:id" element={<ZoneDetailPage />} />
-            <Route path="zones/:id/edit" element={<ZoneEditPage />} />
-
-            {/* Rooms */}
-            <Route path="rooms" element={<RoomListPage />} />
-            <Route path="rooms/new" element={<RoomCreatePage />} />
-            <Route path="rooms/:id" element={<RoomDetailPage />} />
-            <Route path="rooms/:id/edit" element={<RoomEditPage />} />
-
-            {/* Room Types */}
-            <Route path="room-types" element={<RoomTypeListPage />} />
-            <Route path="room-types/new" element={<RoomTypeCreatePage />} />
-            <Route path="room-types/:id" element={<RoomTypeDetailPage />} />
-            <Route path="room-types/:id/edit" element={<RoomTypeEditPage />} />
-
-            {/* Beds */}
-            <Route path="beds" element={<BedListPage />} />
-            <Route path="beds/new" element={<BedCreatePage />} />
-            <Route path="beds/:id" element={<BedDetailPage />} />
-            <Route path="beds/:id/edit" element={<BedEditPage />} />
-
-            {/* Facilities */}
-            <Route path="facilities" element={<FacilityListPage />} />
-            <Route path="facilities/new" element={<FacilityCreatePage />} />
-            <Route path="facilities/:id" element={<FacilityDetailPage />} />
-            <Route path="facilities/:id/edit" element={<FacilityEditPage />} />
-
-            {/* Tenants */}
-            <Route path="tenants" element={<TenantListPage />} />
-            <Route path="tenants/new" element={<TenantCreatePage />} />
-            <Route path="tenants/:id" element={<TenantDetailPage />} />
-            <Route path="tenants/:id/edit" element={<TenantEditPage />} />
-
-            {/* Operations */}
-            <Route path="reservations" element={<ReservationListPage />} />
-            <Route path="reservations/new" element={<ReservationCreatePage />} />
-            <Route path="reservations/:id" element={<ReservationDetailPage />} />
-            <Route path="reservations/:id/edit" element={<ReservationEditPage />} />
-
-            <Route path="contracts" element={<ContractListPage />} />
-            <Route path="contracts/new" element={<ContractCreatePage />} />
-            <Route path="contracts/:id" element={<ContractDetailPage />} />
-            <Route path="contracts/:id/edit" element={<ContractEditPage />} />
-
-            <Route path="occupancies" element={<OccupancyListPage />} />
-            <Route path="occupancies/new" element={<OccupancyCreatePage />} />
-            <Route path="occupancies/:id" element={<OccupancyDetailPage />} />
-            <Route path="occupancies/:id/edit" element={<OccupancyEditPage />} />
-
-            {/* Finance */}
-            <Route path="invoices" element={<InvoiceListPage />} />
-            <Route path="invoices/new" element={<InvoiceCreatePage />} />
-            <Route path="invoices/:id" element={<InvoiceDetailPage />} />
-            <Route path="invoices/:id/edit" element={<InvoiceEditPage />} />
-
-            <Route path="payments" element={<PaymentListPage />} />
-            <Route path="payments/new" element={<PaymentCreatePage />} />
-            <Route path="payments/:id" element={<PaymentDetailPage />} />
-            <Route path="payments/:id/edit" element={<PaymentEditPage />} />
-
-            <Route path="deposits" element={<DepositListPage />} />
-            <Route path="deposits/new" element={<DepositCreatePage />} />
-            <Route path="deposits/:id" element={<DepositDetailPage />} />
-            <Route path="deposits/:id/edit" element={<DepositEditPage />} />
-
-            <Route path="charges" element={<ChargeListPage />} />
-            <Route path="charges/new" element={<ChargeCreatePage />} />
-            <Route path="charges/:id" element={<ChargeDetailPage />} />
-            <Route path="charges/:id/edit" element={<ChargeEditPage />} />
-
-            <Route path="refunds" element={<RefundListPage />} />
-            <Route path="refunds/new" element={<RefundCreatePage />} />
-            <Route path="refunds/:id" element={<RefundDetailPage />} />
-            <Route path="refunds/:id/edit" element={<RefundEditPage />} />
-
-            <Route path="adjustments" element={<AdjustmentListPage />} />
-            <Route path="adjustments/new" element={<AdjustmentCreatePage />} />
-            <Route path="adjustments/:id" element={<AdjustmentDetailPage />} />
-            <Route path="adjustments/:id/edit" element={<AdjustmentEditPage />} />
-
-            <Route path="penalties" element={<PenaltyListPage />} />
-            <Route path="penalties/new" element={<PenaltyCreatePage />} />
-            <Route path="penalties/:id" element={<PenaltyDetailPage />} />
-            <Route path="penalties/:id/edit" element={<PenaltyEditPage />} />
-
-            {/* Assets & Maintenance */}
-            <Route path="assets" element={<AssetListPage />} />
-            <Route path="assets/new" element={<AssetCreatePage />} />
-            <Route path="assets/:id" element={<AssetDetailPage />} />
-            <Route path="assets/:id/edit" element={<AssetEditPage />} />
-
-            <Route path="asset-assignments" element={<AssetAssignmentListPage />} />
-            <Route path="asset-assignments/new" element={<AssetAssignmentCreatePage />} />
-            <Route path="asset-assignments/:id" element={<AssetAssignmentDetailPage />} />
-            <Route path="asset-assignments/:id/edit" element={<AssetAssignmentEditPage />} />
-
-            <Route path="asset-inspections" element={<AssetInspectionListPage />} />
-            <Route path="asset-inspections/new" element={<AssetInspectionCreatePage />} />
-            <Route path="asset-inspections/:id" element={<AssetInspectionDetailPage />} />
-            <Route path="asset-inspections/:id/edit" element={<AssetInspectionEditPage />} />
-
-            <Route path="work-orders" element={<WorkOrderListPage />} />
-            <Route path="work-orders/new" element={<WorkOrderCreatePage />} />
-            <Route path="work-orders/:id" element={<WorkOrderDetailPage />} />
-            <Route path="work-orders/:id/edit" element={<WorkOrderEditPage />} />
-
-            <Route path="technicians" element={<TechnicianListPage />} />
-            <Route path="technicians/new" element={<TechnicianCreatePage />} />
-            <Route path="technicians/:id" element={<TechnicianDetailPage />} />
-            <Route path="technicians/:id/edit" element={<TechnicianEditPage />} />
-
-            <Route path="suppliers" element={<SupplierListPage />} />
-            <Route path="suppliers/new" element={<SupplierCreatePage />} />
-            <Route path="suppliers/:id" element={<SupplierDetailPage />} />
-            <Route path="suppliers/:id/edit" element={<SupplierEditPage />} />
-
-            {/* Communication */}
-            <Route path="messaging/devices" element={<MessagingSettingsPage />} />
-            <Route path="messaging/blast" element={<BlastMessagePage />} />
-
-            {/* Management */}
-            <Route
-              path="management/rbac"
-              element={
-                <ProtectedRoute permission="role:read">
-                  <RBACPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="management/users"
-              element={
-                <ProtectedRoute permission="user:read">
-                  <UserListPage />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route path="settings" element={<div className="p-8">Settings Page (Coming Soon)</div>} />
+            {getModuleRoutes()}
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Route>
 
         {/* Catch-all */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </ErrorBoundary>
   );

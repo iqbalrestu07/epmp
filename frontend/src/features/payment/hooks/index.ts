@@ -38,6 +38,9 @@ export function useCreatePayment() {
     mutationFn: (data: CreatePaymentRequest) => createPayment(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["roster"] });
     },
   });
 }
@@ -48,6 +51,9 @@ export function useUpdatePayment() {
       updatePayment(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["roster"] });
     },
   });
 }
@@ -57,6 +63,9 @@ export function useDeletePayment() {
     mutationFn: (id: string) => deletePayment(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["roster"] });
     },
   });
 }

@@ -50,7 +50,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .me()
       .then(res => {
         const user = (res as any)?.data ?? res;
-        setState({ user, isAuthenticated: true, isLoading: false });
+        const safeUser = {
+          ...user,
+          permissions: Array.isArray(user?.permissions) ? user.permissions : [],
+          roles: Array.isArray(user?.roles) ? user.roles : [],
+        };
+        setState({ user: safeUser, isAuthenticated: true, isLoading: false });
       })
       .catch(() => {
         // Token might be expired — try refresh
@@ -66,7 +71,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .then(res => {
             const data = (res as any)?.data ?? res;
             setStoredTokens(data.access_token, data.refresh_token);
-            setState({ user: data.user, isAuthenticated: true, isLoading: false });
+            const safeUser = {
+              ...data.user,
+              permissions: Array.isArray(data.user?.permissions) ? data.user.permissions : [],
+              roles: Array.isArray(data.user?.roles) ? data.user.roles : [],
+            };
+            setState({ user: safeUser, isAuthenticated: true, isLoading: false });
           })
           .catch(() => {
             clearStoredTokens();
@@ -80,7 +90,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const res = await authService.login({ email, password });
     const data = (res as any)?.data ?? res;
     setStoredTokens(data.access_token, data.refresh_token);
-    setState({ user: data.user, isAuthenticated: true, isLoading: false });
+    const safeUser = {
+      ...data.user,
+      permissions: Array.isArray(data.user?.permissions) ? data.user.permissions : [],
+      roles: Array.isArray(data.user?.roles) ? data.user.roles : [],
+    };
+    setState({ user: safeUser, isAuthenticated: true, isLoading: false });
   }, []);
 
   const register = useCallback(async (name: string, email: string, password: string) => {
@@ -88,7 +103,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const res = await authService.register({ name, email, password });
     const data = (res as any)?.data ?? res;
     setStoredTokens(data.access_token, data.refresh_token);
-    setState({ user: data.user, isAuthenticated: true, isLoading: false });
+    const safeUser = {
+      ...data.user,
+      permissions: Array.isArray(data.user?.permissions) ? data.user.permissions : [],
+      roles: Array.isArray(data.user?.roles) ? data.user.roles : [],
+    };
+    setState({ user: safeUser, isAuthenticated: true, isLoading: false });
   }, []);
 
   const logout = useCallback(async () => {
@@ -105,7 +125,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const hasPermission = useCallback(
     (permission: string) => {
       if (!state.user) return false;
-      return state.user.permissions.includes(permission);
+      return Array.isArray(state.user.permissions) && state.user.permissions.includes(permission);
     },
     [state.user]
   );
@@ -113,7 +133,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const hasRole = useCallback(
     (roleName: string) => {
       if (!state.user) return false;
-      return state.user.roles.some(r => r.name === roleName);
+      return Array.isArray(state.user.roles) && state.user.roles.some(r => r?.name === roleName);
     },
     [state.user]
   );

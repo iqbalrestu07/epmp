@@ -105,3 +105,55 @@ func (h *PropertyHandler) Delete(c echo.Context) error {
 
 	return response.NoContent(c)
 }
+
+func (h *PropertyHandler) ListStaff(c echo.Context) error {
+	propertyID := c.Param("id")
+	orgID := mw.GetOrgID(c)
+	if orgID == "" {
+		return response.BadRequest(c, "X-Organization-ID header is required")
+	}
+
+	staff, err := h.svc.ListStaff(c.Request().Context(), propertyID, orgID)
+	if err != nil {
+		return response.InternalError(c, err.Error())
+	}
+
+	return response.OK(c, staff)
+}
+
+func (h *PropertyHandler) AssignStaff(c echo.Context) error {
+	propertyID := c.Param("id")
+	orgID := mw.GetOrgID(c)
+	if orgID == "" {
+		return response.BadRequest(c, "X-Organization-ID header is required")
+	}
+
+	var req dto.AssignPropertyStaffRequest
+	if err := c.Bind(&req); err != nil {
+		return response.BadRequest(c, "invalid request body")
+	}
+
+	res, err := h.svc.AssignStaff(c.Request().Context(), orgID, propertyID, req.UserId, req.RoleId)
+	if err != nil {
+		return response.InternalError(c, err.Error())
+	}
+
+	return response.Created(c, res)
+}
+
+func (h *PropertyHandler) RemoveStaff(c echo.Context) error {
+	propertyID := c.Param("id")
+	userID := c.Param("userId")
+	roleID := c.Param("roleId")
+	orgID := mw.GetOrgID(c)
+	if orgID == "" {
+		return response.BadRequest(c, "X-Organization-ID header is required")
+	}
+
+	if err := h.svc.RemoveStaff(c.Request().Context(), propertyID, userID, roleID, orgID); err != nil {
+		return response.InternalError(c, err.Error())
+	}
+
+	return response.NoContent(c)
+}
+

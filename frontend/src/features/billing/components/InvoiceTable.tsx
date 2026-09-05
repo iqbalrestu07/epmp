@@ -10,8 +10,14 @@ import type { Invoice } from "../types";
 import { useContracts } from "../../contract/hooks";
 import { useTenants } from "../../tenant/hooks";
 
-const columnHelper = createColumnHelper<Invoice>();
+import { AlertBadge } from "@/components/ui/AlertBadge";
+import { formatCurrency } from "@/utils/currency";
 
+import { useMemo } from "react";
+import { formatDate } from "@/utils/date";
+import { usePayments } from "@/features/payment/hooks";
+
+const columnHelper = createColumnHelper<Invoice>();
 
 interface InvoiceTableProps {
   data: Invoice[];
@@ -21,55 +27,123 @@ interface InvoiceTableProps {
 export function InvoiceTable({ data, onRowClick }: InvoiceTableProps) {
   const { data: contractsData } = useContracts({ per_page: 100 });
   const { data: tenantsData } = useTenants({ per_page: 100 });
+  const { data: paymentsData } = usePayments({ per_page: 200 });
+
   const contractsMap = new Map(
     (Array.isArray(contractsData?.data) ? contractsData.data : Array.isArray(contractsData) ? contractsData : [])
-      .map((item: any) => [item.id, `#` + item.id.slice(0, 8)])
+      .map((item: any) => [item.id, `Kontrak #${item.id.slice(0, 8)}`])
   );
   const tenantsMap = new Map(
     (Array.isArray(tenantsData?.data) ? tenantsData.data : Array.isArray(tenantsData) ? tenantsData : [])
       .map((item: any) => [item.id, item.full_name])
   );
 
+  const paidInvoiceIds = useMemo(() => {
+    const list = Array.isArray(paymentsData?.data) ? paymentsData.data : Array.isArray(paymentsData) ? paymentsData : [];
+    const set = new Set<string>();
+    list.forEach((p: any) => {
+      if ((p.status === "Success" || p.status === "Completed") && p.invoice_id) {
+        set.add(p.invoice_id);
+      }
+    });
+    return set;
+  }, [paymentsData]);
+
   const columns = [
-    columnHelper.accessor("contract_id", {
-      header: "Contract",
+    columnHelper.accessor("tenant_id", {
+      header: "Penyewa (Tenant)",
       cell: (info) => {
         const id = info.getValue() as string;
         if (!id) return <span className="text-slate-400">—</span>;
-        return contractsMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+        const name = tenantsMap.get(id);
+        return (
+          <div>
+            <span className="font-semibold text-slate-800">{name || 'Penyewa'}</span>
+            <p className="text-[11px] text-slate-400 font-mono">#{id.slice(0, 8)}</p>
+          </div>
+        );
       },
     }),
-    columnHelper.accessor("tenant_id", {
-      header: "Tenant",
+    columnHelper.accessor("contract_id", {
+      header: "Kontrak",
       cell: (info) => {
         const id = info.getValue() as string;
         if (!id) return <span className="text-slate-400">—</span>;
-        return tenantsMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+        return (
+          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700">
+            {contractsMap.get(id) || `#${id.slice(0, 8)}`}
+          </span>
+        );
       },
     }),
     columnHelper.accessor("amount", {
-      header: "Amount",
-      cell: (info) => info.getValue(),
+      header: "Jumlah Tagihan",
+      cell: (info) => {
+        const val = info.getValue();
+        const row = info.row.original;
+        return (
+          <span className="font-bold text-slate-900">
+            {formatCurrency(val, (row as any).currency || "IDR")}
+          </span>
+        );
+      },
     }),
     columnHelper.accessor("status", {
-      header: "Status",
-      cell: (info) => info.getValue(),
+      header: "Status & Tenggat",
+      cell: (info) => {
+        const status = info.getValue() as string;
+        const row = info.row.original;
+        const isPaid = status === "Paid" || paidInvoiceIds.has(row.id);
+        if (isPaid) {
+          return <AlertBadge variant="paid" label="Lunas" />;
+        }
+        if (row.due_date) {
+          const now = new Date();
+          const due = new Date(row.due_date);
+          const diffDays = Math.ceil((due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+          if (diffDays < 0) {
+            return (
+              <AlertBadge
+                variant="overdue"
+                label={`Jatuh Tempo (${Math.abs(diffDays)}h lalu)`}
+              />
+            );
+          } else if (diffDays <= 7) {
+            return (
+              <AlertBadge
+                variant="due_soon"
+                label={`Segera Jatuh Tempo (H-${diffDays})`}
+              />
+            );
+          }
+        }
+        return <AlertBadge variant="pending" label={status || "Belum Lunas"} />;
+      },
     }),
     columnHelper.accessor("due_date", {
-      header: "DueDate",
-      cell: (info) => info.getValue(),
+      header: "Jatuh Tempo",
+      cell: (info) => {
+        const val = info.getValue() as string;
+        return <span className="text-slate-700">{formatDate(val)}</span>;
+      },
     }),
     columnHelper.accessor("paid_date", {
-      header: "PaidDate",
-      cell: (info) => info.getValue(),
+      header: "Paid Date",
+      cell: (info) => {
+        const val = info.getValue() as string;
+        return <span className="text-slate-600">{formatDate(val)}</span>;
+      },
     }),
     columnHelper.accessor("payment_method", {
-      header: "PaymentMethod",
-      cell: (info) => info.getValue(),
+      header: "Payment Method",
+      cell: (info) => {
+        const val = info.getValue();
+        return val ? <span className="text-xs bg-slate-100 text-slate-700 px-2 py-1 rounded-md">{val}</span> : <span className="text-slate-400">—</span>;
+      },
     }),
     columnHelper.accessor("notes", {
-      header: "Notes",
-      cell: (info) => info.getValue(),
+      header: "Catatan",
+      cell: (info) => <span className="text-xs text-slate-500 truncate max-w-xs">{info.getValue() || "—"}</span>,
     }),
   ];
 

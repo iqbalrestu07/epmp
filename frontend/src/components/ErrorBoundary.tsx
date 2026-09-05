@@ -17,7 +17,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    console.error("[ErrorBoundary] Caught render error:", error, info.componentStack);
+    const errStr = error?.message || (typeof error === 'object' ? JSON.stringify(error) : String(error));
+    console.error("[ErrorBoundary] Caught render error:", errStr, info.componentStack);
   }
 
   handleReset = () => {
@@ -41,7 +42,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               </p>
             </div>
             <pre className="text-left text-xs bg-slate-100 rounded-lg p-3 overflow-auto max-h-40 text-red-600 whitespace-pre-wrap">
-              {error.message}
+              {error?.message || (typeof error === 'object' ? JSON.stringify(error) : String(error))}
             </pre>
             <div className="flex items-center justify-center gap-3 pt-2">
               <button

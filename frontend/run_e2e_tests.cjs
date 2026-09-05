@@ -43,6 +43,7 @@ const PAGES_TO_TEST = [
   '/dashboard/suppliers',
   '/dashboard/messaging/devices',
   '/dashboard/messaging/blast',
+  '/dashboard/settings',
 ];
 
 (async () => {
@@ -176,7 +177,7 @@ const PAGES_TO_TEST = [
 
     const helperSelect = async (selector, index = 1, timeout = 3000) => {
       const el = page.locator(selector);
-      if (await el.isVisible()) {
+      if ((await el.count()) > 0) {
         try {
           await page.waitForFunction(
             ({ sel, minCount }) => {
@@ -189,7 +190,8 @@ const PAGES_TO_TEST = [
         } catch (e) {}
         const opts = await el.locator('option').all();
         if (opts.length > index) {
-          await el.selectOption({ index });
+          await el.selectOption({ index }, { force: true });
+          await el.dispatchEvent('change');
         }
       }
     };

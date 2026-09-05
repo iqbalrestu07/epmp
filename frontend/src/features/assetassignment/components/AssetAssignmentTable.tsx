@@ -9,6 +9,7 @@ import {
 import type { AssetAssignment } from "../types";
 import { useAssets } from "../../asset/hooks";
 import { useRooms } from "../../room/hooks";
+import { formatDate } from "@/utils/date";
 
 const columnHelper = createColumnHelper<AssetAssignment>();
 
@@ -48,8 +49,8 @@ export function AssetAssignmentTable({ data, onRowClick }: AssetAssignmentTableP
       },
     }),
     columnHelper.accessor("assigned_date", {
-      header: "AssignedDate",
-      cell: (info) => info.getValue(),
+      header: "Assigned Date",
+      cell: (info) => <span className="text-slate-700">{formatDate(info.getValue() as string)}</span>,
     }),
   ];
 

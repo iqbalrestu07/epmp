@@ -8,23 +8,39 @@ import {
 } from "@tanstack/react-table";
 import type { RoomType } from "../types";
 
+import { formatCurrency } from "@/utils/currency";
+
 const columnHelper = createColumnHelper<RoomType>();
 
-const columns = [  columnHelper.accessor("id", {
-    header: "Id",
-    cell: (info) => info.getValue(),
+const columns = [
+  columnHelper.accessor("id", {
+    header: "ID",
+    cell: (info) => (
+      <span className="font-mono text-xs text-slate-400">
+        #{String(info.getValue()).slice(0, 8)}
+      </span>
+    ),
   }),
   columnHelper.accessor("name", {
     header: "Name",
-    cell: (info) => info.getValue(),
+    cell: (info) => (
+      <span className="font-semibold text-slate-900">{info.getValue()}</span>
+    ),
   }),
   columnHelper.accessor("description", {
     header: "Description",
-    cell: (info) => info.getValue(),
+    cell: (info) => info.getValue() || "—",
   }),
   columnHelper.accessor("base_price", {
-    header: "BasePrice",
-    cell: (info) => info.getValue(),
+    header: "Base Price",
+    cell: (info) => {
+      const row = info.row.original;
+      return (
+        <span className="font-semibold text-slate-800">
+          {formatCurrency(info.getValue(), (row as any).currency || "IDR")}
+        </span>
+      );
+    },
   }),
 ];
 

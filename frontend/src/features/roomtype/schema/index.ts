@@ -8,6 +8,7 @@ export const roomTypeSchema = z.object({
   name: z.string().min(1, "Name is required").max(100),
   description: z.string().optional(),
   base_price: z.coerce.number().min(0, "Base price must be >= 0"),
+  currency: z.string().default("IDR").optional(),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),
 });

@@ -15,6 +15,8 @@ type Room struct {
 	Capacity       int        `json:"capacity"`
 	Price          float64    `json:"price"`
 	IsAvailable    bool       `json:"is_available"`
+	Status         string     `json:"status"`
+	Currency       string     `json:"currency"`
 	CreatedAt      time.Time  `json:"created_at"`
 	UpdatedAt      time.Time  `json:"updated_at"`
 	DeletedAt      *time.Time `json:"deleted_at,omitempty"`

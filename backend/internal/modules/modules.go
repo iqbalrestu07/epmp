@@ -1,6 +1,8 @@
 package modules
 
 import (
+	"time"
+
 	"github.com/epmp/backend/internal/modules/asset"
 	"github.com/epmp/backend/internal/modules/assetassignment"
 	"github.com/epmp/backend/internal/modules/assetinspection"
@@ -21,6 +23,7 @@ import (
 	"github.com/epmp/backend/internal/modules/billing"
 	"github.com/epmp/backend/internal/modules/charge"
 	"github.com/epmp/backend/internal/modules/contract"
+	"github.com/epmp/backend/internal/modules/dashboard"
 	"github.com/epmp/backend/internal/modules/deposit"
 	"github.com/epmp/backend/internal/modules/floor"
 	"github.com/epmp/backend/internal/modules/iam"
@@ -41,15 +44,16 @@ import (
 )
 
 // Register registers all modules to the Echo router.
-func Register(e *echo.Echo, db *pgxpool.Pool, log zerolog.Logger, jwtSecret string) error {
+func Register(e *echo.Echo, db *pgxpool.Pool, log zerolog.Logger, jwtSecret string, accessTTL, refreshTTL time.Duration) error {
 	v1 := e.Group("/api/v1")
 
 	// IAM module registers its own public and protected routes.
-	iamMod := iam.NewModule(db, log, jwtSecret)
+	iamMod := iam.NewModule(db, log, jwtSecret, accessTTL, refreshTTL)
 	iamMod.RegisterRoutes(v1)
 
 	// Resource modules — all protected by JWT auth middleware.
 	protected := v1.Group("", mw.AuthRequired(jwtSecret))
+	dashboard.NewModule(db, log).RegisterRoutes(protected)
 	property.NewModule(db, log).RegisterRoutes(protected)
 	tenant.NewModule(db, log).RegisterRoutes(protected)
 	room.NewModule(db, log).RegisterRoutes(protected)

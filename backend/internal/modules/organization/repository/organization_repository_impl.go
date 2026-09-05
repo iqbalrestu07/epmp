@@ -3,9 +3,13 @@ package repository
 import (
 	"context"
 	"fmt"
+	"time"
 
+	"github.com/epmp/backend/internal/modules/organization/dto"
 	"github.com/epmp/backend/internal/modules/organization/entity"
+	"github.com/epmp/backend/internal/pkg/uid"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // OrganizationRepositoryImpl implements OrganizationRepository using PostgreSQL.
@@ -207,3 +211,100 @@ func (r *OrganizationRepositoryImpl) FindMembersByOrgID(ctx context.Context, org
 	}
 	return list, rows.Err()
 }
+
+// FindMembersWithUserByOrgID returns active members with user details.
+func (r *OrganizationRepositoryImpl) FindMembersWithUserByOrgID(ctx context.Context, orgID string) ([]*dto.OrganizationMemberResponse, error) {
+	rows, err := r.db.Query(ctx, `
+		SELECT om.id, om.organization_id, om.user_id, COALESCE(u.name, ''), COALESCE(u.email, ''), om.role, om.joined_at, om.is_active
+		FROM   organization_members om
+		JOIN   users u ON u.id = om.user_id
+		WHERE  om.organization_id = $1 AND om.is_active = true AND om.deleted_at IS NULL AND u.deleted_at IS NULL
+		ORDER  BY om.joined_at ASC`,
+		orgID,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("organization repository: find members with user: %w", err)
+	}
+	defer rows.Close()
+
+	var list []*dto.OrganizationMemberResponse
+	for rows.Next() {
+		m := &dto.OrganizationMemberResponse{}
+		if err := rows.Scan(&m.Id, &m.OrganizationId, &m.UserId, &m.UserName, &m.UserEmail, &m.Role, &m.JoinedAt, &m.IsActive); err != nil {
+			return nil, err
+		}
+		list = append(list, m)
+	}
+	return list, rows.Err()
+}
+
+// DeleteMember soft-deletes an organization member.
+func (r *OrganizationRepositoryImpl) DeleteMember(ctx context.Context, orgID, userID string) error {
+	_, err := r.db.Exec(ctx, `
+		UPDATE organization_members
+		SET    is_active = false, deleted_at = now()
+		WHERE  organization_id = $1 AND user_id = $2`,
+		orgID, userID,
+	)
+	return err
+}
+
+// AddMemberByEmail adds an existing user or creates a new user and joins them to the organization.
+func (r *OrganizationRepositoryImpl) AddMemberByEmail(ctx context.Context, orgID string, email, name, password, role, invitedBy string) (*dto.OrganizationMemberResponse, error) {
+	if role == "" {
+		role = "member"
+	}
+	var userID, userName string
+	// Check if user exists
+	err := r.db.QueryRow(ctx, `SELECT id, name FROM users WHERE email = $1 AND deleted_at IS NULL`, email).Scan(&userID, &userName)
+	if err != nil {
+		// User doesn't exist, create user
+		if password == "" {
+			password = "Password123!"
+		}
+		hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+		if err != nil {
+			return nil, fmt.Errorf("hash password: %w", err)
+		}
+		if name == "" {
+			name = email
+		}
+		err = r.db.QueryRow(ctx, `
+			INSERT INTO users (email, password_hash, name, is_active, organization_id)
+			VALUES ($1, $2, $3, true, $4)
+			RETURNING id, name`,
+			email, string(hash), name, orgID,
+		).Scan(&userID, &userName)
+		if err != nil {
+			return nil, fmt.Errorf("create user: %w", err)
+		}
+	}
+
+	memberID := uid.New()
+	var joinedAt time.Time
+	var isActive bool
+	err = r.db.QueryRow(ctx, `
+		INSERT INTO organization_members (id, organization_id, user_id, role, invited_by, is_active)
+		VALUES ($1, $2, $3, $4, NULLIF($5, '')::uuid, true)
+		ON CONFLICT (organization_id, user_id)
+		DO UPDATE SET role = $4, is_active = true, deleted_at = NULL, updated_at = now()
+		RETURNING id, joined_at, is_active`,
+		memberID, orgID, userID, role, invitedBy,
+	).Scan(&memberID, &joinedAt, &isActive)
+	if err != nil {
+		return nil, fmt.Errorf("insert org member: %w", err)
+	}
+
+	return &dto.OrganizationMemberResponse{
+		Id:             memberID,
+		OrganizationId: orgID,
+		UserId:         userID,
+		UserName:       userName,
+		UserEmail:      email,
+		Role:           role,
+		JoinedAt:       joinedAt,
+		IsActive:       isActive,
+	}, nil
+}
+
+

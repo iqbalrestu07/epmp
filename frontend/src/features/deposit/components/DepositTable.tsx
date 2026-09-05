@@ -10,8 +10,10 @@ import type { Deposit } from "../types";
 import { useContracts } from "../../contract/hooks";
 import { useTenants } from "../../tenant/hooks";
 
-const columnHelper = createColumnHelper<Deposit>();
+import { formatDate } from "@/utils/date";
+import { formatCurrency } from "@/utils/currency";
 
+const columnHelper = createColumnHelper<Deposit>();
 
 interface DepositTableProps {
   data: Deposit[];
@@ -23,7 +25,7 @@ export function DepositTable({ data, onRowClick }: DepositTableProps) {
   const { data: tenantsData } = useTenants({ per_page: 100 });
   const contractsMap = new Map(
     (Array.isArray(contractsData?.data) ? contractsData.data : Array.isArray(contractsData) ? contractsData : [])
-      .map((item: any) => [item.id, `#` + item.id.slice(0, 8)])
+      .map((item: any) => [item.id, `Kontrak #${item.id.slice(0, 8)}`])
   );
   const tenantsMap = new Map(
     (Array.isArray(tenantsData?.data) ? tenantsData.data : Array.isArray(tenantsData) ? tenantsData : [])
@@ -31,41 +33,75 @@ export function DepositTable({ data, onRowClick }: DepositTableProps) {
   );
 
   const columns = [
-    columnHelper.accessor("contract_id", {
-      header: "Contract",
+    columnHelper.accessor("tenant_id", {
+      header: "Penyewa (Tenant)",
       cell: (info) => {
         const id = info.getValue() as string;
         if (!id) return <span className="text-slate-400">—</span>;
-        return contractsMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+        const name = tenantsMap.get(id);
+        return (
+          <div>
+            <span className="font-semibold text-slate-800">{name || 'Penyewa'}</span>
+            <p className="text-[11px] text-slate-400 font-mono">#{id.slice(0, 8)}</p>
+          </div>
+        );
       },
     }),
-    columnHelper.accessor("tenant_id", {
-      header: "Tenant",
+    columnHelper.accessor("contract_id", {
+      header: "Kontrak",
       cell: (info) => {
         const id = info.getValue() as string;
         if (!id) return <span className="text-slate-400">—</span>;
-        return tenantsMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+        return (
+          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700">
+            {contractsMap.get(id) || `#${id.slice(0, 8)}`}
+          </span>
+        );
       },
     }),
     columnHelper.accessor("amount", {
-      header: "Amount",
-      cell: (info) => info.getValue(),
+      header: "Jumlah Deposit",
+      cell: (info) => {
+        const val = info.getValue();
+        const row = info.row.original;
+        return (
+          <span className="font-bold text-slate-900">
+            {formatCurrency(val, (row as any).currency || "IDR")}
+          </span>
+        );
+      },
     }),
     columnHelper.accessor("status", {
       header: "Status",
-      cell: (info) => info.getValue(),
+      cell: (info) => {
+        const val = (info.getValue() as string) || "Holding";
+        const isRefunded = val.toLowerCase() === "refunded";
+        return (
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+            isRefunded ? 'bg-slate-100 text-slate-600' : 'bg-blue-100 text-blue-700'
+          }`}>
+            {val}
+          </span>
+        );
+      },
     }),
     columnHelper.accessor("collection_date", {
-      header: "CollectionDate",
-      cell: (info) => info.getValue(),
+      header: "Collection Date",
+      cell: (info) => {
+        const val = info.getValue() as string;
+        return <span className="text-slate-700">{formatDate(val)}</span>;
+      },
     }),
     columnHelper.accessor("refund_date", {
-      header: "RefundDate",
-      cell: (info) => info.getValue(),
+      header: "Refund Date",
+      cell: (info) => {
+        const val = info.getValue() as string;
+        return <span className="text-slate-600">{formatDate(val)}</span>;
+      },
     }),
     columnHelper.accessor("notes", {
-      header: "Notes",
-      cell: (info) => info.getValue(),
+      header: "Catatan",
+      cell: (info) => <span className="text-xs text-slate-500">{info.getValue() || "—"}</span>,
     }),
   ];
 

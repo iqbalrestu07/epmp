@@ -133,6 +133,22 @@ func (s *OrganizationService) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
+func (s *OrganizationService) ListMembers(ctx context.Context, orgID string) ([]*dto.OrganizationMemberResponse, error) {
+	return s.repo.FindMembersWithUserByOrgID(ctx, orgID)
+}
+
+func (s *OrganizationService) AddMember(ctx context.Context, orgID string, req *dto.AddOrganizationMemberRequest, invitedBy string) (*dto.OrganizationMemberResponse, error) {
+	if req.Email == "" {
+		return nil, fmt.Errorf("email is required")
+	}
+	return s.repo.AddMemberByEmail(ctx, orgID, req.Email, req.Name, req.Password, req.Role, invitedBy)
+}
+
+func (s *OrganizationService) RemoveMember(ctx context.Context, orgID, userID string) error {
+	return s.repo.DeleteMember(ctx, orgID, userID)
+}
+
+
 func (s *OrganizationService) toResponse(e *entity.Organization) *dto.OrganizationResponse {
 	return &dto.OrganizationResponse{
 		Id:        e.Id,

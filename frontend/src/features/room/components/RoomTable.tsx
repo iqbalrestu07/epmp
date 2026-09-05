@@ -4,11 +4,12 @@ import {
   flexRender,
   createColumnHelper,
 } from "@tanstack/react-table";
-import { DoorOpen, Eye, Pencil, Trash2, Users, DollarSign } from "lucide-react";
+import { DoorOpen, Eye, Pencil, Trash2, Users } from "lucide-react";
 import type { Room } from "../types";
 import type { Floor } from "../../floor/types";
 import type { Building } from "../../building/types";
 import type { Property } from "../../property/types";
+import { formatCurrency } from "@/utils/currency";
 
 const columnHelper = createColumnHelper<Room>();
 
@@ -79,24 +80,52 @@ export function RoomTable({ data, floors = [], buildings = [], properties = [], 
     }),
     columnHelper.accessor("price", {
       header: "Price",
-      cell: (info) => (
-        <span className="inline-flex items-center gap-1 text-sm font-medium">
-          <DollarSign size={14} className="text-slate-400" />
-          {info.getValue().toLocaleString()}
-        </span>
-      ),
+      cell: (info) => {
+        const row = info.row.original;
+        return (
+          <span className="text-sm font-semibold text-slate-800">
+            {formatCurrency(info.getValue(), (row as any).currency || "IDR")}
+          </span>
+        );
+      },
     }),
-    columnHelper.accessor("is_available", {
-      header: "Status",
-      cell: (info) => (
-        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-          info.getValue()
-            ? "bg-green-50 text-green-700 border border-green-200"
-            : "bg-red-50 text-red-700 border border-red-200"
-        }`}>
-          {info.getValue() ? "Available" : "Occupied"}
-        </span>
-      ),
+    columnHelper.accessor("status", {
+      header: "Status Kamar",
+      cell: (info) => {
+        const row = info.row.original;
+        const status = (info.getValue() || (row.is_available ? "Available" : "Occupied")) as string;
+
+        if (status === "Occupied") {
+          return (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-200">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+              Terisi (Occupied)
+            </span>
+          );
+        }
+        if (status === "Reserved") {
+          return (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+              Dipesan (Belum Masuk)
+            </span>
+          );
+        }
+        if (status === "Maintenance") {
+          return (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+              Perbaikan
+            </span>
+          );
+        }
+        return (
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            Tersedia
+          </span>
+        );
+      },
     }),
     columnHelper.display({
       id: "actions",

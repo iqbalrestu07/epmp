@@ -10,29 +10,48 @@ import type { Tenant } from "../types";
 
 const columnHelper = createColumnHelper<Tenant>();
 
-const columns = [  columnHelper.accessor("id", {
-    header: "Id",
-    cell: (info) => info.getValue(),
+const columns = [
+  columnHelper.accessor("id", {
+    header: "ID",
+    cell: (info) => (
+      <span className="font-mono text-xs text-slate-400">
+        #{String(info.getValue()).slice(0, 8)}
+      </span>
+    ),
   }),
   columnHelper.accessor("full_name", {
-    header: "FullName",
-    cell: (info) => info.getValue(),
+    header: "Nama Lengkap",
+    cell: (info) => (
+      <span className="font-medium text-slate-900">{info.getValue()}</span>
+    ),
   }),
   columnHelper.accessor("email", {
     header: "Email",
     cell: (info) => info.getValue(),
   }),
   columnHelper.accessor("phone", {
-    header: "Phone",
+    header: "No. HP / WhatsApp",
     cell: (info) => info.getValue(),
   }),
   columnHelper.accessor("identity_number", {
-    header: "IdentityNumber",
-    cell: (info) => info.getValue(),
+    header: "No. Identitas (KTP)",
+    cell: (info) => info.getValue() || "—",
   }),
   columnHelper.accessor("is_active", {
-    header: "IsActive",
-    cell: (info) => info.getValue(),
+    header: "Status",
+    cell: (info) => {
+      const active = info.getValue();
+      return active ? (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          Aktif
+        </span>
+      ) : (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-500">
+          Nonaktif
+        </span>
+      );
+    },
   }),
 ];
 

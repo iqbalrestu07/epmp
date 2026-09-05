@@ -12,6 +12,9 @@ import { useTenants } from "../../tenant/hooks";
 import { usePropertys } from "../../property/hooks";
 import { useRooms } from "../../room/hooks";
 
+import { AlertBadge } from "@/components/ui/AlertBadge";
+import { formatCurrency } from "@/utils/currency";
+
 const columnHelper = createColumnHelper<Contract>();
 
 
@@ -76,24 +79,68 @@ export function ContractTable({ data, onRowClick }: ContractTableProps) {
       },
     }),
     columnHelper.accessor("status", {
-      header: "Status",
-      cell: (info) => info.getValue(),
+      header: "Status & Tanda Khusus",
+      cell: (info) => {
+        const status = info.getValue() as string;
+        const row = info.row.original;
+        if (status === "Terminated") {
+          return <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-medium">Terminated</span>;
+        }
+        if (status === "Expired") {
+          return <AlertBadge variant="expired" label="Habis Kontrak" />;
+        }
+        if (row.end_date) {
+          const now = new Date();
+          const end = new Date(row.end_date);
+          const diffDays = Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+          if (diffDays < 0) {
+            return <AlertBadge variant="expired" label="Habis Kontrak" />;
+          } else if (diffDays <= 30) {
+            return <AlertBadge variant="expiring_soon" label={`Akan Habis (H-${diffDays})`} />;
+          }
+        }
+        return <AlertBadge variant="active" label={status || "Aktif"} />;
+      },
     }),
     columnHelper.accessor("start_date", {
-      header: "StartDate",
-      cell: (info) => info.getValue(),
+      header: "Start Date",
+      cell: (info) => {
+        const val = info.getValue() as string;
+        if (!val) return <span className="text-slate-400">—</span>;
+        return new Date(val).toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        });
+      },
     }),
     columnHelper.accessor("end_date", {
-      header: "EndDate",
-      cell: (info) => info.getValue(),
+      header: "End Date",
+      cell: (info) => {
+        const val = info.getValue() as string;
+        if (!val) return <span className="text-slate-400">—</span>;
+        return new Date(val).toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        });
+      },
     }),
     columnHelper.accessor("monthly_rent", {
-      header: "MonthlyRent",
-      cell: (info) => info.getValue(),
+      header: "Monthly Rent",
+      cell: (info) => {
+        const val = info.getValue();
+        const row = info.row.original;
+        return formatCurrency(val, (row as any).currency || "IDR");
+      },
     }),
     columnHelper.accessor("deposit_amount", {
-      header: "DepositAmount",
-      cell: (info) => info.getValue(),
+      header: "Deposit Amount",
+      cell: (info) => {
+        const val = info.getValue();
+        const row = info.row.original;
+        return formatCurrency(val, (row as any).currency || "IDR");
+      },
     }),
     columnHelper.accessor("terms", {
       header: "Terms",

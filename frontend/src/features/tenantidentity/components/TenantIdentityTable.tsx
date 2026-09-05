@@ -34,16 +34,23 @@ export function TenantIdentityTable({ data, onRowClick }: TenantIdentityTablePro
       },
     }),
     columnHelper.accessor("identity_type", {
-      header: "IdentityType",
-      cell: (info) => info.getValue(),
+      header: "Identity Type",
+      cell: (info) => <span className="font-semibold text-slate-800">{info.getValue()}</span>,
     }),
     columnHelper.accessor("identity_number", {
-      header: "IdentityNumber",
-      cell: (info) => info.getValue(),
+      header: "Identity Number",
+      cell: (info) => <span className="font-mono text-xs text-slate-700">{info.getValue()}</span>,
     }),
     columnHelper.accessor("file_url", {
-      header: "FileUrl",
-      cell: (info) => info.getValue(),
+      header: "File URL",
+      cell: (info) => {
+        const url = info.getValue() as string;
+        return url ? (
+          <a href={url} target="_blank" rel="noreferrer" className="text-orange hover:underline text-xs">
+            Lihat Berkas ↗
+          </a>
+        ) : <span className="text-slate-400">—</span>;
+      },
     }),
   ];
 

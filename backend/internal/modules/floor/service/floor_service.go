@@ -4,22 +4,39 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/epmp/backend/internal/modules/building/repository"
 	"github.com/epmp/backend/internal/modules/floor/dto"
 	"github.com/epmp/backend/internal/modules/floor/entity"
-	"github.com/epmp/backend/internal/modules/floor/repository"
+	floorrepo "github.com/epmp/backend/internal/modules/floor/repository"
 )
 
 // FloorService implements the application layer for Floor.
 type FloorService struct {
-	repo repository.FloorRepository
+	repo         floorrepo.FloorRepository
+	buildingRepo repository.BuildingRepository
 }
 
 // NewFloorService creates a new FloorService.
-func NewFloorService(repo repository.FloorRepository) *FloorService {
-	return &FloorService{repo: repo}
+func NewFloorService(repo floorrepo.FloorRepository, buildingRepo repository.BuildingRepository) *FloorService {
+	return &FloorService{repo: repo, buildingRepo: buildingRepo}
 }
 
 func (s *FloorService) Create(ctx context.Context, req *dto.CreateFloorRequest, orgID string) (*dto.FloorResponse, error) {
+	// Validate against building's total_floors limit
+	if s.buildingRepo != nil && req.BuildingId != "" {
+		building, err := s.buildingRepo.FindByID(ctx, req.BuildingId, orgID)
+		if err != nil {
+			return nil, fmt.Errorf("floor service: create: building not found: %w", err)
+		}
+		count, err := s.repo.CountByBuildingID(ctx, req.BuildingId)
+		if err != nil {
+			return nil, fmt.Errorf("floor service: create: count floors: %w", err)
+		}
+		if int(count) >= building.TotalFloors {
+			return nil, fmt.Errorf("floor service: create: cannot add more floors than building's total_floors (%d)", building.TotalFloors)
+		}
+	}
+
 	e := entity.NewFloor()
 	e.OrganizationId = orgID
 	e.BuildingId = req.BuildingId

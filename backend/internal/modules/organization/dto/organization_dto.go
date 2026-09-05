@@ -37,3 +37,22 @@ type OrganizationListResponse struct {
 	PerPage    int                 `json:"per_page"`
 	TotalPages int                 `json:"total_pages"`
 }
+
+type OrganizationMemberResponse struct {
+	Id             string    `json:"id"`
+	OrganizationId string    `json:"organization_id"`
+	UserId         string    `json:"user_id"`
+	UserName       string    `json:"user_name"`
+	UserEmail      string    `json:"user_email"`
+	Role           string    `json:"role"`
+	JoinedAt       time.Time `json:"joined_at"`
+	IsActive       bool      `json:"is_active"`
+}
+
+type AddOrganizationMemberRequest struct {
+	Email    string `json:"email"`
+	Name     string `json:"name,omitempty"`
+	Password string `json:"password,omitempty"`
+	Role     string `json:"role,omitempty"`
+}
+

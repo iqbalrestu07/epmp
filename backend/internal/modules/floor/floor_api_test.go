@@ -82,7 +82,9 @@ func setupTestEnv(t *testing.T) *testEnv {
 	e.HidePort = true
 
 	jwtSecret := "test-jwt-secret-for-integration-tests"
-	if err := modules.Register(e, db, log, jwtSecret); err != nil {
+	accessTTL := 2 * time.Hour
+	refreshTTL := 30 * 24 * time.Hour
+	if err := modules.Register(e, db, log, jwtSecret, accessTTL, refreshTTL); err != nil {
 		t.Fatalf("failed to register modules: %v", err)
 	}
 
@@ -550,5 +552,49 @@ func TestFloorAPI_Unauthorized(t *testing.T) {
 
 	if resp.StatusCode != http.StatusUnauthorized {
 		t.Fatalf("expected 401, got %d", resp.StatusCode)
+	}
+}
+
+// TestFloorAPI_Create_ExceedsTotalFloors verifies that creating more floors
+// than the building's total_floors limit returns an error.
+func TestFloorAPI_Create_ExceedsTotalFloors(t *testing.T) {
+	env := setupTestEnv(t)
+
+	// The test building is created with total_floors=5 (see createTestBuilding).
+	// Create 5 floors (the maximum allowed).
+	var ids []string
+	for i := 0; i < 5; i++ {
+		name := fmt.Sprintf("Limit Floor %d-%d", i, time.Now().UnixNano())
+		body := fmt.Sprintf(`{"building_id":"%s","name":"%s","floor_number":%d,"is_active":true}`, env.buildingID, name, i+100)
+		resp := env.doAuthRequest(t, "POST", "/api/v1/floors", body)
+		if resp.StatusCode != http.StatusCreated {
+			t.Fatalf("create floor %d failed: expected 201, got %d", i, resp.StatusCode)
+		}
+		f := parseFloor(t, resp.Body)
+		resp.Body.Close()
+		ids = append(ids, f.ID)
+	}
+	defer func() {
+		for _, id := range ids {
+			env.cleanupFloor(t, id)
+		}
+	}()
+
+	// 6th floor should fail — exceeds total_floors=5.
+	name := fmt.Sprintf("Exceed Floor %d", time.Now().UnixNano())
+	body := fmt.Sprintf(`{"building_id":"%s","name":"%s","floor_number":999,"is_active":true}`, env.buildingID, name)
+	resp := env.doAuthRequest(t, "POST", "/api/v1/floors", body)
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusInternalServerError {
+		t.Fatalf("expected 500 for exceeding total_floors, got %d", resp.StatusCode)
+	}
+
+	var env2 responseEnvelope
+	if err := json.NewDecoder(resp.Body).Decode(&env2); err != nil {
+		t.Fatalf("failed to decode error response: %v", err)
+	}
+	if env2.Error == nil {
+		t.Fatal("expected error in response body")
 	}
 }

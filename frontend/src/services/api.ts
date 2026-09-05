@@ -43,6 +43,43 @@ export function clearStoredOrgId(): void {
   localStorage.removeItem(ORG_ID_KEY);
 }
 
+// ── 401 Auto-Refresh Interceptor ────────────────────────────────────────────
+
+let isRefreshing = false;
+let refreshPromise: Promise<string | null> | null = null;
+
+async function doRefreshToken(): Promise<string | null> {
+  const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+  if (!refreshToken) return null;
+
+  try {
+    const res = await fetch(`${BASE_URL}/auth/refresh`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    });
+
+    if (!res.ok) return null;
+
+    const json = await res.json();
+    const data = json?.data ?? json;
+    if (!data?.access_token) return null;
+
+    setStoredTokens(data.access_token, data.refresh_token || refreshToken);
+    return data.access_token as string;
+  } catch {
+    return null;
+  }
+}
+
+function redirectToLogin(): void {
+  clearStoredTokens();
+  // Only redirect if not already on an auth page
+  if (!window.location.pathname.startsWith("/auth/")) {
+    window.location.href = "/auth/signin";
+  }
+}
+
 async function request<T>(
   path: string,
   options?: RequestInit
@@ -67,6 +104,53 @@ async function request<T>(
     ...options,
     headers,
   });
+
+  // ── 401 Auto-Refresh: try refresh token, then retry once ──
+  if (res.status === 401 && !path.startsWith("/auth/")) {
+    // Avoid infinite refresh loops on auth endpoints
+    if (!isRefreshing) {
+      isRefreshing = true;
+      refreshPromise = doRefreshToken();
+    }
+
+    const newToken = await refreshPromise;
+    isRefreshing = false;
+    refreshPromise = null;
+
+    if (newToken) {
+      // Retry the original request with the new token
+      const retryHeaders: Record<string, string> = {
+        "Content-Type": "application/json",
+        ...(options?.headers as Record<string, string>),
+        Authorization: `Bearer ${newToken}`,
+      };
+      if (orgId) {
+        retryHeaders["X-Organization-ID"] = orgId;
+      }
+
+      const retryRes = await fetch(`${BASE_URL}${path}`, {
+        ...options,
+        headers: retryHeaders,
+      });
+
+      if (!retryRes.ok) {
+        const body = await retryRes.json().catch(() => ({ message: retryRes.statusText }));
+        const message = body?.error?.message ?? body?.message ?? retryRes.statusText;
+        throw new ApiError(retryRes.status, message, body);
+      }
+
+      if (retryRes.status === 204) {
+        return undefined as T;
+      }
+
+      const retryJson = await retryRes.json();
+      return retryJson as T;
+    } else {
+      // Refresh failed — clear tokens and redirect to login
+      redirectToLogin();
+      throw new ApiError(401, "Session expired. Please log in again.");
+    }
+  }
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({ message: res.statusText }));
