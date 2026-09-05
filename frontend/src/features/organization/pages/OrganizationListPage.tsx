@@ -25,15 +25,15 @@ export function OrganizationListPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 text-sm text-black/40">
-        <Link to="/dashboard" className="hover:text-black/60">Dashboard</Link>
+      <div className="flex items-center gap-2 text-sm text-slate-500">
+        <Link to="/dashboard" className="hover:text-slate-600">Dashboard</Link>
         <ChevronRight size={14} />
-        <span className="text-black/60">Organizations</span>
+        <span className="text-slate-600">Organizations</span>
       </div>
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Organizations</h1>
-          <p className="text-sm text-gray-500 mt-1">Your organizations. Switch between them using the header dropdown.</p>
+          <p className="text-sm text-slate-500 mt-1">Your organizations. Switch between them using the header dropdown.</p>
         </div>
         <Button onClick={() => navigate("/dashboard/organizations/new")}>
           <Plus className="w-4 h-4 mr-1" />
@@ -51,10 +51,10 @@ export function OrganizationListPage() {
       </form>
 
       {isLoading ? (
-        <div className="text-center py-8">Loading...</div>
+        <div className="text-center py-12 text-slate-400">Loading...</div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-xl border">
-          <p className="text-gray-500 mb-4">No organizations found.</p>
+          <p className="text-slate-500 mb-4">No organizations found.</p>
           <Button onClick={() => navigate("/dashboard/organizations/new")}>
             <Plus className="w-4 h-4 mr-1" />
             Create your first organization

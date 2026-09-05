@@ -10,6 +10,10 @@ import {
   type CreateContractFormData,
 } from "../schema";
 
+import { useTenants } from "../../tenant/hooks";
+import { usePropertys } from "../../property/hooks";
+import { useRooms } from "../../room/hooks";
+
 interface ContractFormProps {
   onSubmit: (data: CreateContractFormData) => void;
   defaultValues?: Partial<CreateContractFormData>;
@@ -27,113 +31,171 @@ export function ContractForm({
     formState: { errors },
   } = useForm<CreateContractFormData>({
     resolver: zodResolver(createContractSchema),
-    defaultValues,
+    defaultValues: {
+      status: "Active",
+      monthly_rent: 0,
+      deposit_amount: 0,
+      ...defaultValues,
+    },
   });
 
+  const { data: tenantsData } = useTenants({ per_page: 100 });
+  const tenants = Array.isArray(tenantsData?.data) ? tenantsData.data : Array.isArray(tenantsData) ? tenantsData : [];
+
+  const { data: propertiesData } = usePropertys({ per_page: 100 });
+  const properties = Array.isArray(propertiesData?.data) ? propertiesData.data : Array.isArray(propertiesData) ? propertiesData : [];
+
+  const { data: roomsData } = useRooms({ per_page: 100 });
+  const rooms = Array.isArray(roomsData?.data) ? roomsData.data : Array.isArray(roomsData) ? roomsData : [];
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="reservation_id">ReservationId</Label>
-        <Input
-          id="reservation_id"
-          {...register("reservation_id")}
-        />
-        {errors.reservation_id && (
-          <p className="text-sm text-red-500">{errors.reservation_id.message}</p>
-        )}
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="tenant_id">TenantId</Label>
-        <Input
+        <Label htmlFor="tenant_id">Tenant</Label>
+        <select
           id="tenant_id"
           {...register("tenant_id")}
-        />
+          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 text-slate-800"
+        >
+          <option value="">Select a tenant…</option>
+          {tenants.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.full_name} ({t.email})
+            </option>
+          ))}
+        </select>
         {errors.tenant_id && (
-          <p className="text-sm text-red-500">{errors.tenant_id.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.tenant_id.message}</p>
         )}
       </div>
+
       <div className="space-y-2">
-        <Label htmlFor="property_id">PropertyId</Label>
-        <Input
+        <Label htmlFor="property_id">Property</Label>
+        <select
           id="property_id"
           {...register("property_id")}
-        />
+          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 text-slate-800"
+        >
+          <option value="">Select a property…</option>
+          {properties.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.name}
+            </option>
+          ))}
+        </select>
         {errors.property_id && (
-          <p className="text-sm text-red-500">{errors.property_id.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.property_id.message}</p>
         )}
       </div>
+
       <div className="space-y-2">
-        <Label htmlFor="room_id">RoomId</Label>
-        <Input
+        <Label htmlFor="room_id">Room</Label>
+        <select
           id="room_id"
           {...register("room_id")}
-        />
+          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 text-slate-800"
+        >
+          <option value="">Select a room…</option>
+          {rooms.map((r) => (
+            <option key={r.id} value={r.id}>
+              {r.name} (Cap: {r.capacity})
+            </option>
+          ))}
+        </select>
         {errors.room_id && (
-          <p className="text-sm text-red-500">{errors.room_id.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.room_id.message}</p>
         )}
       </div>
+
       <div className="space-y-2">
         <Label htmlFor="status">Status</Label>
-        <Input
+        <select
           id="status"
           {...register("status")}
-        />
+          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 text-slate-800"
+        >
+          <option value="Active">Active</option>
+          <option value="Pending">Pending</option>
+          <option value="Draft">Draft</option>
+          <option value="Renewed">Renewed</option>
+          <option value="Completed">Completed</option>
+          <option value="Terminated">Terminated</option>
+          <option value="Expired">Expired</option>
+        </select>
         {errors.status && (
-          <p className="text-sm text-red-500">{errors.status.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.status.message}</p>
         )}
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="start_date">StartDate</Label>
-        <Input
-          id="start_date"
-          {...register("start_date")}
-        />
-        {errors.start_date && (
-          <p className="text-sm text-red-500">{errors.start_date.message}</p>
-        )}
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="start_date">Start Date</Label>
+          <Input
+            id="start_date"
+            type="date"
+            {...register("start_date")}
+          />
+          {errors.start_date && (
+            <p className="text-xs text-red-600 mt-1">{errors.start_date.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="end_date">End Date</Label>
+          <Input
+            id="end_date"
+            type="date"
+            {...register("end_date")}
+          />
+          {errors.end_date && (
+            <p className="text-xs text-red-600 mt-1">{errors.end_date.message}</p>
+          )}
+        </div>
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="end_date">EndDate</Label>
-        <Input
-          id="end_date"
-          {...register("end_date")}
-        />
-        {errors.end_date && (
-          <p className="text-sm text-red-500">{errors.end_date.message}</p>
-        )}
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="monthly_rent">Monthly Rent (Rp)</Label>
+          <Input
+            id="monthly_rent"
+            type="number"
+            step="any"
+            placeholder="0"
+            {...register("monthly_rent", { valueAsNumber: true })}
+          />
+          {errors.monthly_rent && (
+            <p className="text-xs text-red-600 mt-1">{errors.monthly_rent.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="deposit_amount">Deposit Amount (Rp)</Label>
+          <Input
+            id="deposit_amount"
+            type="number"
+            step="any"
+            placeholder="0"
+            {...register("deposit_amount", { valueAsNumber: true })}
+          />
+          {errors.deposit_amount && (
+            <p className="text-xs text-red-600 mt-1">{errors.deposit_amount.message}</p>
+          )}
+        </div>
       </div>
+
       <div className="space-y-2">
-        <Label htmlFor="monthly_rent">MonthlyRent</Label>
-        <Input
-          id="monthly_rent"
-          {...register("monthly_rent")}
-        />
-        {errors.monthly_rent && (
-          <p className="text-sm text-red-500">{errors.monthly_rent.message}</p>
-        )}
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="deposit_amount">DepositAmount</Label>
-        <Input
-          id="deposit_amount"
-          {...register("deposit_amount")}
-        />
-        {errors.deposit_amount && (
-          <p className="text-sm text-red-500">{errors.deposit_amount.message}</p>
-        )}
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="terms">Terms</Label>
+        <Label htmlFor="terms">Terms & Conditions (Optional)</Label>
         <Input
           id="terms"
+          placeholder="e.g. 1 year agreement, quarterly billing"
           {...register("terms")}
         />
         {errors.terms && (
-          <p className="text-sm text-red-500">{errors.terms.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.terms.message}</p>
         )}
       </div>
 
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} className="bg-orange hover:bg-orange/90 text-white w-full sm:w-auto">
         {isSubmitting ? "Saving..." : "Save"}
       </Button>
     </form>

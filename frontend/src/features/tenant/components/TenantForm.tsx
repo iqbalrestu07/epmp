@@ -34,7 +34,7 @@ export function TenantForm({
     });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-2">
         <Label htmlFor="full_name">FullName</Label>
         <Input
@@ -42,7 +42,7 @@ export function TenantForm({
           {...register("full_name")}
         />
         {errors.full_name && (
-          <p className="text-sm text-red-500">{errors.full_name.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.full_name.message}</p>
         )}
       </div>
       <div className="space-y-2">
@@ -53,7 +53,7 @@ export function TenantForm({
           {...register("email")}
         />
         {errors.email && (
-          <p className="text-sm text-red-500">{errors.email.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.email.message}</p>
         )}
       </div>
       <div className="space-y-2">
@@ -63,7 +63,7 @@ export function TenantForm({
           {...register("phone")}
         />
         {errors.phone && (
-          <p className="text-sm text-red-500">{errors.phone.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.phone.message}</p>
         )}
       </div>
       <div className="space-y-2">
@@ -73,7 +73,7 @@ export function TenantForm({
           {...register("identity_number")}
         />
         {errors.identity_number && (
-          <p className="text-sm text-red-500">{errors.identity_number.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.identity_number.message}</p>
         )}
       </div>
       <div className="flex items-center space-x-2 pt-2">
@@ -81,12 +81,12 @@ export function TenantForm({
           id="is_active"
           type="checkbox"
           {...register("is_active")}
-          className="h-4 w-4 rounded border-gray-300 text-orange focus:ring-orange accent-orange"
+          className="h-4 w-4 rounded border-slate-300 text-orange focus:ring-orange accent-orange"
         />
         <Label htmlFor="is_active" className="cursor-pointer">Active</Label>
       </div>
 
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} className="bg-orange hover:bg-orange/90 text-white w-full sm:w-auto">
         {isSubmitting ? "Saving..." : "Save"}
       </Button>
     </form>

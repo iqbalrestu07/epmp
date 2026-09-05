@@ -23,67 +23,76 @@ export function AssetTable({ data, onRowClick, onEditClick, onDeleteClick }: Ass
 
   const getStatusColor = (status: string) => {
     switch(status) {
-      case "Available": return "bg-green-100 text-green-700 border-green-200";
-      case "Assigned": return "bg-blue-100 text-blue-700 border-blue-200";
-      case "Maintenance": return "bg-yellow-100 text-yellow-700 border-yellow-200";
-      case "Disposed": return "bg-red-100 text-red-700 border-red-200";
-      default: return "bg-gray-100 text-gray-700 border-gray-200";
+      case "Available": return "bg-green-50 text-green-700 border-green-200";
+      case "Assigned": return "bg-blue-50 text-blue-700 border-blue-200";
+      case "Maintenance": return "bg-yellow-50 text-yellow-700 border-yellow-200";
+      case "Disposed": return "bg-red-50 text-red-700 border-red-200";
+      default: return "bg-slate-100 text-slate-700 border-slate-200";
     }
   };
 
   const list: Asset[] = Array.isArray(data) ? data : (data as any)?.data ?? [];
 
   if (!list || list.length === 0) {
-    return <div className="text-center py-12 text-black/50 text-sm">No assets found.</div>;
+    return (
+      <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+        <div className="py-12 text-center text-slate-400">
+          <Tag size={36} className="mx-auto mb-2 opacity-30" />
+          <p className="font-medium text-slate-600">No assets found.</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="w-full overflow-auto">
-      <table className="w-full text-left text-sm">
-        <thead className="bg-black/[0.02] text-black/60 font-medium">
+    <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+      <table className="w-full text-sm text-left">
+        <thead className="border-b border-slate-200 bg-slate-50/75 text-slate-600 font-semibold">
           <tr>
-            <th className="px-4 py-3">Asset Name</th>
-            <th className="px-4 py-3">Category</th>
-            <th className="px-4 py-3">Property</th>
-            <th className="px-4 py-3">Price</th>
-            <th className="px-4 py-3">Status</th>
-            <th className="px-4 py-3 text-right">Actions</th>
+            <th className="px-5 py-3.5">Asset Name</th>
+            <th className="px-5 py-3.5">Category</th>
+            <th className="px-5 py-3.5">Property</th>
+            <th className="px-5 py-3.5">Price</th>
+            <th className="px-5 py-3.5">Status</th>
+            <th className="px-5 py-3.5 text-right">Actions</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-black/5">
+        <tbody className="divide-y divide-slate-100">
           {list.map((row: Asset) => (
-            <tr 
-              key={row.id} 
+            <tr
+              key={row.id}
               onClick={() => onRowClick?.(row)}
-              className="hover:bg-black/[0.02] cursor-pointer transition-colors"
+              className="hover:bg-orange/5 cursor-pointer transition-colors"
             >
-              <td className="px-4 py-3">
+              <td className="px-5 py-4">
                 <div className="flex items-center gap-2">
-                  <Tag size={16} className="text-orange" />
-                  <span className="font-medium text-black/80">{row.name}</span>
+                  <div className="w-8 h-8 rounded-lg bg-orange/10 flex items-center justify-center text-orange shrink-0">
+                    <Tag size={16} />
+                  </div>
+                  <span className="font-semibold text-slate-800">{row.name}</span>
                 </div>
               </td>
-              <td className="px-4 py-3 text-black/60">{row.category}</td>
-              <td className="px-4 py-3 text-black/60">{getPropertyName(row.property_id)}</td>
-              <td className="px-4 py-3 text-black/60">
-                {row.purchase_price > 0 ? `$${row.purchase_price.toLocaleString()}` : "-"}
+              <td className="px-5 py-4 text-slate-600">{row.category}</td>
+              <td className="px-5 py-4 text-slate-600">{getPropertyName(row.property_id)}</td>
+              <td className="px-5 py-4 text-slate-600">
+                {row.purchase_price > 0 ? `$${row.purchase_price.toLocaleString()}` : "—"}
               </td>
-              <td className="px-4 py-3">
-                <span className={`px-2 py-1 rounded-full text-xs border ${getStatusColor(row.status)}`}>
+              <td className="px-5 py-4">
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${getStatusColor(row.status)}`}>
                   {row.status}
                 </span>
               </td>
-              <td className="px-4 py-3 text-right">
+              <td className="px-5 py-4 text-right">
                 <div className="flex items-center justify-end gap-2">
-                  <button 
+                  <button
                     onClick={(e) => onEditClick?.(row, e)}
-                    className="p-1.5 text-black/40 hover:text-orange hover:bg-orange/10 rounded-md transition-colors"
+                    className="p-1.5 text-slate-400 hover:text-orange hover:bg-orange/10 rounded-md transition-colors"
                   >
                     <Edit2 size={16} />
                   </button>
-                  <button 
+                  <button
                     onClick={(e) => onDeleteClick?.(row, e)}
-                    className="p-1.5 text-black/40 hover:text-red-500 hover:bg-red-500/10 rounded-md transition-colors"
+                    className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-md transition-colors"
                   >
                     <Trash2 size={16} />
                   </button>

@@ -7,6 +7,7 @@ type CreateRoomRequest struct {
 	OrganizationId string  `json:"organization_id"`
 	PropertyId     string  `json:"property_id"`
 	FloorId        string  `json:"floor_id"`
+	RoomTypeId     string  `json:"room_type_id,omitempty"`
 	Name           string  `json:"name"`
 	Capacity       int     `json:"capacity"`
 	Price          float64 `json:"price"`
@@ -18,6 +19,7 @@ type UpdateRoomRequest struct {
 	OrganizationId string  `json:"organization_id"`
 	PropertyId     string  `json:"property_id"`
 	FloorId        string  `json:"floor_id"`
+	RoomTypeId     string  `json:"room_type_id,omitempty"`
 	Name           string  `json:"name"`
 	Capacity       int     `json:"capacity"`
 	Price          float64 `json:"price"`
@@ -30,6 +32,7 @@ type RoomResponse struct {
 	Id             string    `json:"id"`
 	PropertyId     string    `json:"property_id"`
 	FloorId        string    `json:"floor_id,omitempty"`
+	RoomTypeId     string    `json:"room_type_id,omitempty"`
 	Name           string    `json:"name"`
 	Capacity       int       `json:"capacity"`
 	Price          float64   `json:"price"`

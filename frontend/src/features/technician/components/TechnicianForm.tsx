@@ -31,7 +31,7 @@ export function TechnicianForm({
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-2">
         <Label htmlFor="name">Name</Label>
         <Input
@@ -39,7 +39,7 @@ export function TechnicianForm({
           {...register("name")}
         />
         {errors.name && (
-          <p className="text-sm text-red-500">{errors.name.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.name.message}</p>
         )}
       </div>
       <div className="space-y-2">
@@ -49,7 +49,7 @@ export function TechnicianForm({
           {...register("phone")}
         />
         {errors.phone && (
-          <p className="text-sm text-red-500">{errors.phone.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.phone.message}</p>
         )}
       </div>
       <div className="space-y-2">
@@ -59,11 +59,11 @@ export function TechnicianForm({
           {...register("specialty")}
         />
         {errors.specialty && (
-          <p className="text-sm text-red-500">{errors.specialty.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.specialty.message}</p>
         )}
       </div>
 
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} className="bg-orange hover:bg-orange/90 text-white w-full sm:w-auto">
         {isSubmitting ? "Saving..." : "Save"}
       </Button>
     </form>

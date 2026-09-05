@@ -23,7 +23,7 @@ export default function DashboardPage() {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <h1 className="text-3xl font-display mb-2">Overview</h1>
-      <p className="text-gray-500 mb-8">Welcome back to EPMP. Here's what's happening today.</p>
+      <p className="text-slate-500 mb-8">Welcome back to EPMP. Here's what's happening today.</p>
 
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -41,8 +41,8 @@ export default function DashboardPage() {
                 </div>
               </div>
               <h3 className="text-3xl font-bold mb-1">{m.value}</h3>
-              <p className="text-sm font-medium text-gray-900 mb-1">{m.title}</p>
-              <p className="text-xs text-gray-500">{m.trend}</p>
+              <p className="text-sm font-medium text-slate-900 mb-1">{m.title}</p>
+              <p className="text-xs text-slate-500">{m.trend}</p>
             </motion.div>
           )
         })}
@@ -56,8 +56,8 @@ export default function DashboardPage() {
         className="bg-white p-8 rounded-2xl border shadow-sm mb-8"
       >
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-gray-800">Revenue & Occupancy Trend</h2>
-          <p className="text-sm text-gray-500">Interactive overview of the last 7 months</p>
+          <h2 className="text-xl font-bold text-slate-800">Revenue & Occupancy Trend</h2>
+          <p className="text-sm text-slate-500">Interactive overview of the last 7 months</p>
         </div>
         <div className="h-80 w-full">
           <ResponsiveContainer width="100%" height="100%">

@@ -3,11 +3,11 @@
 import { z } from "zod";
 
 export const adjustmentSchema = z.object({
-  organization_id: z.string(),
+  organization_id: z.string().optional(),
   id: z.string(),
   invoice_id: z.string(),
   adjustment_type: z.enum(["Credit", "Debit"]),
-  amount: z.number(),
+  amount: z.coerce.number().min(0, "Amount must be positive"),
   adjustment_date: z.string(),
   reason: z.string(),
   created_at: z.string().optional(),

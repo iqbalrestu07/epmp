@@ -3,13 +3,13 @@
 import { z } from "zod";
 
 export const invoiceSchema = z.object({
-  organization_id: z.string(),
+  organization_id: z.string().optional(),
   id: z.string(),
-  contract_id: z.string(),
-  tenant_id: z.string(),
-  amount: z.number(),
+  contract_id: z.string().min(1, "Contract is required"),
+  tenant_id: z.string().min(1, "Tenant is required"),
+  amount: z.coerce.number().min(0, "Amount must be >= 0"),
   status: z.enum(["Unpaid", "Paid", "Overdue", "Cancelled"]),
-  due_date: z.string(),
+  due_date: z.string().min(1, "Due date is required"),
   paid_date: z.string().optional(),
   payment_method: z.string().optional(),
   notes: z.string().optional(),

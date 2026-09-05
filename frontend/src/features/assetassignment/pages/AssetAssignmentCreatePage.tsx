@@ -25,13 +25,13 @@ export function AssetAssignmentCreatePage() {
   };
 
   return (
-    <div className="space-y-6 h-full flex flex-col">
-      <div className="flex items-center gap-2 text-sm text-black/40">
-        <Link to="/dashboard" className="hover:text-black/60">Dashboard</Link>
+    <div className="space-y-6">
+      <div className="flex items-center gap-2 text-sm text-slate-500">
+        <Link to="/dashboard" className="hover:text-slate-600">Dashboard</Link>
         <ChevronRight size={14} />
-        <Link to="/dashboard/asset-assignments" className="hover:text-black/60">Asset Assignments</Link>
+        <Link to="/dashboard/asset-assignments" className="hover:text-slate-600">Asset Assignments</Link>
         <ChevronRight size={14} />
-        <span className="text-black/60">New Assignment</span>
+        <span className="text-slate-600">New Assignment</span>
       </div>
 
       <div className="flex items-center justify-between">
@@ -56,9 +56,9 @@ export function AssetAssignmentCreatePage() {
         </div>
       </div>
       
-      <div className="flex-1 min-h-[600px]">
+      <div className="min-h-[400px]">
         {viewMode === "basic" ? (
-          <div className="max-w-2xl bg-white p-6 rounded-xl border border-black/5 shadow-sm">
+          <div className="max-w-2xl bg-white p-8 rounded-xl border border-slate-200 shadow-sm">
             <AssetAssignmentForm
               onSubmit={handleSubmit as any}
               isSubmitting={createMutation.isPending}

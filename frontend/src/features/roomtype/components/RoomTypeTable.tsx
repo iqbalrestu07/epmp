@@ -35,19 +35,19 @@ interface RoomTypeTableProps {
 
 export function RoomTypeTable({ data, onRowClick }: RoomTypeTableProps) {
   const table = useReactTable({
-    data,
+    data: data || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
 
   return (
-    <div className="rounded-md border">
-      <table className="w-full text-sm">
-        <thead className="border-b bg-gray-50">
+    <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+      <table className="w-full text-sm text-left">
+        <thead className="border-b border-slate-200 bg-slate-50/75 text-slate-600 font-semibold">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <th key={header.id} className="px-4 py-3 text-left font-medium">
+                <th key={header.id} className="px-5 py-3.5">
                   {flexRender(
                     header.column.columnDef.header,
                     header.getContext()
@@ -57,15 +57,15 @@ export function RoomTypeTable({ data, onRowClick }: RoomTypeTableProps) {
             </tr>
           ))}
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-slate-100">
           {table.getRowModel().rows.map((row) => (
             <tr
               key={row.id}
-              className="border-b hover:bg-gray-50 cursor-pointer"
+              className="hover:bg-orange/5 cursor-pointer transition-colors"
               onClick={() => onRowClick?.(row.original)}
             >
               {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="px-4 py-3">
+                <td key={cell.id} className="px-5 py-4">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
@@ -73,7 +73,7 @@ export function RoomTypeTable({ data, onRowClick }: RoomTypeTableProps) {
           ))}
           {table.getRowModel().rows.length === 0 && (
             <tr>
-              <td colSpan={columns.length} className="px-4 py-8 text-center text-gray-500">
+              <td colSpan={columns.length} className="px-5 py-12 text-center text-slate-400">
                 No data found.
               </td>
             </tr>

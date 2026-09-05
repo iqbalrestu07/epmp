@@ -17,24 +17,24 @@ export function RoomEditPage() {
     );
   };
 
-  if (isLoading) return <div className="text-center py-12 text-black/30">Loading…</div>;
-  if (!data) return <div className="text-center py-12 text-black/30">Not found</div>;
+  if (isLoading) return <div className="text-center py-12 text-slate-400">Loading…</div>;
+  if (!data) return <div className="text-center py-12 text-slate-400">Not found</div>;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 text-sm text-black/40">
-        <Link to="/dashboard" className="hover:text-black/60">Dashboard</Link>
+      <div className="flex items-center gap-2 text-sm text-slate-500">
+        <Link to="/dashboard" className="hover:text-slate-600">Dashboard</Link>
         <ChevronRight size={14} />
-        <Link to="/dashboard/rooms" className="hover:text-black/60">Rooms</Link>
+        <Link to="/dashboard/rooms" className="hover:text-slate-600">Rooms</Link>
         <ChevronRight size={14} />
-        <Link to={`/dashboard/rooms/${id}`} className="hover:text-black/60 truncate max-w-32">{data.name}</Link>
+        <Link to={`/dashboard/rooms/${id}`} className="hover:text-slate-600 truncate max-w-32">{data.name}</Link>
         <ChevronRight size={14} />
-        <span className="text-black/60">Edit</span>
+        <span className="text-slate-600">Edit</span>
       </div>
 
       <h1 className="text-2xl font-bold">Edit Room</h1>
 
-      <div className="max-w-2xl bg-white rounded-xl border border-black/5 p-6">
+      <div className="max-w-2xl bg-white rounded-xl border border-slate-200 p-6">
         <RoomForm
           onSubmit={handleSubmit}
           defaultValues={data}

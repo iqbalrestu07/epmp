@@ -3,11 +3,11 @@
 import { z } from "zod";
 
 export const roomTypeSchema = z.object({
-  organization_id: z.string(),
+  organization_id: z.string().optional(),
   id: z.string(),
-  name: z.string().max(100),
+  name: z.string().min(1, "Name is required").max(100),
   description: z.string().optional(),
-  base_price: z.number(),
+  base_price: z.coerce.number().min(0, "Base price must be >= 0"),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),
 });

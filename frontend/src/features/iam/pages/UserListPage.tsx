@@ -47,11 +47,11 @@ function InviteUserModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-1000 backdrop-blur-sm p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200">
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-xl font-semibold">Invite User</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-black transition-colors">
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-900 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -64,7 +64,7 @@ function InviteUserModal({
           )}
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-gray-700">Full Name</label>
+            <label className="text-sm font-medium text-slate-700">Full Name</label>
             <input
               value={form.name}
               onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
@@ -74,7 +74,7 @@ function InviteUserModal({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-gray-700">Email</label>
+            <label className="text-sm font-medium text-slate-700">Email</label>
             <input
               value={form.email}
               onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
@@ -85,7 +85,7 @@ function InviteUserModal({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-gray-700">Initial Password</label>
+            <label className="text-sm font-medium text-slate-700">Initial Password</label>
             <input
               value={form.password}
               onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
@@ -96,25 +96,25 @@ function InviteUserModal({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-gray-700">Assign Roles</label>
+            <label className="text-sm font-medium text-slate-700">Assign Roles</label>
             <div className="border rounded-xl overflow-hidden divide-y">
               {allRoles.map(role => (
-                <label key={role.id} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors">
+                <label key={role.id} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer transition-colors">
                   <div
                     className={`w-5 h-5 rounded flex items-center justify-center border-2 transition-colors ${
-                      form.role_ids?.includes(role.id) ? 'bg-orange border-orange' : 'border-gray-300'
+                      form.role_ids?.includes(role.id) ? 'bg-orange border-orange' : 'border-slate-300'
                     }`}
                     onClick={() => toggleRole(role.id)}
                   >
                     {form.role_ids?.includes(role.id) && (
-                      <svg className="w-3 h-3 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <svg className="w-3 h-3 text-slate-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
                     )}
                   </div>
                   <div>
                     <p className="text-sm font-medium">{role.name}</p>
-                    {role.description && <p className="text-xs text-gray-500">{role.description}</p>}
+                    {role.description && <p className="text-xs text-slate-500">{role.description}</p>}
                   </div>
                 </label>
               ))}
@@ -123,13 +123,13 @@ function InviteUserModal({
         </div>
 
         <div className="p-6 border-t flex justify-end gap-3">
-          <button onClick={onClose} className="px-5 py-2 rounded-xl border text-sm font-medium hover:bg-gray-50 transition-colors">
+          <button onClick={onClose} className="px-5 py-2 rounded-xl border text-sm font-medium hover:bg-slate-50 transition-colors">
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={saving}
-            className="px-5 py-2 rounded-xl bg-black text-white text-sm font-medium hover:bg-black/80 transition-colors disabled:opacity-60 flex items-center gap-2"
+            className="px-5 py-2 rounded-xl bg-slate-900 text-white text-sm font-medium hover:bg-slate-900/80 transition-colors disabled:opacity-60 flex items-center gap-2"
           >
             {saving && <Loader2 size={14} className="animate-spin" />}
             {saving ? 'Creating…' : 'Create User'}
@@ -189,12 +189,12 @@ export default function UserListPage() {
       <div className="flex justify-between items-start mb-8">
         <div>
           <h1 className="text-3xl font-display mb-2">User Accounts</h1>
-          <p className="text-gray-500">Manage team members in this workspace.</p>
+          <p className="text-slate-500">Manage team members in this workspace.</p>
         </div>
         <PermissionGuard permission="user:write">
           <button
             onClick={() => setModalOpen(true)}
-            className="bg-black text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-black/80 transition-colors"
+            className="bg-slate-900 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-slate-900/80 transition-colors"
           >
             <Plus size={18} />
             Invite User
@@ -209,20 +209,20 @@ export default function UserListPage() {
             <Loader2 size={28} className="animate-spin text-orange" />
           </div>
         ) : users.length === 0 ? (
-          <div className="text-center py-20 text-gray-500">No users found.</div>
+          <div className="text-center py-20 text-slate-500">No users found.</div>
         ) : (
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-gray-50 border-b">
-                <th className="px-6 py-4 font-semibold text-sm text-gray-600">User</th>
-                <th className="px-6 py-4 font-semibold text-sm text-gray-600">Roles</th>
-                <th className="px-6 py-4 font-semibold text-sm text-gray-600">Status</th>
-                <th className="px-6 py-4 font-semibold text-sm text-gray-600 text-right">Actions</th>
+              <tr className="bg-slate-50 border-b">
+                <th className="px-6 py-4 font-semibold text-sm text-slate-600">User</th>
+                <th className="px-6 py-4 font-semibold text-sm text-slate-600">Roles</th>
+                <th className="px-6 py-4 font-semibold text-sm text-slate-600">Status</th>
+                <th className="px-6 py-4 font-semibold text-sm text-slate-600 text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
               {users.map((u) => (
-                <tr key={u.id} className="border-b hover:bg-gray-50/50 transition-colors">
+                <tr key={u.id} className="border-b hover:bg-slate-50/50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-orange/10 flex items-center justify-center font-bold text-sm text-orange">
@@ -230,26 +230,26 @@ export default function UserListPage() {
                       </div>
                       <div>
                         <p className="font-medium">{u.name}</p>
-                        <p className="text-xs text-gray-500">{u.email}</p>
+                        <p className="text-xs text-slate-500">{u.email}</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex flex-wrap gap-1">
                       {u.roles.length > 0 ? u.roles.map(r => (
-                        <span key={r.id} className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+                        <span key={r.id} className="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">
                           <ShieldCheck size={10} className="text-orange" />
                           {r.name}
                         </span>
                       )) : (
-                        <span className="text-xs text-gray-400 italic">No roles</span>
+                        <span className="text-xs text-slate-400 italic">No roles</span>
                       )}
                     </div>
                   </td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${
                       u.is_active
-                        ? 'bg-green-100 text-green-700'
+                        ? 'bg-green-50 text-green-700 border border-green-200'
                         : 'bg-red-100 text-red-600'
                     }`}>
                       <span className={`w-1.5 h-1.5 rounded-full ${u.is_active ? 'bg-green-500' : 'bg-red-400'}`} />
@@ -259,7 +259,7 @@ export default function UserListPage() {
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center gap-2 justify-end">
                       <PermissionGuard permission="user:write">
-                        <button className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-black transition-colors" title="Edit user">
+                        <button className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors" title="Edit user">
                           <Pencil size={16} />
                         </button>
                       </PermissionGuard>
@@ -272,13 +272,13 @@ export default function UserListPage() {
                             >Confirm</button>
                             <button
                               onClick={() => setDeleteConfirm(null)}
-                              className="px-3 py-1.5 bg-gray-100 text-xs rounded-lg hover:bg-gray-200 transition-colors"
+                              className="px-3 py-1.5 bg-slate-100 text-xs rounded-lg hover:bg-slate-200 transition-colors"
                             >Cancel</button>
                           </div>
                         ) : (
                           <button
                             onClick={() => setDeleteConfirm(u.id)}
-                            className="p-2 rounded-lg text-gray-500 hover:bg-red-50 hover:text-red-500 transition-colors"
+                            className="p-2 rounded-lg text-slate-500 hover:bg-red-50 hover:text-red-500 transition-colors"
                             title="Deactivate user"
                           >
                             <Trash2 size={16} />

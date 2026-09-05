@@ -3,15 +3,15 @@
 import { z } from "zod";
 
 export const reservationSchema = z.object({
-  organization_id: z.string(),
+  organization_id: z.string().optional(),
   id: z.string(),
-  tenant_id: z.string(),
-  property_id: z.string(),
-  room_id: z.string(),
+  tenant_id: z.string().min(1, "Tenant is required"),
+  property_id: z.string().min(1, "Property is required"),
+  room_id: z.string().min(1, "Room is required"),
   status: z.enum(["Draft", "Pending", "Confirmed", "Cancelled", "Expired"]),
-  check_in_date: z.string(),
+  check_in_date: z.string().min(1, "Check-in date is required"),
   check_out_date: z.string().optional(),
-  booking_fee: z.number(),
+  booking_fee: z.coerce.number().min(0, "Booking fee must be >= 0"),
   notes: z.string().optional(),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),

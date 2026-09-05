@@ -45,7 +45,7 @@ export function FloorForm({
           <select
             id="building_id"
             {...register("building_id")}
-            className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30"
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30"
           >
             <option value="">Select a building…</option>
             {buildings.map(b => (
@@ -60,7 +60,7 @@ export function FloorForm({
           />
         )}
         {errors.building_id && (
-          <p className="text-sm text-red-500">{errors.building_id.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.building_id.message}</p>
         )}
       </div>
 
@@ -72,7 +72,7 @@ export function FloorForm({
           {...register("name")}
         />
         {errors.name && (
-          <p className="text-sm text-red-500">{errors.name.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.name.message}</p>
         )}
       </div>
 
@@ -85,7 +85,7 @@ export function FloorForm({
           {...register("floor_number", { valueAsNumber: true })}
         />
         {errors.floor_number && (
-          <p className="text-sm text-red-500">{errors.floor_number.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.floor_number.message}</p>
         )}
       </div>
 
@@ -98,10 +98,10 @@ export function FloorForm({
             {...register("is_active")}
             className="w-5 h-5 rounded border-black/20 text-orange focus:ring-orange/30"
           />
-          <span className="text-sm text-black/60">Floor is active and available</span>
+          <span className="text-sm text-slate-600">Floor is active and available</span>
         </label>
         {errors.is_active && (
-          <p className="text-sm text-red-500">{errors.is_active.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.is_active.message}</p>
         )}
       </div>
 

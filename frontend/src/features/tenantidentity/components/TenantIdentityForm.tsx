@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTenants } from "@/features/tenant/hooks";
 import {
   createTenantIdentitySchema,
   type CreateTenantIdentityFormData,
@@ -27,53 +28,73 @@ export function TenantIdentityForm({
     formState: { errors },
   } = useForm<CreateTenantIdentityFormData>({
     resolver: zodResolver(createTenantIdentitySchema),
-    defaultValues,
+    defaultValues: {
+      identity_type: "KTP",
+      ...defaultValues,
+    },
   });
 
+  const { data: tenantsData } = useTenants({ per_page: 100 });
+  const tenants = tenantsData?.data || [];
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="tenant_id">TenantId</Label>
-        <Input
+        <Label htmlFor="tenant_id">Tenant</Label>
+        <select
           id="tenant_id"
           {...register("tenant_id")}
-        />
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange"
+        >
+          <option value="">Select a tenant...</option>
+          {tenants.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.full_name} ({t.email || t.phone})
+            </option>
+          ))}
+        </select>
         {errors.tenant_id && (
-          <p className="text-sm text-red-500">{errors.tenant_id.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.tenant_id.message}</p>
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="identity_type">IdentityType</Label>
-        <Input
+        <Label htmlFor="identity_type">Identity Type</Label>
+        <select
           id="identity_type"
           {...register("identity_type")}
-        />
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange"
+        >
+          <option value="KTP">KTP</option>
+          <option value="Passport">Passport</option>
+        </select>
         {errors.identity_type && (
-          <p className="text-sm text-red-500">{errors.identity_type.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.identity_type.message}</p>
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="identity_number">IdentityNumber</Label>
+        <Label htmlFor="identity_number">Identity Number</Label>
         <Input
           id="identity_number"
+          placeholder="e.g. 3201234567890001"
           {...register("identity_number")}
         />
         {errors.identity_number && (
-          <p className="text-sm text-red-500">{errors.identity_number.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.identity_number.message}</p>
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="file_url">FileUrl</Label>
+        <Label htmlFor="file_url">File URL (Optional)</Label>
         <Input
           id="file_url"
+          placeholder="https://... or /uploads/..."
           {...register("file_url")}
         />
         {errors.file_url && (
-          <p className="text-sm text-red-500">{errors.file_url.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.file_url.message}</p>
         )}
       </div>
 
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} className="bg-orange hover:bg-orange/90 text-white w-full sm:w-auto">
         {isSubmitting ? "Saving..." : "Save"}
       </Button>
     </form>

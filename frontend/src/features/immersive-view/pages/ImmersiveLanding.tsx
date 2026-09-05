@@ -84,7 +84,7 @@ export default function ImmersiveLanding() {
         
         {/* Section 1: Hero */}
         <section className="min-h-screen flex flex-col items-center justify-center px-10 text-center">
-          <div className="bg-black/30 backdrop-blur-md p-10 rounded-3xl border border-white/10 shadow-2xl max-w-5xl mx-auto">
+          <div className="bg-slate-900/30 backdrop-blur-md p-10 rounded-3xl border border-white/10 shadow-2xl max-w-5xl mx-auto">
             <div className="flex items-center justify-center gap-3 text-xs tracking-[0.2em] uppercase text-orange mb-6">
               <span className="w-6 h-px bg-orange"></span>
               Enterprise Property Management
@@ -101,7 +101,7 @@ export default function ImmersiveLanding() {
 
         {/* Section 2: The Problem */}
         <section className="min-h-screen flex flex-col items-center justify-center px-10 text-center">
-          <div className="max-w-4xl mx-auto bg-black/40 backdrop-blur-lg p-12 rounded-3xl border border-white/5">
+          <div className="max-w-4xl mx-auto bg-slate-900/40 backdrop-blur-lg p-12 rounded-3xl border border-white/5">
             <h2 className="animate-text font-display text-4xl md:text-5xl text-white mb-8 drop-shadow-lg">
               The Industry Problem: <br/> <span className="text-orange">Hardcoded & Fragmented</span>
             </h2>
@@ -113,14 +113,14 @@ export default function ImmersiveLanding() {
 
         {/* Section 3: Core Capabilities (Bento Grid) */}
         <section className="min-h-screen flex flex-col items-center justify-center px-10 max-w-7xl mx-auto py-32 pointer-events-auto">
-          <div className="bg-black/60 backdrop-blur-xl p-10 md:p-16 rounded-[3rem] border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] w-full">
+          <div className="bg-slate-900/60 backdrop-blur-xl p-10 md:p-16 rounded-[3rem] border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] w-full">
             <h2 className="animate-text font-display text-4xl md:text-5xl text-white mb-16 text-center drop-shadow-md">
               Unified Core Capabilities
             </h2>
             <div className="features-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
               {FEATURES.map((feat, idx) => (
                 <div key={idx} className="feature-card pointer-events-auto border border-white/10 p-8 rounded-2xl bg-white/5 backdrop-blur-md hover:-translate-y-3 hover:bg-white/10 hover:border-orange/50 hover:shadow-[0_10px_30px_rgba(255,103,17,0.15)] transition-all duration-300 cursor-default group">
-                  <div className="w-12 h-12 rounded-full border border-orange/50 mb-6 flex items-center justify-center text-orange group-hover:bg-orange group-hover:text-black group-hover:border-orange transition-colors duration-300 text-lg font-bold">
+                  <div className="w-12 h-12 rounded-full border border-orange/50 mb-6 flex items-center justify-center text-orange group-hover:bg-orange group-hover:text-slate-900 group-hover:border-orange transition-colors duration-300 text-lg font-bold">
                     {idx + 1}
                   </div>
                   <h3 className="text-2xl font-bold text-white mb-3">{feat.title}</h3>
@@ -133,7 +133,7 @@ export default function ImmersiveLanding() {
 
         {/* Section 4: Sketchfab Embed & Interactive 3D */}
         <section className="min-h-screen flex flex-col lg:flex-row items-center justify-center gap-12 px-10 max-w-7xl mx-auto py-32 pointer-events-auto">
-          <div className="flex-1 text-left bg-black/40 backdrop-blur-lg p-10 rounded-3xl border border-white/10">
+          <div className="flex-1 text-left bg-slate-900/40 backdrop-blur-lg p-10 rounded-3xl border border-white/10">
             <h2 className="animate-text font-display text-4xl md:text-5xl leading-tight text-white mb-6">
               Immersive <br/> <span className="text-orange drop-shadow-[0_0_15px_rgba(255,103,17,0.5)]">3D Showcases.</span>
             </h2>
@@ -143,7 +143,7 @@ export default function ImmersiveLanding() {
           </div>
           
           <div className="flex-1 w-full animate-text">
-            <div className="sketchfab-embed-wrapper w-full rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.8)] border border-white/20 aspect-video bg-black hover:scale-105 transition-transform duration-500 ease-out">
+            <div className="sketchfab-embed-wrapper w-full rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.8)] border border-white/20 aspect-video bg-slate-900 hover:scale-105 transition-transform duration-500 ease-out">
               <iframe 
                 title="Wire Frame City 001" 
                 className="w-full h-full"
@@ -164,7 +164,7 @@ export default function ImmersiveLanding() {
 
         {/* Section 5: CTA / End */}
         <section className="section-end min-h-screen flex flex-col items-center justify-center px-10 text-center">
-          <div className="bg-black/50 backdrop-blur-xl p-16 rounded-[3rem] border border-orange/20 shadow-[0_0_60px_rgba(255,103,17,0.1)]">
+          <div className="bg-slate-1000 backdrop-blur-xl p-16 rounded-[3rem] border border-orange/20 shadow-[0_0_60px_rgba(255,103,17,0.1)]">
             <h2 className="animate-text font-display text-5xl md:text-7xl lg:text-8xl mb-8 text-white drop-shadow-xl">
               Ready to <span className="text-orange font-bold">Scale?</span>
             </h2>
@@ -172,7 +172,7 @@ export default function ImmersiveLanding() {
               The foundation for AI Analytics, Dynamic Pricing, IoT Smart Locks, and your ultimate enterprise operational dashboard.
             </p>
             <div className="animate-text pointer-events-auto">
-              <Link to="/auth/signin" className="inline-block bg-orange text-black font-bold text-xl px-12 py-5 rounded-full hover:bg-white hover:scale-110 hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] transition-all duration-300">
+              <Link to="/auth/signin" className="inline-block bg-orange text-slate-900 font-bold text-xl px-12 py-5 rounded-full hover:bg-white hover:scale-110 hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] transition-all duration-300">
                 Enter EPMP Workspace
               </Link>
             </div>

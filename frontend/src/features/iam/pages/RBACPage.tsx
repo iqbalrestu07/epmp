@@ -16,18 +16,18 @@ function PermissionToggle({
   onChange: (id: string, value: boolean) => void;
 }) {
   return (
-    <label className="flex items-center gap-3 p-3 rounded-xl hover:bg-black/5 cursor-pointer transition-colors">
+    <label className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100 cursor-pointer transition-colors">
       <div
         className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${
-          checked ? 'bg-orange border-orange' : 'border-gray-300'
+          checked ? 'bg-orange border-orange' : 'border-slate-300'
         }`}
         onClick={() => onChange(permission.id, !checked)}
       >
-        {checked && <Check size={12} className="text-black" strokeWidth={3} />}
+        {checked && <Check size={12} className="text-slate-900" strokeWidth={3} />}
       </div>
       <div>
         <p className="text-sm font-medium">{permission.key}</p>
-        <p className="text-xs text-gray-500">{permission.description}</p>
+        <p className="text-xs text-slate-500">{permission.description}</p>
       </div>
     </label>
   );
@@ -103,14 +103,14 @@ function RoleModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-1000 backdrop-blur-sm p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-xl font-semibold">
             {existingRole ? 'Edit Role' : 'Create New Role'}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-black transition-colors">
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-900 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -125,38 +125,38 @@ function RoleModal({
 
           <div className="space-y-4">
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-700">Role Name</label>
+              <label className="text-sm font-medium text-slate-700">Role Name</label>
               <input
                 value={name}
                 onChange={e => setName(e.target.value)}
                 disabled={existingRole?.is_system}
                 placeholder="e.g. Property Inspector"
-                className="border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 focus:border-orange transition-all disabled:bg-gray-50 disabled:text-gray-400"
+                className="border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 focus:border-orange transition-all disabled:bg-slate-50 disabled:text-slate-400"
               />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-700">Description</label>
+              <label className="text-sm font-medium text-slate-700">Description</label>
               <input
                 value={description}
                 onChange={e => setDescription(e.target.value)}
                 disabled={existingRole?.is_system}
                 placeholder="What can this role do?"
-                className="border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 focus:border-orange transition-all disabled:bg-gray-50 disabled:text-gray-400"
+                className="border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 focus:border-orange transition-all disabled:bg-slate-50 disabled:text-slate-400"
               />
             </div>
           </div>
 
           {/* Permissions */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Permissions</h3>
+            <h3 className="text-sm font-semibold text-slate-700 mb-3">Permissions</h3>
             {existingRole?.is_system ? (
-              <p className="text-sm text-gray-500 italic">System roles have all permissions by default and cannot be modified.</p>
+              <p className="text-sm text-slate-500 italic">System roles have all permissions by default and cannot be modified.</p>
             ) : (
               <div className="space-y-4">
                 {Object.entries(grouped).map(([resource, perms]) => (
                   <div key={resource} className="border rounded-xl overflow-hidden">
-                    <div className="bg-gray-50 px-4 py-2 border-b">
-                      <span className="text-xs font-bold uppercase tracking-wider text-gray-600">{resource}</span>
+                    <div className="bg-slate-50 px-4 py-2 border-b">
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-600">{resource}</span>
                     </div>
                     <div className="divide-y">
                       {perms.map(p => (
@@ -177,14 +177,14 @@ function RoleModal({
 
         {/* Footer */}
         <div className="p-6 border-t flex justify-end gap-3">
-          <button onClick={onClose} className="px-5 py-2 rounded-xl border text-sm font-medium hover:bg-gray-50 transition-colors">
+          <button onClick={onClose} className="px-5 py-2 rounded-xl border text-sm font-medium hover:bg-slate-50 transition-colors">
             Cancel
           </button>
           {!existingRole?.is_system && (
             <button
               onClick={handleSave}
               disabled={saving}
-              className="px-5 py-2 rounded-xl bg-black text-white text-sm font-medium hover:bg-black/80 transition-colors disabled:opacity-60 flex items-center gap-2"
+              className="px-5 py-2 rounded-xl bg-slate-900 text-white text-sm font-medium hover:bg-slate-900/80 transition-colors disabled:opacity-60 flex items-center gap-2"
             >
               {saving && <Loader2 size={14} className="animate-spin" />}
               {saving ? 'Saving…' : 'Save Role'}
@@ -254,12 +254,12 @@ export default function RBACPage() {
       <div className="flex justify-between items-start mb-8">
         <div>
           <h1 className="text-3xl font-display mb-2">Roles & Permissions</h1>
-          <p className="text-gray-500">Manage what your team members can see and do.</p>
+          <p className="text-slate-500">Manage what your team members can see and do.</p>
         </div>
         <PermissionGuard permission="role:write">
           <button
             onClick={() => { setEditingRole(null); setModalOpen(true); }}
-            className="bg-black text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-black/80 transition-colors"
+            className="bg-slate-900 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-slate-900/80 transition-colors"
           >
             <Plus size={18} />
             Create Role
@@ -274,26 +274,26 @@ export default function RBACPage() {
             <Loader2 size={28} className="animate-spin text-orange" />
           </div>
         ) : roles.length === 0 ? (
-          <div className="text-center py-20 text-gray-500">No roles found.</div>
+          <div className="text-center py-20 text-slate-500">No roles found.</div>
         ) : (
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-gray-50 border-b">
-                <th className="px-6 py-4 font-semibold text-sm text-gray-600">Role Name</th>
-                <th className="px-6 py-4 font-semibold text-sm text-gray-600">Type</th>
-                <th className="px-6 py-4 font-semibold text-sm text-gray-600">Permissions</th>
-                <th className="px-6 py-4 font-semibold text-sm text-gray-600 text-right">Actions</th>
+              <tr className="bg-slate-50 border-b">
+                <th className="px-6 py-4 font-semibold text-sm text-slate-600">Role Name</th>
+                <th className="px-6 py-4 font-semibold text-sm text-slate-600">Type</th>
+                <th className="px-6 py-4 font-semibold text-sm text-slate-600">Permissions</th>
+                <th className="px-6 py-4 font-semibold text-sm text-slate-600 text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
               {roles.map((r) => (
-                <tr key={r.id} className="border-b hover:bg-gray-50/50 transition-colors">
+                <tr key={r.id} className="border-b hover:bg-slate-50/50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       <ShieldCheck size={18} className="text-orange flex-shrink-0" />
                       <div>
                         <p className="font-medium">{r.name}</p>
-                        {r.description && <p className="text-xs text-gray-500">{r.description}</p>}
+                        {r.description && <p className="text-xs text-slate-500">{r.description}</p>}
                       </div>
                     </div>
                   </td>
@@ -301,10 +301,10 @@ export default function RBACPage() {
                     {r.is_system ? (
                       <span className="px-2 py-1 bg-orange/10 text-orange rounded-full text-xs font-medium">System</span>
                     ) : (
-                      <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">Custom</span>
+                      <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-medium">Custom</span>
                     )}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
+                  <td className="px-6 py-4 text-sm text-slate-600">
                     {r.is_system ? (
                       <span className="text-orange font-medium">All Access</span>
                     ) : (
@@ -316,7 +316,7 @@ export default function RBACPage() {
                       <PermissionGuard permission="role:write">
                         <button
                           onClick={() => { setEditingRole(r); setModalOpen(true); }}
-                          className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-black transition-colors"
+                          className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
                           title="Edit role"
                         >
                           <Pencil size={16} />
@@ -332,13 +332,13 @@ export default function RBACPage() {
                               >Confirm</button>
                               <button
                                 onClick={() => setDeleteConfirm(null)}
-                                className="px-3 py-1.5 bg-gray-100 text-xs rounded-lg hover:bg-gray-200 transition-colors"
+                                className="px-3 py-1.5 bg-slate-100 text-xs rounded-lg hover:bg-slate-200 transition-colors"
                               >Cancel</button>
                             </div>
                           ) : (
                             <button
                               onClick={() => setDeleteConfirm(r.id)}
-                              className="p-2 rounded-lg text-gray-500 hover:bg-red-50 hover:text-red-500 transition-colors"
+                              className="p-2 rounded-lg text-slate-500 hover:bg-red-50 hover:text-red-500 transition-colors"
                               title="Delete role"
                             >
                               <Trash2 size={16} />

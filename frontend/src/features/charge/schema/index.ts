@@ -3,12 +3,12 @@
 import { z } from "zod";
 
 export const chargeSchema = z.object({
-  organization_id: z.string(),
+  organization_id: z.string().optional(),
   id: z.string(),
   contract_id: z.string(),
   invoice_id: z.string().optional(),
   charge_type: z.enum(["Rental", "Water", "Electricity", "Cleaning", "Parking", "Internet", "Other"]),
-  amount: z.number(),
+  amount: z.coerce.number().min(0, "Amount must be positive"),
   status: z.enum(["Unbilled", "Billed", "Cancelled"]),
   charge_date: z.string(),
   notes: z.string().optional(),

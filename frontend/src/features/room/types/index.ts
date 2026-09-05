@@ -3,6 +3,7 @@ export interface Room {
   id: string;
   name: string;
   floor_id: string;
+  room_type_id?: string;
   capacity: number;
   price: number;
   is_available: boolean;
@@ -23,19 +24,21 @@ export interface RoomListResponse {
 export interface CreateRoomRequest {
   name: string;
   property_id: string;
-  floor_id: string;
+  floor_id?: string | null;
+  room_type_id?: string | null;
   capacity: number;
   price: number;
   is_available: boolean;
 }
 
 export interface UpdateRoomRequest {
-  name: string;
-  property_id: string;
-  floor_id: string;
-  capacity: number;
-  price: number;
-  is_available: boolean;
+  name?: string;
+  property_id?: string;
+  floor_id?: string | null;
+  room_type_id?: string | null;
+  capacity?: number;
+  price?: number;
+  is_available?: boolean;
 }
 
 export interface RoomQueryParams {

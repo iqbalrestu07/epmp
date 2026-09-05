@@ -45,10 +45,10 @@ export function AssetListPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 text-sm text-black/40">
-        <Link to="/dashboard" className="hover:text-black/60">Dashboard</Link>
+      <div className="flex items-center gap-2 text-sm text-slate-500">
+        <Link to="/dashboard" className="hover:text-slate-600">Dashboard</Link>
         <ChevronRight size={14} />
-        <span className="text-black/60">Assets</span>
+        <span className="text-slate-600">Assets</span>
       </div>
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -58,21 +58,21 @@ export function AssetListPage() {
         </Button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-black/5 overflow-hidden">
-        <div className="p-4 border-b border-black/5">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="p-4 border-b border-slate-200">
           <form onSubmit={handleSearch} className="flex gap-2 max-w-md">
             <Input
               placeholder="Search assets..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              className="flex-1 rounded-lg border-black/10 focus:ring-orange/30"
+              className="flex-1 rounded-lg border-slate-300 focus:ring-orange/30"
             />
             <Button type="submit" variant="outline" className="rounded-lg">Search</Button>
           </form>
         </div>
 
         {isLoading ? (
-          <div className="text-center py-12 text-black/50 text-sm">Loading assets...</div>
+          <div className="text-center py-12 text-slate-500 text-sm">Loading assets...</div>
         ) : (
           <AssetTable 
             data={data?.data ?? []} 
@@ -85,7 +85,7 @@ export function AssetListPage() {
 
       {data && data.total_pages > 1 && (
         <div className="flex items-center justify-between pt-4">
-          <p className="text-sm text-black/50">
+          <p className="text-sm text-slate-500">
             Showing page {data.page} of {data.total_pages} ({data.total} total)
           </p>
           <div className="flex gap-2">

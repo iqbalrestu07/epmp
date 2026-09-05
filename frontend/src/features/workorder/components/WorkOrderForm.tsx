@@ -5,6 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { usePropertys } from "@/features/property/hooks";
+import { useRooms } from "@/features/room/hooks";
 import {
   createWorkOrderSchema,
   type CreateWorkOrderFormData,
@@ -27,63 +29,100 @@ export function WorkOrderForm({
     formState: { errors },
   } = useForm<CreateWorkOrderFormData>({
     resolver: zodResolver(createWorkOrderSchema),
-    defaultValues,
+    defaultValues: {
+      status: "Open",
+      priority: "Medium",
+      ...defaultValues,
+    },
   });
 
+  const { data: propertiesData } = usePropertys({ per_page: 100 });
+  const { data: roomsData } = useRooms({ per_page: 100 });
+  const properties = propertiesData?.data || [];
+  const rooms = roomsData?.data || [];
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="property_id">PropertyId</Label>
-        <Input
+        <Label htmlFor="property_id">Property</Label>
+        <select
           id="property_id"
           {...register("property_id")}
-        />
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange"
+        >
+          <option value="">Select a property...</option>
+          {properties.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.name} {p.address ? `(${p.address})` : ""}
+            </option>
+          ))}
+        </select>
         {errors.property_id && (
-          <p className="text-sm text-red-500">{errors.property_id.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.property_id.message}</p>
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="room_id">RoomId</Label>
-        <Input
+        <Label htmlFor="room_id">Room (Optional)</Label>
+        <select
           id="room_id"
           {...register("room_id")}
-        />
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange"
+        >
+          <option value="">None / Select a room...</option>
+          {rooms.map((r) => (
+            <option key={r.id} value={r.id}>
+              {r.name}
+            </option>
+          ))}
+        </select>
         {errors.room_id && (
-          <p className="text-sm text-red-500">{errors.room_id.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.room_id.message}</p>
         )}
       </div>
       <div className="space-y-2">
         <Label htmlFor="description">Description</Label>
         <Input
           id="description"
+          placeholder="Issue description"
           {...register("description")}
         />
         {errors.description && (
-          <p className="text-sm text-red-500">{errors.description.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.description.message}</p>
         )}
       </div>
       <div className="space-y-2">
         <Label htmlFor="status">Status</Label>
-        <Input
+        <select
           id="status"
           {...register("status")}
-        />
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange"
+        >
+          <option value="Open">Open</option>
+          <option value="InProgress">InProgress</option>
+          <option value="Resolved">Resolved</option>
+        </select>
         {errors.status && (
-          <p className="text-sm text-red-500">{errors.status.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.status.message}</p>
         )}
       </div>
       <div className="space-y-2">
         <Label htmlFor="priority">Priority</Label>
-        <Input
+        <select
           id="priority"
           {...register("priority")}
-        />
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange"
+        >
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+          <option value="Urgent">Urgent</option>
+        </select>
         {errors.priority && (
-          <p className="text-sm text-red-500">{errors.priority.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.priority.message}</p>
         )}
       </div>
 
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} className="bg-orange hover:bg-orange/90 text-white w-full sm:w-auto">
         {isSubmitting ? "Saving..." : "Save"}
       </Button>
     </form>

@@ -10,6 +10,9 @@ import {
   type CreateInvoiceFormData,
 } from "../schema";
 
+import { useContracts } from "../../contract/hooks";
+import { useTenants } from "../../tenant/hooks";
+
 interface InvoiceFormProps {
   onSubmit: (data: CreateInvoiceFormData) => void;
   defaultValues?: Partial<CreateInvoiceFormData>;
@@ -27,93 +30,147 @@ export function InvoiceForm({
     formState: { errors },
   } = useForm<CreateInvoiceFormData>({
     resolver: zodResolver(createInvoiceSchema),
-    defaultValues,
+    defaultValues: {
+      status: "Unpaid",
+      amount: 0,
+      payment_method: "Bank Transfer",
+      ...defaultValues,
+    },
   });
 
+  const { data: contractsData } = useContracts({ per_page: 100 });
+  const contracts = Array.isArray(contractsData?.data) ? contractsData.data : Array.isArray(contractsData) ? contractsData : [];
+
+  const { data: tenantsData } = useTenants({ per_page: 100 });
+  const tenants = Array.isArray(tenantsData?.data) ? tenantsData.data : Array.isArray(tenantsData) ? tenantsData : [];
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="contract_id">ContractId</Label>
-        <Input
+        <Label htmlFor="contract_id">Contract</Label>
+        <select
           id="contract_id"
           {...register("contract_id")}
-        />
+          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 text-slate-800"
+        >
+          <option value="">Select a contract…</option>
+          {contracts.map((c) => (
+            <option key={c.id} value={c.id}>
+              Contract #{c.id.slice(0, 8)} ({c.status})
+            </option>
+          ))}
+        </select>
         {errors.contract_id && (
-          <p className="text-sm text-red-500">{errors.contract_id.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.contract_id.message}</p>
         )}
       </div>
+
       <div className="space-y-2">
-        <Label htmlFor="tenant_id">TenantId</Label>
-        <Input
+        <Label htmlFor="tenant_id">Tenant</Label>
+        <select
           id="tenant_id"
           {...register("tenant_id")}
-        />
+          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 text-slate-800"
+        >
+          <option value="">Select a tenant…</option>
+          {tenants.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.full_name} ({t.email})
+            </option>
+          ))}
+        </select>
         {errors.tenant_id && (
-          <p className="text-sm text-red-500">{errors.tenant_id.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.tenant_id.message}</p>
         )}
       </div>
+
       <div className="space-y-2">
-        <Label htmlFor="amount">Amount</Label>
+        <Label htmlFor="amount">Invoice Amount (Rp)</Label>
         <Input
           id="amount"
-          {...register("amount")}
+          type="number"
+          step="any"
+          placeholder="0"
+          {...register("amount", { valueAsNumber: true })}
         />
         {errors.amount && (
-          <p className="text-sm text-red-500">{errors.amount.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.amount.message}</p>
         )}
       </div>
+
       <div className="space-y-2">
         <Label htmlFor="status">Status</Label>
-        <Input
+        <select
           id="status"
           {...register("status")}
-        />
+          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 text-slate-800"
+        >
+          <option value="Unpaid">Unpaid</option>
+          <option value="Paid">Paid</option>
+          <option value="Overdue">Overdue</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
         {errors.status && (
-          <p className="text-sm text-red-500">{errors.status.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.status.message}</p>
         )}
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="due_date">DueDate</Label>
-        <Input
-          id="due_date"
-          {...register("due_date")}
-        />
-        {errors.due_date && (
-          <p className="text-sm text-red-500">{errors.due_date.message}</p>
-        )}
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="due_date">Due Date</Label>
+          <Input
+            id="due_date"
+            type="date"
+            {...register("due_date")}
+          />
+          {errors.due_date && (
+            <p className="text-xs text-red-600 mt-1">{errors.due_date.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="paid_date">Paid Date (Optional)</Label>
+          <Input
+            id="paid_date"
+            type="date"
+            {...register("paid_date")}
+          />
+          {errors.paid_date && (
+            <p className="text-xs text-red-600 mt-1">{errors.paid_date.message}</p>
+          )}
+        </div>
       </div>
+
       <div className="space-y-2">
-        <Label htmlFor="paid_date">PaidDate</Label>
-        <Input
-          id="paid_date"
-          {...register("paid_date")}
-        />
-        {errors.paid_date && (
-          <p className="text-sm text-red-500">{errors.paid_date.message}</p>
-        )}
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="payment_method">PaymentMethod</Label>
-        <Input
+        <Label htmlFor="payment_method">Payment Method</Label>
+        <select
           id="payment_method"
           {...register("payment_method")}
-        />
+          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 text-slate-800"
+        >
+          <option value="Bank Transfer">Bank Transfer</option>
+          <option value="Cash">Cash</option>
+          <option value="Credit Card">Credit Card</option>
+          <option value="E-Wallet">E-Wallet (QRIS / GoPay / OVO)</option>
+        </select>
         {errors.payment_method && (
-          <p className="text-sm text-red-500">{errors.payment_method.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.payment_method.message}</p>
         )}
       </div>
+
       <div className="space-y-2">
-        <Label htmlFor="notes">Notes</Label>
+        <Label htmlFor="notes">Notes (Optional)</Label>
         <Input
           id="notes"
+          placeholder="e.g. Rent for September 2026"
           {...register("notes")}
         />
         {errors.notes && (
-          <p className="text-sm text-red-500">{errors.notes.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.notes.message}</p>
         )}
       </div>
 
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} className="bg-orange hover:bg-orange/90 text-white w-full sm:w-auto">
         {isSubmitting ? "Saving..." : "Save"}
       </Button>
     </form>

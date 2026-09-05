@@ -3,10 +3,10 @@
 import { z } from "zod";
 
 export const penaltySchema = z.object({
-  organization_id: z.string(),
+  organization_id: z.string().optional(),
   id: z.string(),
   invoice_id: z.string(),
-  amount: z.number(),
+  amount: z.coerce.number().min(0, "Amount must be positive"),
   status: z.enum(["Unpaid", "Paid", "Waived"]),
   penalty_date: z.string(),
   description: z.string(),

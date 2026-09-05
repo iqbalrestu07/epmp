@@ -40,13 +40,13 @@ export function BuildingForm({
     : [];
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-md">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-2">
         <Label htmlFor="property_id">Property</Label>
         <select
           id="property_id"
           {...register("property_id")}
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 text-slate-800"
         >
           <option value="">Select a property…</option>
           {properties.map((p) => (
@@ -56,7 +56,7 @@ export function BuildingForm({
           ))}
         </select>
         {errors.property_id && (
-          <p className="text-sm text-red-500">{errors.property_id.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.property_id.message}</p>
         )}
       </div>
 
@@ -68,7 +68,7 @@ export function BuildingForm({
           placeholder="e.g. Tower A"
         />
         {errors.name && (
-          <p className="text-sm text-red-500">{errors.name.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.name.message}</p>
         )}
       </div>
 
@@ -81,11 +81,11 @@ export function BuildingForm({
           {...register("total_floors")}
         />
         {errors.total_floors && (
-          <p className="text-sm text-red-500">{errors.total_floors.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.total_floors.message}</p>
         )}
       </div>
 
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} className="bg-orange hover:bg-orange/90 text-white w-full sm:w-auto">
         {isSubmitting ? "Saving..." : "Save"}
       </Button>
     </form>

@@ -35,8 +35,8 @@ export function RoomTable({ data, floors = [], onRowClick, onEdit, onDelete }: R
     columnHelper.accessor("capacity", {
       header: "Capacity",
       cell: (info) => (
-        <span className="inline-flex items-center gap-1 text-sm text-black/60">
-          <Users size={14} className="text-black/30" />
+        <span className="inline-flex items-center gap-1 text-sm text-slate-600">
+          <Users size={14} className="text-slate-400" />
           {info.getValue()}
         </span>
       ),
@@ -45,7 +45,7 @@ export function RoomTable({ data, floors = [], onRowClick, onEdit, onDelete }: R
       header: "Price",
       cell: (info) => (
         <span className="inline-flex items-center gap-1 text-sm font-medium">
-          <DollarSign size={14} className="text-black/30" />
+          <DollarSign size={14} className="text-slate-400" />
           {info.getValue().toLocaleString()}
         </span>
       ),
@@ -53,7 +53,7 @@ export function RoomTable({ data, floors = [], onRowClick, onEdit, onDelete }: R
     columnHelper.accessor("floor_id", {
       header: "Floor",
       cell: (info) => (
-        <span className="text-sm text-black/70">
+        <span className="text-sm text-slate-600">
           {floorNameById.get(info.getValue()) ?? "—"}
         </span>
       ),
@@ -63,8 +63,8 @@ export function RoomTable({ data, floors = [], onRowClick, onEdit, onDelete }: R
       cell: (info) => (
         <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
           info.getValue()
-            ? "bg-green-100 text-green-700"
-            : "bg-red-100 text-red-700"
+            ? "bg-green-50 text-green-700 border border-green-200"
+            : "bg-red-50 text-red-700 border border-red-200"
         }`}>
           {info.getValue() ? "Available" : "Occupied"}
         </span>
@@ -77,21 +77,21 @@ export function RoomTable({ data, floors = [], onRowClick, onEdit, onDelete }: R
         <div className="flex items-center gap-1">
           <button
             onClick={(e) => { e.stopPropagation(); onRowClick?.(info.row.original); }}
-            className="p-1.5 rounded-lg hover:bg-black/5 text-black/50 hover:text-black transition-colors"
+            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
             title="View"
           >
             <Eye size={16} />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); onEdit?.(info.row.original); }}
-            className="p-1.5 rounded-lg hover:bg-black/5 text-black/50 hover:text-orange transition-colors"
+            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-orange transition-colors"
             title="Edit"
           >
             <Pencil size={16} />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); onDelete?.(info.row.original); }}
-            className="p-1.5 rounded-lg hover:bg-black/5 text-black/50 hover:text-red-500 transition-colors"
+            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-red-500 transition-colors"
             title="Delete"
           >
             <Trash2 size={16} />
@@ -102,34 +102,34 @@ export function RoomTable({ data, floors = [], onRowClick, onEdit, onDelete }: R
   ];
 
   const table = useReactTable({
-    data,
+    data: data || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
 
   return (
-    <div className="rounded-xl border border-black/5 overflow-hidden bg-white">
-      <table className="w-full text-sm">
-        <thead className="border-b border-black/5 bg-black/[0.02]">
+    <div className="rounded-xl border border-slate-200 overflow-hidden bg-white">
+      <table className="w-full text-sm text-left">
+        <thead className="border-b border-slate-200 bg-slate-50/75">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <th key={header.id} className="px-4 py-3 text-left font-semibold text-black/60 text-xs uppercase tracking-wider">
+                <th key={header.id} className="px-5 py-3.5">
                   {flexRender(header.column.columnDef.header, header.getContext())}
                 </th>
               ))}
             </tr>
           ))}
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-slate-100">
           {table.getRowModel().rows.map((row) => (
             <tr
               key={row.id}
-              className="border-b border-black/5 hover:bg-black/[0.02] cursor-pointer transition-colors"
+              className="hover:bg-orange/5 cursor-pointer transition-colors"
               onClick={() => onRowClick?.(row.original)}
             >
               {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="px-4 py-3">
+                <td key={cell.id} className="px-5 py-4">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
@@ -137,9 +137,8 @@ export function RoomTable({ data, floors = [], onRowClick, onEdit, onDelete }: R
           ))}
           {table.getRowModel().rows.length === 0 && (
             <tr>
-              <td colSpan={columns.length} className="px-4 py-12 text-center text-black/30">
-                <DoorOpen size={32} className="mx-auto mb-2 opacity-50" />
-                No rooms found. Create one to get started.
+              <td colSpan={columns.length} className="px-5 py-12 text-center text-slate-400">
+                No data found.
               </td>
             </tr>
           )}

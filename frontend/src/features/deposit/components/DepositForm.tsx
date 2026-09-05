@@ -5,6 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useContracts } from "@/features/contract/hooks";
+import { useTenants } from "@/features/tenant/hooks";
 import {
   createDepositSchema,
   type CreateDepositFormData,
@@ -27,83 +29,120 @@ export function DepositForm({
     formState: { errors },
   } = useForm<CreateDepositFormData>({
     resolver: zodResolver(createDepositSchema),
-    defaultValues,
+    defaultValues: {
+      status: "Collected",
+      collection_date: new Date().toISOString().split("T")[0],
+      ...defaultValues,
+    },
   });
 
+  const { data: contractsData } = useContracts({ per_page: 100 });
+  const { data: tenantsData } = useTenants({ per_page: 100 });
+  const contracts = contractsData?.data || [];
+  const tenants = tenantsData?.data || [];
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="contract_id">ContractId</Label>
-        <Input
+        <Label htmlFor="contract_id">Contract</Label>
+        <select
           id="contract_id"
           {...register("contract_id")}
-        />
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange"
+        >
+          <option value="">Select a contract...</option>
+          {contracts.map((c) => (
+            <option key={c.id} value={c.id}>
+              Contract #{c.id.slice(0, 8)} ({c.status})
+            </option>
+          ))}
+        </select>
         {errors.contract_id && (
-          <p className="text-sm text-red-500">{errors.contract_id.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.contract_id.message}</p>
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="tenant_id">TenantId</Label>
-        <Input
+        <Label htmlFor="tenant_id">Tenant</Label>
+        <select
           id="tenant_id"
           {...register("tenant_id")}
-        />
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange"
+        >
+          <option value="">Select a tenant...</option>
+          {tenants.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.full_name} ({t.email || t.phone})
+            </option>
+          ))}
+        </select>
         {errors.tenant_id && (
-          <p className="text-sm text-red-500">{errors.tenant_id.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.tenant_id.message}</p>
         )}
       </div>
       <div className="space-y-2">
         <Label htmlFor="amount">Amount</Label>
         <Input
           id="amount"
-          {...register("amount")}
+          type="number"
+          step="any"
+          min="0"
+          placeholder="0.00"
+          {...register("amount", { valueAsNumber: true })}
         />
         {errors.amount && (
-          <p className="text-sm text-red-500">{errors.amount.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.amount.message}</p>
         )}
       </div>
       <div className="space-y-2">
         <Label htmlFor="status">Status</Label>
-        <Input
+        <select
           id="status"
           {...register("status")}
-        />
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange"
+        >
+          <option value="Collected">Collected</option>
+          <option value="Returned">Returned</option>
+          <option value="Forfeited">Forfeited</option>
+        </select>
         {errors.status && (
-          <p className="text-sm text-red-500">{errors.status.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.status.message}</p>
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="collection_date">CollectionDate</Label>
+        <Label htmlFor="collection_date">Collection Date</Label>
         <Input
           id="collection_date"
+          type="date"
           {...register("collection_date")}
         />
         {errors.collection_date && (
-          <p className="text-sm text-red-500">{errors.collection_date.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.collection_date.message}</p>
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="refund_date">RefundDate</Label>
+        <Label htmlFor="refund_date">Refund Date (Optional)</Label>
         <Input
           id="refund_date"
+          type="date"
           {...register("refund_date")}
         />
         {errors.refund_date && (
-          <p className="text-sm text-red-500">{errors.refund_date.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.refund_date.message}</p>
         )}
       </div>
       <div className="space-y-2">
         <Label htmlFor="notes">Notes</Label>
         <Input
           id="notes"
+          placeholder="Optional notes"
           {...register("notes")}
         />
         {errors.notes && (
-          <p className="text-sm text-red-500">{errors.notes.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.notes.message}</p>
         )}
       </div>
 
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} className="bg-orange hover:bg-orange/90 text-white w-full sm:w-auto">
         {isSubmitting ? "Saving..." : "Save"}
       </Button>
     </form>

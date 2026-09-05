@@ -3,7 +3,7 @@
 import { z } from "zod";
 
 export const facilitySchema = z.object({
-  organization_id: z.string(),
+  organization_id: z.string().optional(),
   id: z.string(),
   property_id: z.string(),
   name: z.string().max(100),

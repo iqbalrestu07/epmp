@@ -10,6 +10,8 @@ import {
   type CreateBedFormData,
 } from "../schema";
 
+import { useRooms } from "../../room/hooks";
+
 interface BedFormProps {
   onSubmit: (data: CreateBedFormData) => void;
   defaultValues?: Partial<CreateBedFormData>;
@@ -27,43 +29,63 @@ export function BedForm({
     formState: { errors },
   } = useForm<CreateBedFormData>({
     resolver: zodResolver(createBedSchema),
-    defaultValues,
+    defaultValues: {
+      status: "Available",
+      ...defaultValues,
+    },
   });
 
+  const { data: roomsData } = useRooms({ per_page: 100 });
+  const rooms = Array.isArray(roomsData?.data) ? roomsData.data : Array.isArray(roomsData) ? roomsData : [];
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="room_id">RoomId</Label>
-        <Input
+        <Label htmlFor="room_id">Room</Label>
+        <select
           id="room_id"
           {...register("room_id")}
-        />
+          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 text-slate-800"
+        >
+          <option value="">Select a room…</option>
+          {rooms.map((r) => (
+            <option key={r.id} value={r.id}>
+              {r.name} (Cap: {r.capacity})
+            </option>
+          ))}
+        </select>
         {errors.room_id && (
-          <p className="text-sm text-red-500">{errors.room_id.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.room_id.message}</p>
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="name">Name</Label>
+        <Label htmlFor="name">Bed Label / Name</Label>
         <Input
           id="name"
+          placeholder="e.g. Bed A, Bunk 1, King Bed"
           {...register("name")}
         />
         {errors.name && (
-          <p className="text-sm text-red-500">{errors.name.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.name.message}</p>
         )}
       </div>
       <div className="space-y-2">
         <Label htmlFor="status">Status</Label>
-        <Input
+        <select
           id="status"
           {...register("status")}
-        />
+          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 text-slate-800"
+        >
+          <option value="available">Available</option>
+          <option value="occupied">Occupied</option>
+          <option value="maintenance">Maintenance</option>
+        </select>
         {errors.status && (
-          <p className="text-sm text-red-500">{errors.status.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.status.message}</p>
         )}
       </div>
 
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} className="bg-orange hover:bg-orange/90 text-white w-full sm:w-auto">
         {isSubmitting ? "Saving..." : "Save"}
       </Button>
     </form>

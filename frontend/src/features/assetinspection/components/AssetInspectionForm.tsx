@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAssets } from "@/features/asset/hooks";
 import {
   createAssetInspectionSchema,
   type CreateAssetInspectionFormData,
@@ -27,53 +28,77 @@ export function AssetInspectionForm({
     formState: { errors },
   } = useForm<CreateAssetInspectionFormData>({
     resolver: zodResolver(createAssetInspectionSchema),
-    defaultValues,
+    defaultValues: {
+      condition: "Good",
+      inspection_date: new Date().toISOString().split("T")[0],
+      ...defaultValues,
+    },
   });
 
+  const { data: assetsData } = useAssets({ per_page: 100 });
+  const assets = assetsData?.data || [];
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="asset_id">AssetId</Label>
-        <Input
+        <Label htmlFor="asset_id">Asset</Label>
+        <select
           id="asset_id"
           {...register("asset_id")}
-        />
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange"
+        >
+          <option value="">Select an asset...</option>
+          {assets.map((a) => (
+            <option key={a.id} value={a.id}>
+              {a.name} ({a.category} - {a.status})
+            </option>
+          ))}
+        </select>
         {errors.asset_id && (
-          <p className="text-sm text-red-500">{errors.asset_id.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.asset_id.message}</p>
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="inspection_date">InspectionDate</Label>
+        <Label htmlFor="inspection_date">Inspection Date</Label>
         <Input
           id="inspection_date"
+          type="date"
           {...register("inspection_date")}
         />
         {errors.inspection_date && (
-          <p className="text-sm text-red-500">{errors.inspection_date.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.inspection_date.message}</p>
         )}
       </div>
       <div className="space-y-2">
         <Label htmlFor="condition">Condition</Label>
-        <Input
+        <select
           id="condition"
           {...register("condition")}
-        />
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange"
+        >
+          <option value="Excellent">Excellent</option>
+          <option value="Good">Good</option>
+          <option value="Fair">Fair</option>
+          <option value="Poor">Poor</option>
+          <option value="Damaged">Damaged</option>
+        </select>
         {errors.condition && (
-          <p className="text-sm text-red-500">{errors.condition.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.condition.message}</p>
         )}
       </div>
       <div className="space-y-2">
         <Label htmlFor="notes">Notes</Label>
         <Input
           id="notes"
+          placeholder="Inspection findings / notes"
           {...register("notes")}
         />
         {errors.notes && (
-          <p className="text-sm text-red-500">{errors.notes.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.notes.message}</p>
         )}
       </div>
 
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} className="bg-orange hover:bg-orange/90 text-white w-full sm:w-auto">
         {isSubmitting ? "Saving..." : "Save"}
       </Button>
     </form>

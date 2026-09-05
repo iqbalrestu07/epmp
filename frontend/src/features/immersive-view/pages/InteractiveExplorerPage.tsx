@@ -27,14 +27,14 @@ export function InteractiveExplorerPage() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-6rem)] -m-4 md:-m-8">
-      {/* Top Header & Toggle */}
-      <div className="absolute z-10 top-4 left-4 right-4 flex justify-between pointer-events-none">
-        <div className="bg-white/90 backdrop-blur p-4 rounded-xl shadow-lg border border-slate-200 pointer-events-auto flex items-center gap-4">
+      {/* Top Header & Toggle — fixed height, not overlapping */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-6 py-4 bg-white border-b border-slate-200 z-10">
+        <div className="flex items-center gap-4">
           <div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-orange to-red-500 bg-clip-text text-transparent">
+            <h1 className="text-xl font-bold text-slate-900">
               Spatial Explorer
             </h1>
-            <p className="text-sm text-slate-600">Property Digital Twin</p>
+            <p className="text-sm text-slate-500">Property Digital Twin</p>
           </div>
           <div className="h-8 w-px bg-slate-200 mx-2"></div>
           <div className="flex bg-slate-100 p-1 rounded-md">
@@ -56,23 +56,23 @@ export function InteractiveExplorerPage() {
             </Button>
           </div>
         </div>
-        
+
         {viewMode === "interactive" && (
-          <div className="bg-white/90 backdrop-blur p-4 rounded-xl shadow-lg border border-slate-200 pointer-events-auto flex items-center gap-4">
+          <div className="flex items-center gap-4">
             <div className="flex flex-col">
               <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
                 Exploded View
               </label>
-              <input 
-                type="range" 
-                min="0" max="1" step="0.01" 
+              <input
+                type="range"
+                min="0" max="1" step="0.01"
                 value={explodedView}
                 onChange={(e) => setExplodedView(parseFloat(e.target.value))}
                 className="accent-orange w-32"
               />
             </div>
             {selectedBuilding && (
-              <button 
+              <button
                 onClick={() => setSelectedBuilding(null)}
                 className="ml-2 text-xs bg-slate-200 hover:bg-slate-300 px-3 py-1.5 rounded-full font-medium transition-colors"
               >
@@ -83,19 +83,20 @@ export function InteractiveExplorerPage() {
         )}
       </div>
 
-      <div className="flex-1 w-full relative bg-slate-50">
+      {/* Content area — fills remaining space, no overlap */}
+      <div className="flex-1 w-full relative bg-slate-50 overflow-hidden">
         {viewMode === "basic" ? (
-          <div className="pt-24 px-8 pb-8 h-full overflow-y-auto">
+          <div className="p-6 h-full overflow-y-auto">
             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-bold">Buildings Data</h2>
+                <h2 className="text-lg font-bold text-slate-900">Buildings Data</h2>
                 <Button onClick={() => navigate("/dashboard/buildings/new")}>+ Add Building</Button>
               </div>
               {buildings.length === 0 ? (
                 <p className="text-center text-slate-500 py-8">No buildings found. Please add a building first.</p>
               ) : (
-                <BuildingTable 
-                  data={buildings} 
+                <BuildingTable
+                  data={buildings}
                   onRowClick={(row) => navigate(`/dashboard/buildings/${row.id}`)}
                 />
               )}

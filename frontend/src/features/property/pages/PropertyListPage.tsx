@@ -32,16 +32,16 @@ export function PropertyListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
+          <div className="flex items-center gap-2 text-sm text-slate-500 mb-1">
             <Globe2 size={14} />
             <button
               onClick={() => navigate("/dashboard/organizations")}
-              className="hover:text-black"
+              className="hover:text-slate-900"
             >
               Organizations
             </button>
             <span>/</span>
-            <span className="text-black font-medium">Properties</span>
+            <span className="text-slate-900 font-medium">Properties</span>
           </div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold">Properties</h1>
@@ -71,14 +71,14 @@ export function PropertyListPage() {
       </form>
 
       {isLoading ? (
-        <div className="text-center py-8">Loading...</div>
+        <div className="text-center py-12 text-slate-400">Loading...</div>
       ) : (
         <>
           <PropertyTable data={data?.data ?? []} onRowClick={handleRowClick} />
 
           {data && data.total_pages > 1 && (
             <div className="flex items-center justify-between">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-slate-500">
                 Page {data.page} of {data.total_pages} ({data.total} total)
               </p>
               <div className="flex gap-2">

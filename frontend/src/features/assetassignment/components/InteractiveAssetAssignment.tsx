@@ -127,7 +127,7 @@ export function InteractiveAssetAssignment({ onSubmit }: Props) {
             </group>
           ) : (
             <Html center>
-              <div className="bg-black/50 text-white px-4 py-2 rounded-lg backdrop-blur">
+              <div className="bg-slate-1000 text-white px-4 py-2 rounded-lg backdrop-blur">
                 Please select a room to view the 3D planner.
               </div>
             </Html>

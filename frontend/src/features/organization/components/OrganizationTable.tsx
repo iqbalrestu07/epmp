@@ -15,15 +15,15 @@ const columns = [
   }),
   columnHelper.accessor("domain", {
     header: "Domain",
-    cell: (info) => <span className="text-gray-600">{info.getValue() || "—"}</span>,
+    cell: (info) => <span className="text-slate-600">{info.getValue() || "—"}</span>,
   }),
   columnHelper.accessor("is_active", {
     header: "Status",
     cell: (info) => (
       <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
         info.getValue()
-          ? "bg-green-100 text-green-700"
-          : "bg-red-100 text-red-700"
+          ? "bg-green-50 text-green-700 border border-green-200"
+          : "bg-red-50 text-red-700 border border-red-200"
       }`}>
         {info.getValue() ? "Active" : "Inactive"}
       </span>
@@ -38,19 +38,19 @@ interface OrganizationTableProps {
 
 export function OrganizationTable({ data, onRowClick }: OrganizationTableProps) {
   const table = useReactTable({
-    data,
+    data: data || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
 
   return (
-    <div className="rounded-md border">
-      <table className="w-full text-sm">
-        <thead className="border-b bg-gray-50">
+    <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+      <table className="w-full text-sm text-left">
+        <thead className="border-b border-slate-200 bg-slate-50/75 text-slate-600 font-semibold">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <th key={header.id} className="px-4 py-3 text-left font-medium">
+                <th key={header.id} className="px-5 py-3.5">
                   {flexRender(
                     header.column.columnDef.header,
                     header.getContext()
@@ -60,15 +60,15 @@ export function OrganizationTable({ data, onRowClick }: OrganizationTableProps) 
             </tr>
           ))}
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-slate-100">
           {table.getRowModel().rows.map((row) => (
             <tr
               key={row.id}
-              className="border-b hover:bg-gray-50 cursor-pointer"
+              className="hover:bg-orange/5 cursor-pointer transition-colors"
               onClick={() => onRowClick?.(row.original)}
             >
               {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="px-4 py-3">
+                <td key={cell.id} className="px-5 py-4">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
@@ -76,7 +76,7 @@ export function OrganizationTable({ data, onRowClick }: OrganizationTableProps) 
           ))}
           {table.getRowModel().rows.length === 0 && (
             <tr>
-              <td colSpan={columns.length} className="px-4 py-8 text-center text-gray-500">
+              <td colSpan={columns.length} className="px-4 py-8 text-center text-slate-500">
                 No organizations found. Create one to get started.
               </td>
             </tr>

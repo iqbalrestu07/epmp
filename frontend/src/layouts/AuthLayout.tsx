@@ -16,7 +16,7 @@ export default function AuthLayout() {
           </Link>
         </div>
         
-        <div className="bg-black/40 backdrop-blur-xl border border-white/10 p-8 md:p-10 rounded-3xl shadow-2xl">
+        <div className="bg-slate-900/40 backdrop-blur-xl border border-white/10 p-8 md:p-10 rounded-3xl shadow-2xl">
           <Outlet />
         </div>
       </div>

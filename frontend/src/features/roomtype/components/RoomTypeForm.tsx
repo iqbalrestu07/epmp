@@ -31,7 +31,7 @@ export function RoomTypeForm({
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-2">
         <Label htmlFor="name">Name</Label>
         <Input
@@ -39,7 +39,7 @@ export function RoomTypeForm({
           {...register("name")}
         />
         {errors.name && (
-          <p className="text-sm text-red-500">{errors.name.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.name.message}</p>
         )}
       </div>
       <div className="space-y-2">
@@ -49,21 +49,28 @@ export function RoomTypeForm({
           {...register("description")}
         />
         {errors.description && (
-          <p className="text-sm text-red-500">{errors.description.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.description.message}</p>
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="base_price">BasePrice</Label>
+        <Label htmlFor="base_price">Base Price (Rp)</Label>
         <Input
           id="base_price"
-          {...register("base_price")}
+          type="number"
+          step="any"
+          min="0"
+          placeholder="e.g. 500000"
+          {...register("base_price", { valueAsNumber: true })}
         />
+        <p className="text-xs text-slate-500">
+          Template default rate for rooms assigned to this type. Can still be customized per room.
+        </p>
         {errors.base_price && (
-          <p className="text-sm text-red-500">{errors.base_price.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.base_price.message}</p>
         )}
       </div>
 
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} className="bg-orange hover:bg-orange/90 text-white w-full sm:w-auto">
         {isSubmitting ? "Saving..." : "Save"}
       </Button>
     </form>

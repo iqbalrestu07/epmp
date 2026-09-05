@@ -26,6 +26,7 @@ func (s *RoomService) Create(ctx context.Context, req *dto.CreateRoomRequest, or
 	e.OrganizationId = orgID
 	e.PropertyId = req.PropertyId
 	e.FloorId = req.FloorId
+	e.RoomTypeId = req.RoomTypeId
 	e.Name = req.Name
 	e.Capacity = req.Capacity
 	e.Price = req.Price
@@ -91,6 +92,7 @@ func (s *RoomService) Update(ctx context.Context, id, orgID string, req *dto.Upd
 	}
 	e.PropertyId = req.PropertyId
 	e.FloorId = req.FloorId
+	e.RoomTypeId = req.RoomTypeId
 	e.Name = req.Name
 	e.Capacity = req.Capacity
 	e.Price = req.Price
@@ -120,6 +122,7 @@ func (s *RoomService) toResponse(e *entity.Room) *dto.RoomResponse {
 		Id:             e.Id,
 		PropertyId:     e.PropertyId,
 		FloorId:        e.FloorId,
+		RoomTypeId:     e.RoomTypeId,
 		Name:           e.Name,
 		Capacity:       e.Capacity,
 		Price:          e.Price,

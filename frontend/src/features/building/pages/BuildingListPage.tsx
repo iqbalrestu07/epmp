@@ -38,16 +38,16 @@ export function BuildingListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
+          <div className="flex items-center gap-2 text-sm text-slate-500 mb-1">
             <Building2 size={14} />
             <button
               onClick={() => navigate("/dashboard/properties")}
-              className="hover:text-black"
+              className="hover:text-slate-900"
             >
               Properties
             </button>
             <span>/</span>
-            <span className="text-black font-medium">Buildings</span>
+            <span className="text-slate-900 font-medium">Buildings</span>
           </div>
           <h1 className="text-2xl font-bold">Buildings</h1>
         </div>
@@ -67,7 +67,7 @@ export function BuildingListPage() {
         <select
           value={propertyId}
           onChange={(e) => { setPropertyId(e.target.value); setPage(1); }}
-          className="sm:max-w-xs rounded-md border border-gray-300 px-3 py-2 text-sm"
+          className="sm:max-w-xs rounded-md border border-slate-300 px-3 py-2 text-sm"
         >
           <option value="">All Properties</option>
           {properties.map((p: Property) => (
@@ -77,14 +77,14 @@ export function BuildingListPage() {
       </form>
 
       {isLoading ? (
-        <div className="text-center py-8">Loading...</div>
+        <div className="text-center py-12 text-slate-400">Loading...</div>
       ) : (
         <>
           <BuildingTable data={data?.data ?? []} properties={properties} onRowClick={handleRowClick} />
 
           {data && data.total_pages > 1 && (
             <div className="flex items-center justify-between">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-slate-500">
                 Page {data.page} of {data.total_pages} ({data.total} total)
               </p>
               <div className="flex gap-2">

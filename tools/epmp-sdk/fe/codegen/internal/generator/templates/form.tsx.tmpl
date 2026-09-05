@@ -31,7 +31,7 @@ export function {{.Name}}Form({
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 {{- range .Fields}}
 {{- if .PrimaryKey}}
 {{- continue}}
@@ -43,12 +43,12 @@ export function {{.Name}}Form({
           {...register("{{.JSONName}}")}
         />
         {errors.{{.JSONName}} && (
-          <p className="text-sm text-red-500">{errors.{{.JSONName}}.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.{{.JSONName}}.message}</p>
         )}
       </div>
 {{- end}}
 
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} className="bg-orange hover:bg-orange/90 text-white w-full sm:w-auto">
         {isSubmitting ? "Saving..." : "Save"}
       </Button>
     </form>

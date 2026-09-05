@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useBuildings } from "@/features/building/hooks";
 import {
   createZoneSchema,
   type CreateZoneFormData,
@@ -27,43 +28,60 @@ export function ZoneForm({
     formState: { errors },
   } = useForm<CreateZoneFormData>({
     resolver: zodResolver(createZoneSchema),
-    defaultValues,
+    defaultValues: {
+      floor: 1,
+      ...defaultValues,
+    },
   });
 
+  const { data: buildingsData } = useBuildings({ per_page: 100 });
+  const buildings = buildingsData?.data || [];
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="building_id">BuildingId</Label>
-        <Input
+        <Label htmlFor="building_id">Building</Label>
+        <select
           id="building_id"
           {...register("building_id")}
-        />
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange"
+        >
+          <option value="">Select a building...</option>
+          {buildings.map((b) => (
+            <option key={b.id} value={b.id}>
+              {b.name}
+            </option>
+          ))}
+        </select>
         {errors.building_id && (
-          <p className="text-sm text-red-500">{errors.building_id.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.building_id.message}</p>
         )}
       </div>
       <div className="space-y-2">
         <Label htmlFor="floor">Floor</Label>
         <Input
           id="floor"
-          {...register("floor")}
+          type="number"
+          min="1"
+          {...register("floor", { valueAsNumber: true })}
         />
         {errors.floor && (
-          <p className="text-sm text-red-500">{errors.floor.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.floor.message}</p>
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="name">Name</Label>
+        <Label htmlFor="name">Zone Name</Label>
         <Input
           id="name"
+          placeholder="e.g. Lobby, Rooftop Lounge, Parking A"
           {...register("name")}
         />
         {errors.name && (
-          <p className="text-sm text-red-500">{errors.name.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.name.message}</p>
         )}
       </div>
 
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} className="bg-orange hover:bg-orange/90 text-white w-full sm:w-auto">
         {isSubmitting ? "Saving..." : "Save"}
       </Button>
     </form>

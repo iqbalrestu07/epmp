@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useCreateBuilding } from "../hooks";
 import { BuildingForm } from "../components/BuildingForm";
 import { InteractiveBuildingCreator } from "../components/InteractiveBuildingCreator";
@@ -8,8 +8,15 @@ import { ChevronRight, Building2, Box, FileText } from "lucide-react";
 
 export function BuildingCreatePage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const createMutation = useCreateBuilding();
   const [viewMode, setViewMode] = useState<"interactive" | "basic">("interactive");
+
+  const defaultValues: Partial<CreateBuildingFormData> = {};
+  const prefillPropertyId = searchParams.get("property_id");
+  if (prefillPropertyId) {
+    defaultValues.property_id = prefillPropertyId;
+  }
 
   const handleSubmit = (data: CreateBuildingFormData) => {
     createMutation.mutate(data, {
@@ -18,7 +25,7 @@ export function BuildingCreatePage() {
   };
 
   return (
-    <div className="space-y-6 h-full flex flex-col">
+    <div className="space-y-6">
       {/* Breadcrumb Navigation */}
       <div className="flex items-center gap-2 text-sm text-slate-500">
         <Link to="/dashboard" className="hover:text-slate-800 transition-colors">Dashboard</Link>
@@ -79,6 +86,7 @@ export function BuildingCreatePage() {
             <p className="text-sm text-slate-500 mb-6">Enter the property and floor capacity for this building structure.</p>
             <BuildingForm
               onSubmit={handleSubmit}
+              defaultValues={defaultValues}
               isSubmitting={createMutation.isPending}
             />
           </div>

@@ -3,13 +3,13 @@
 import { z } from "zod";
 
 export const occupancySchema = z.object({
-  organization_id: z.string(),
+  organization_id: z.string().optional(),
   id: z.string(),
-  contract_id: z.string(),
-  room_id: z.string(),
-  tenant_id: z.string(),
+  contract_id: z.string().min(1, "Contract is required"),
+  room_id: z.string().min(1, "Room is required"),
+  tenant_id: z.string().min(1, "Tenant is required"),
   status: z.enum(["CheckedIn", "CheckedOut"]),
-  check_in_time: z.string(),
+  check_in_time: z.string().min(1, "Check-in time is required"),
   check_out_time: z.string().optional(),
   notes: z.string().optional(),
   created_at: z.string().optional(),

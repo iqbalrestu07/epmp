@@ -10,6 +10,10 @@ import {
   type CreateReservationFormData,
 } from "../schema";
 
+import { useTenants } from "../../tenant/hooks";
+import { usePropertys } from "../../property/hooks";
+import { useRooms } from "../../room/hooks";
+
 interface ReservationFormProps {
   onSubmit: (data: CreateReservationFormData) => void;
   defaultValues?: Partial<CreateReservationFormData>;
@@ -27,93 +31,152 @@ export function ReservationForm({
     formState: { errors },
   } = useForm<CreateReservationFormData>({
     resolver: zodResolver(createReservationSchema),
-    defaultValues,
+    defaultValues: {
+      status: "Pending",
+      booking_fee: 0,
+      ...defaultValues,
+    },
   });
 
+  const { data: tenantsData } = useTenants({ per_page: 100 });
+  const tenants = Array.isArray(tenantsData?.data) ? tenantsData.data : Array.isArray(tenantsData) ? tenantsData : [];
+
+  const { data: propertiesData } = usePropertys({ per_page: 100 });
+  const properties = Array.isArray(propertiesData?.data) ? propertiesData.data : Array.isArray(propertiesData) ? propertiesData : [];
+
+  const { data: roomsData } = useRooms({ per_page: 100 });
+  const rooms = Array.isArray(roomsData?.data) ? roomsData.data : Array.isArray(roomsData) ? roomsData : [];
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="tenant_id">TenantId</Label>
-        <Input
+        <Label htmlFor="tenant_id">Tenant</Label>
+        <select
           id="tenant_id"
           {...register("tenant_id")}
-        />
+          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 text-slate-800"
+        >
+          <option value="">Select a tenant…</option>
+          {tenants.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.full_name} ({t.email})
+            </option>
+          ))}
+        </select>
         {errors.tenant_id && (
-          <p className="text-sm text-red-500">{errors.tenant_id.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.tenant_id.message}</p>
         )}
       </div>
+
       <div className="space-y-2">
-        <Label htmlFor="property_id">PropertyId</Label>
-        <Input
+        <Label htmlFor="property_id">Property</Label>
+        <select
           id="property_id"
           {...register("property_id")}
-        />
+          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 text-slate-800"
+        >
+          <option value="">Select a property…</option>
+          {properties.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.name}
+            </option>
+          ))}
+        </select>
         {errors.property_id && (
-          <p className="text-sm text-red-500">{errors.property_id.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.property_id.message}</p>
         )}
       </div>
+
       <div className="space-y-2">
-        <Label htmlFor="room_id">RoomId</Label>
-        <Input
+        <Label htmlFor="room_id">Room</Label>
+        <select
           id="room_id"
           {...register("room_id")}
-        />
+          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 text-slate-800"
+        >
+          <option value="">Select a room…</option>
+          {rooms.map((r) => (
+            <option key={r.id} value={r.id}>
+              {r.name} (Cap: {r.capacity})
+            </option>
+          ))}
+        </select>
         {errors.room_id && (
-          <p className="text-sm text-red-500">{errors.room_id.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.room_id.message}</p>
         )}
       </div>
+
       <div className="space-y-2">
         <Label htmlFor="status">Status</Label>
-        <Input
+        <select
           id="status"
           {...register("status")}
-        />
+          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 text-slate-800"
+        >
+          <option value="Pending">Pending</option>
+          <option value="Confirmed">Confirmed</option>
+          <option value="Draft">Draft</option>
+          <option value="Cancelled">Cancelled</option>
+          <option value="Expired">Expired</option>
+        </select>
         {errors.status && (
-          <p className="text-sm text-red-500">{errors.status.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.status.message}</p>
         )}
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="check_in_date">CheckInDate</Label>
-        <Input
-          id="check_in_date"
-          {...register("check_in_date")}
-        />
-        {errors.check_in_date && (
-          <p className="text-sm text-red-500">{errors.check_in_date.message}</p>
-        )}
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="check_in_date">Check-in Date</Label>
+          <Input
+            id="check_in_date"
+            type="date"
+            {...register("check_in_date")}
+          />
+          {errors.check_in_date && (
+            <p className="text-xs text-red-600 mt-1">{errors.check_in_date.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="check_out_date">Check-out Date (Optional)</Label>
+          <Input
+            id="check_out_date"
+            type="date"
+            {...register("check_out_date")}
+          />
+          {errors.check_out_date && (
+            <p className="text-xs text-red-600 mt-1">{errors.check_out_date.message}</p>
+          )}
+        </div>
       </div>
+
       <div className="space-y-2">
-        <Label htmlFor="check_out_date">CheckOutDate</Label>
-        <Input
-          id="check_out_date"
-          {...register("check_out_date")}
-        />
-        {errors.check_out_date && (
-          <p className="text-sm text-red-500">{errors.check_out_date.message}</p>
-        )}
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="booking_fee">BookingFee</Label>
+        <Label htmlFor="booking_fee">Booking Fee (Rp)</Label>
         <Input
           id="booking_fee"
-          {...register("booking_fee")}
+          type="number"
+          step="any"
+          placeholder="0"
+          {...register("booking_fee", { valueAsNumber: true })}
         />
         {errors.booking_fee && (
-          <p className="text-sm text-red-500">{errors.booking_fee.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.booking_fee.message}</p>
         )}
       </div>
+
       <div className="space-y-2">
-        <Label htmlFor="notes">Notes</Label>
+        <Label htmlFor="notes">Notes (Optional)</Label>
         <Input
           id="notes"
+          placeholder="Special requests or instructions"
           {...register("notes")}
         />
         {errors.notes && (
-          <p className="text-sm text-red-500">{errors.notes.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.notes.message}</p>
         )}
       </div>
 
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} className="bg-orange hover:bg-orange/90 text-white w-full sm:w-auto">
         {isSubmitting ? "Saving..." : "Save"}
       </Button>
     </form>

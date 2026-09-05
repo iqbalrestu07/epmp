@@ -1,4 +1,4 @@
-import { useState, useRef, Suspense } from "react";
+import { useState, useRef, useEffect, useMemo, Suspense } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Environment, ContactShadows, useGLTF, Html } from "@react-three/drei";
 import { useForm } from "react-hook-form";
@@ -20,7 +20,6 @@ export interface BuildingModelPreset {
   name: string;
   category: string;
   modelPath: string;
-  scale: [number, number, number];
   previewIcon: string;
   tag: string;
   badgeColor: string;
@@ -33,7 +32,6 @@ export const BUILDING_PRESETS: BuildingModelPreset[] = [
     name: "Modern Office Tower",
     category: "Commercial & Office",
     modelPath: "/3d-models/buildings/building.glb",
-    scale: [0.6, 0.6, 0.6],
     previewIcon: "🏢",
     tag: "building.glb",
     badgeColor: "bg-blue-50 text-blue-700 border-blue-200",
@@ -44,7 +42,6 @@ export const BUILDING_PRESETS: BuildingModelPreset[] = [
     name: "Hotel & Luxury Suites",
     category: "Hospitality & Resort",
     modelPath: "/3d-models/buildings/hotel.glb",
-    scale: [0.55, 0.55, 0.55],
     previewIcon: "🏨",
     tag: "hotel.glb",
     badgeColor: "bg-amber-50 text-amber-800 border-amber-200",
@@ -57,25 +54,56 @@ interface Props {
   isSubmitting: boolean;
 }
 
-// Dynamic 3D model asset renderer for chosen GLB
+// Dynamic 3D model asset renderer for chosen GLB with bounds normalization
 function GLBBuildingAsset({
   modelPath,
-  scale,
+  targetHeight = 3.2,
   targetY,
 }: {
   modelPath: string;
-  scale: [number, number, number];
+  targetHeight?: number;
   targetY: number;
 }) {
   const { scene } = useGLTF(modelPath);
-  const cloned = scene.clone(true);
 
-  cloned.traverse((child) => {
-    if (child instanceof THREE.Mesh) {
-      child.castShadow = true;
-      child.receiveShadow = true;
-    }
-  });
+  const normalizedScene = useMemo(() => {
+    const cloned = scene.clone(true);
+
+    cloned.traverse((c) => {
+      if (
+        c instanceof THREE.Mesh &&
+        (c.name === 'Object_181' ||
+          (c.geometry?.boundingBox &&
+            c.geometry.boundingBox.getSize(new THREE.Vector3()).x > 200000))
+      ) {
+        c.visible = false;
+      }
+    });
+
+    const box = new THREE.Box3();
+    cloned.traverse((c) => {
+      if (c instanceof THREE.Mesh && c.visible) {
+        c.castShadow = true;
+        c.receiveShadow = true;
+        box.expandByObject(c);
+      }
+    });
+
+    const size = new THREE.Vector3();
+    box.getSize(size);
+    const center = new THREE.Vector3();
+    box.getCenter(center);
+
+    const safeHeight = size.y > 0 ? size.y : 1;
+    const scaleFactor = targetHeight / safeHeight;
+
+    const wrapper = new THREE.Group();
+    cloned.position.set(-center.x, -box.min.y, -center.z);
+    wrapper.add(cloned);
+    wrapper.scale.set(scaleFactor, scaleFactor, scaleFactor);
+
+    return wrapper;
+  }, [scene, targetHeight]);
 
   const groupRef = useRef<THREE.Group>(null);
 
@@ -92,7 +120,7 @@ function GLBBuildingAsset({
 
   return (
     <group ref={groupRef} position={[0, 4, 0]}>
-      <primitive object={cloned} scale={scale} position={[0, 0, 0]} />
+      <primitive object={normalizedScene} position={[0, 0, 0]} />
     </group>
   );
 }
@@ -123,6 +151,13 @@ export function InteractiveBuildingCreator({ onSubmit, isSubmitting }: Props) {
       property_id: properties[0]?.id ?? "",
     },
   });
+
+  // Keep property_id populated once properties load
+  useEffect(() => {
+    if (properties.length > 0 && !watch("property_id")) {
+      setValue("property_id", properties[0].id);
+    }
+  }, [properties, setValue, watch]);
 
   const currentBuildingName = watch("name") || selectedPreset.suggestedName;
   const currentFloors = watch("total_floors") || 4;
@@ -237,19 +272,19 @@ export function InteractiveBuildingCreator({ onSubmit, isSubmitting }: Props) {
                 <GLBBuildingAsset
                   key={selectedPreset.id}
                   modelPath={selectedPreset.modelPath}
-                  scale={selectedPreset.scale}
+                  targetHeight={3.2}
                   targetY={0}
                 />
               </Suspense>
 
               {/* Glowing base ring and boundary */}
               <mesh position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-                <ringGeometry args={[2.2, 2.5, 32]} />
+                <ringGeometry args={[1.9, 2.25, 32]} />
                 <meshBasicMaterial color="#f97316" side={THREE.DoubleSide} />
               </mesh>
 
               {/* 3D Floating Billboard Tag */}
-              <Html position={[0, 4.2, 0]} center distanceFactor={14}>
+              <Html position={[0, 3.6, 0]} center distanceFactor={14}>
                 <div className="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap shadow-xl border bg-slate-900/90 backdrop-blur text-white border-white/20 pointer-events-none flex items-center gap-2">
                   <span>{selectedPreset.previewIcon}</span>
                   <div>

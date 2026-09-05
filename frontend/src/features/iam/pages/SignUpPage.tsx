@@ -101,7 +101,7 @@ export default function SignUpPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="mt-4 bg-white text-black font-bold py-3 rounded-xl hover:bg-orange transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="mt-4 bg-white text-slate-900 font-bold py-3 rounded-xl hover:bg-orange transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {isSubmitting ? (
             <>

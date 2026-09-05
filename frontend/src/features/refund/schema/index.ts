@@ -3,11 +3,11 @@
 import { z } from "zod";
 
 export const refundSchema = z.object({
-  organization_id: z.string(),
+  organization_id: z.string().optional(),
   id: z.string(),
   payment_id: z.string(),
   tenant_id: z.string(),
-  amount: z.number(),
+  amount: z.coerce.number().min(0, "Amount must be positive"),
   status: z.enum(["Pending", "Processed", "Failed"]),
   refund_date: z.string(),
   reason: z.string(),

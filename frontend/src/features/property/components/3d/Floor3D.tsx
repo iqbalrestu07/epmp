@@ -15,7 +15,7 @@ export interface Floor3DProps {
 export function Floor3D({ floors, rooms, selectedFloorId, onFloorClick, onRoomClick }: Floor3DProps) {
   const [hoveredFloor, setHoveredFloor] = useState<string | null>(null);
 
-  const sortedFloors = [...floors].sort((a, b) => b.floor_number - a.floor_number);
+  const sortedFloors = [...floors].sort((a, b) => a.floor_number - b.floor_number);
 
   return (
     <group>
@@ -56,7 +56,7 @@ export function Floor3D({ floors, rooms, selectedFloorId, onFloorClick, onRoomCl
             {/* Floor label */}
             <Html position={[1.7, 0, 0]} center distanceFactor={6}>
               <div className={`px-2 py-0.5 text-xs rounded whitespace-nowrap pointer-events-none ${
-                isSelected ? 'bg-orange-500 text-white' : 'bg-gray-800 text-white'
+                isSelected ? 'bg-orange-500 text-white' : 'bg-slate-800 text-white'
               }`}>
                 {floor.name}
               </div>

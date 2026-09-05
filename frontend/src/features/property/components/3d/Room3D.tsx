@@ -31,7 +31,7 @@ export function Room3D({ room, position, onClick }: Room3DProps) {
         opacity={0.8}
       />
       <Html position={[0, 0.4, 0]} center distanceFactor={4}>
-        <div className="px-1 py-0.5 bg-black/70 text-white text-[10px] rounded whitespace-nowrap pointer-events-none">
+        <div className="px-1 py-0.5 bg-slate-900/70 text-white text-[10px] rounded whitespace-nowrap pointer-events-none">
           {room.name}
         </div>
       </Html>

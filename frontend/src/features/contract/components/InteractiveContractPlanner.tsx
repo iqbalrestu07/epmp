@@ -168,7 +168,7 @@ export function InteractiveContractPlanner({ onSubmit, isSubmitting }: Props) {
                       />
                     </mesh>
                     <Html position={[0, 2.5, 0]} center zIndexRange={[100, 0]}>
-                      <div className="bg-black/50 backdrop-blur text-white text-xs px-2 py-1 rounded whitespace-nowrap pointer-events-none">
+                      <div className="bg-slate-1000 backdrop-blur text-white text-xs px-2 py-1 rounded whitespace-nowrap pointer-events-none">
                         {room.name}
                       </div>
                     </Html>

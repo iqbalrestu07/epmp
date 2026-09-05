@@ -80,7 +80,7 @@ export function OrganizationForm({
         />
         <p className="text-[11px] text-slate-500">The primary legal or operating entity name for your tenant spaces.</p>
         {errors.name && (
-          <p className="text-xs text-red-500 font-medium">{errors.name.message}</p>
+          <p className="text-xs text-red-600 mt-1 font-medium">{errors.name.message}</p>
         )}
       </div>
 
@@ -103,7 +103,7 @@ export function OrganizationForm({
         </div>
         <p className="text-[11px] text-slate-500">Domain or unique slug used for branding and member invitations.</p>
         {errors.domain && (
-          <p className="text-xs text-red-500 font-medium">{errors.domain.message}</p>
+          <p className="text-xs text-red-600 mt-1 font-medium">{errors.domain.message}</p>
         )}
       </div>
 

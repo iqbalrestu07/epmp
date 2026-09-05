@@ -87,7 +87,7 @@ export default function MainLayout() {
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          className="fixed inset-0 z-40 bg-slate-1000 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -128,11 +128,11 @@ export default function MainLayout() {
                 onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                   isActive
-                    ? 'bg-orange text-black font-semibold shadow-[0_4px_12px_rgba(255,102,0,0.3)]'
+                    ? 'bg-orange text-slate-900 font-semibold shadow-[0_4px_12px_rgba(255,102,0,0.3)]'
                     : 'text-white/70 hover:bg-white/10 hover:text-white'
                 }`}
               >
-                <Icon size={18} className={isActive ? 'text-black' : 'text-orange'} />
+                <Icon size={18} className={isActive ? 'text-slate-900' : 'text-orange'} />
                 {item.label}
               </NavLink>
             );
@@ -142,7 +142,7 @@ export default function MainLayout() {
         {/* User Footer */}
         <div className="p-4 border-t border-white/10">
           <div className="flex items-center gap-3 bg-white/5 p-3 rounded-xl">
-            <div className="w-10 h-10 rounded-full bg-orange flex items-center justify-center text-black font-bold text-sm flex-shrink-0">
+            <div className="w-10 h-10 rounded-full bg-orange flex items-center justify-center text-slate-900 font-bold text-sm flex-shrink-0">
               {user ? getInitials(user.name) : 'U'}
             </div>
             <div className="flex-1 overflow-hidden">
@@ -164,9 +164,9 @@ export default function MainLayout() {
       <div className="flex-1 flex flex-col min-w-0">
 
         {/* Top Header */}
-        <header className="h-16 bg-white border-b border-black/5 flex items-center justify-between px-6 sticky top-0 z-30 shadow-sm">
+        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 sticky top-0 z-30 shadow-sm">
           <div className="flex items-center gap-4">
-            <button className="lg:hidden text-black/70 hover:text-black" onClick={() => setSidebarOpen(true)}>
+            <button className="lg:hidden text-slate-600 hover:text-slate-900" onClick={() => setSidebarOpen(true)}>
               <Menu size={24} />
             </button>
             <h2 className="text-lg font-semibold capitalize hidden sm:block">
@@ -178,11 +178,11 @@ export default function MainLayout() {
             <div className="relative">
               <button
                 onClick={() => setOrgMenuOpen(!orgMenuOpen)}
-                className="hidden md:flex items-center gap-2 bg-black/5 hover:bg-black/10 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                className="hidden md:flex items-center gap-2 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
               >
                 <Globe2 size={16} className="text-orange" />
                 <span className="max-w-40 truncate">{currentOrg?.name ?? 'No Organization'}</span>
-                <ChevronDown size={16} className="text-black/50 ml-1" />
+                <ChevronDown size={16} className="text-slate-500 ml-1" />
               </button>
 
               {orgMenuOpen && (
@@ -191,13 +191,13 @@ export default function MainLayout() {
                     className="fixed inset-0 z-40"
                     onClick={() => setOrgMenuOpen(false)}
                   />
-                  <div className="absolute right-0 top-full mt-2 z-50 w-64 bg-white rounded-xl shadow-lg border border-black/5 overflow-hidden">
-                    <div className="px-4 py-3 border-b border-black/5 text-xs font-bold text-black/40 tracking-wider">
+                  <div className="absolute right-0 top-full mt-2 z-50 w-64 bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+                    <div className="px-4 py-3 border-b border-slate-200 text-xs font-bold text-slate-500 tracking-wider">
                       YOUR ORGANIZATIONS
                     </div>
                     <div className="max-h-64 overflow-y-auto">
                       {orgs.length === 0 && (
-                        <div className="px-4 py-6 text-center text-sm text-black/40">
+                        <div className="px-4 py-6 text-center text-sm text-slate-500">
                           No organizations yet.
                           <button
                             onClick={() => { navigate('/dashboard/organizations/new'); setOrgMenuOpen(false); }}
@@ -211,11 +211,11 @@ export default function MainLayout() {
                         <button
                           key={org.id}
                           onClick={() => { switchOrg(org.id); setOrgMenuOpen(false); }}
-                          className="w-full flex items-center justify-between px-4 py-3 hover:bg-black/5 transition-colors text-left"
+                          className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-100 transition-colors text-left"
                         >
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium truncate">{org.name}</p>
-                            <p className="text-xs text-black/40 truncate">{org.domain}</p>
+                            <p className="text-xs text-slate-500 truncate">{org.domain}</p>
                           </div>
                           {currentOrg?.id === org.id && (
                             <Check size={16} className="text-orange flex-shrink-0 ml-2" />
@@ -223,7 +223,7 @@ export default function MainLayout() {
                         </button>
                       ))}
                     </div>
-                    <div className="border-t border-black/5">
+                    <div className="border-t border-slate-200">
                       <button
                         onClick={() => { navigate('/dashboard/organizations/new'); setOrgMenuOpen(false); }}
                         className="w-full flex items-center gap-2 px-4 py-3 text-sm font-medium text-orange hover:bg-orange/5 transition-colors"
@@ -237,8 +237,8 @@ export default function MainLayout() {
               )}
             </div>
 
-            <button className="w-10 h-10 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center relative transition-colors">
-              <Bell size={18} className="text-black/70" />
+            <button className="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center relative transition-colors">
+              <Bell size={18} className="text-slate-600" />
               <span className="absolute top-2 right-2 w-2 h-2 bg-orange rounded-full border border-white" />
             </button>
           </div>

@@ -15,8 +15,8 @@ export function PropertyDetailPage() {
     });
   };
 
-  if (isLoading) return <div>Loading...</div>;
-  if (!data) return <div>Not found</div>;
+  if (isLoading) return <div className="text-center py-12 text-slate-400">Loading...</div>;
+  if (!data) return <div className="text-center py-12 text-slate-400">Not found</div>;
 
   return (
     <div className="space-y-6">
@@ -35,30 +35,30 @@ export function PropertyDetailPage() {
         </div>
       </div>
 
-      <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <dl className="grid grid-cols-1 gap-5 sm:grid-cols-2 bg-white rounded-xl border border-slate-200 shadow-sm p-6">
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">Type</dt>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Type</dt>
           <dd className="text-sm capitalize">{data.property_type.replace(/_/g, " ")}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">Status</dt>
-          <dd className="text-sm">
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</dt>
+          <dd className="text-sm text-slate-800 mt-1">
             <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
               data.is_active
-                ? "bg-green-100 text-green-700"
-                : "bg-red-100 text-red-700"
+                ? "bg-green-50 text-green-700 border border-green-200"
+                : "bg-red-50 text-red-700 border border-red-200"
             }`}>
               {data.is_active ? "Active" : "Inactive"}
             </span>
           </dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">Address</dt>
-          <dd className="text-sm">{data.address || "—"}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Address</dt>
+          <dd className="text-sm text-slate-800 mt-1">{data.address || "—"}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">Description</dt>
-          <dd className="text-sm">{data.description || "—"}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Description</dt>
+          <dd className="text-sm text-slate-800 mt-1">{data.description || "—"}</dd>
         </div>
       </dl>
     </div>

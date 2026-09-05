@@ -17,8 +17,8 @@ export function ContractDetailPage() {
     });
   };
 
-  if (isLoading) return <div>Loading...</div>;
-  if (!data) return <div>Not found</div>;
+  if (isLoading) return <div className="text-center py-12 text-slate-400">Loading...</div>;
+  if (!data) return <div className="text-center py-12 text-slate-400">Not found</div>;
 
   return (
     <div className="space-y-6">
@@ -37,54 +37,54 @@ export function ContractDetailPage() {
         </div>
       </div>
 
-      <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <dl className="grid grid-cols-1 gap-5 sm:grid-cols-2 bg-white rounded-xl border border-slate-200 shadow-sm p-6">
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">OrganizationId</dt>
-          <dd className="text-sm">{String(data.organization_id ?? "—")}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">OrganizationId</dt>
+          <dd className="text-sm text-slate-800 mt-1">{String(data.organization_id ?? "—")}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">Id</dt>
-          <dd className="text-sm">{String(data.id ?? "—")}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Id</dt>
+          <dd className="text-sm text-slate-800 mt-1">{String(data.id ?? "—")}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">ReservationId</dt>
-          <dd className="text-sm">{String(data.reservation_id ?? "—")}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">ReservationId</dt>
+          <dd className="text-sm text-slate-800 mt-1">{String(data.reservation_id ?? "—")}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">TenantId</dt>
-          <dd className="text-sm">{String(data.tenant_id ?? "—")}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">TenantId</dt>
+          <dd className="text-sm text-slate-800 mt-1">{String(data.tenant_id ?? "—")}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">PropertyId</dt>
-          <dd className="text-sm">{String(data.property_id ?? "—")}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">PropertyId</dt>
+          <dd className="text-sm text-slate-800 mt-1">{String(data.property_id ?? "—")}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">RoomId</dt>
-          <dd className="text-sm">{String(data.room_id ?? "—")}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">RoomId</dt>
+          <dd className="text-sm text-slate-800 mt-1">{String(data.room_id ?? "—")}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">Status</dt>
-          <dd className="text-sm">{String(data.status ?? "—")}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</dt>
+          <dd className="text-sm text-slate-800 mt-1">{String(data.status ?? "—")}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">StartDate</dt>
-          <dd className="text-sm">{String(data.start_date ?? "—")}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">StartDate</dt>
+          <dd className="text-sm text-slate-800 mt-1">{String(data.start_date ?? "—")}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">EndDate</dt>
-          <dd className="text-sm">{String(data.end_date ?? "—")}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">EndDate</dt>
+          <dd className="text-sm text-slate-800 mt-1">{String(data.end_date ?? "—")}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">MonthlyRent</dt>
-          <dd className="text-sm">{String(data.monthly_rent ?? "—")}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">MonthlyRent</dt>
+          <dd className="text-sm text-slate-800 mt-1">{String(data.monthly_rent ?? "—")}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">DepositAmount</dt>
-          <dd className="text-sm">{String(data.deposit_amount ?? "—")}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">DepositAmount</dt>
+          <dd className="text-sm text-slate-800 mt-1">{String(data.deposit_amount ?? "—")}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">Terms</dt>
-          <dd className="text-sm">{String(data.terms ?? "—")}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Terms</dt>
+          <dd className="text-sm text-slate-800 mt-1">{String(data.terms ?? "—")}</dd>
         </div>
       </dl>
     </div>

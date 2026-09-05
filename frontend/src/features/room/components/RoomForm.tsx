@@ -9,6 +9,7 @@ import {
 } from "../schema";
 import { usePropertys } from "../../property/hooks";
 import { useFloors } from "../../floor/hooks";
+import { useRoomTypes } from "../../roomtype/hooks";
 
 interface RoomFormProps {
   onSubmit: (data: CreateRoomFormData) => void;
@@ -28,6 +29,7 @@ export function RoomForm({
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<CreateRoomFormData>({
     resolver: zodResolver(createRoomSchema),
@@ -41,6 +43,8 @@ export function RoomForm({
   const properties = propProperties || (Array.isArray(propertiesData?.data) ? propertiesData.data : Array.isArray(propertiesData) ? propertiesData : []);
   const { data: floorsData } = useFloors({ per_page: 100 });
   const floors = propFloors || (Array.isArray(floorsData?.data) ? floorsData.data : Array.isArray(floorsData) ? floorsData : []);
+  const { data: roomTypesData } = useRoomTypes({ per_page: 100 });
+  const roomTypes = Array.isArray(roomTypesData?.data) ? roomTypesData.data : Array.isArray(roomTypesData) ? roomTypesData : [];
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -50,7 +54,7 @@ export function RoomForm({
           <select
             id="property_id"
             {...register("property_id")}
-            className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30"
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30"
           >
             <option value="">Select a property…</option>
             {properties.map(p => (
@@ -65,7 +69,7 @@ export function RoomForm({
           />
         )}
         {errors.property_id && (
-          <p className="text-sm text-red-500">{errors.property_id.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.property_id.message}</p>
         )}
       </div>
 
@@ -75,7 +79,7 @@ export function RoomForm({
           <select
             id="floor_id"
             {...register("floor_id")}
-            className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30"
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30"
           >
             <option value="">Select a floor…</option>
             {floors.map(f => (
@@ -90,8 +94,35 @@ export function RoomForm({
           />
         )}
         {errors.floor_id && (
-          <p className="text-sm text-red-500">{errors.floor_id.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.floor_id.message}</p>
         )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="room_type_id">Room Type</Label>
+        <select
+          id="room_type_id"
+          {...register("room_type_id")}
+          onChange={(e) => {
+            const rtId = e.target.value;
+            setValue("room_type_id", rtId);
+            const found = roomTypes.find((rt) => rt.id === rtId);
+            if (found && typeof found.base_price === 'number') {
+              setValue("price", found.base_price);
+            }
+          }}
+          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30 text-slate-800"
+        >
+          <option value="">Select Room Type (Optional template)…</option>
+          {roomTypes.map((rt) => (
+            <option key={rt.id} value={rt.id}>
+              {rt.name} {rt.base_price ? `· Base: Rp ${rt.base_price.toLocaleString()}` : ''}
+            </option>
+          ))}
+        </select>
+        <p className="text-xs text-slate-500">
+          Selecting a Room Type auto-fills the default Base Price into the Price field below (can still be customized per room).
+        </p>
       </div>
 
       <div className="space-y-2">
@@ -102,7 +133,7 @@ export function RoomForm({
           {...register("name")}
         />
         {errors.name && (
-          <p className="text-sm text-red-500">{errors.name.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.name.message}</p>
         )}
       </div>
 
@@ -116,7 +147,7 @@ export function RoomForm({
             {...register("capacity", { valueAsNumber: true })}
           />
           {errors.capacity && (
-            <p className="text-sm text-red-500">{errors.capacity.message}</p>
+            <p className="text-xs text-red-600 mt-1">{errors.capacity.message}</p>
           )}
         </div>
 
@@ -130,7 +161,7 @@ export function RoomForm({
             {...register("price", { valueAsNumber: true })}
           />
           {errors.price && (
-            <p className="text-sm text-red-500">{errors.price.message}</p>
+            <p className="text-xs text-red-600 mt-1">{errors.price.message}</p>
           )}
         </div>
       </div>
@@ -144,10 +175,10 @@ export function RoomForm({
             {...register("is_available")}
             className="w-5 h-5 rounded border-black/20 text-orange focus:ring-orange/30"
           />
-          <span className="text-sm text-black/60">Room is available for booking</span>
+          <span className="text-sm text-slate-600">Room is available for booking</span>
         </label>
         {errors.is_available && (
-          <p className="text-sm text-red-500">{errors.is_available.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.is_available.message}</p>
         )}
       </div>
 

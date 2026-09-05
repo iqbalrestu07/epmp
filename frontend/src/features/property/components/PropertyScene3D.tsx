@@ -1,6 +1,7 @@
-import { Suspense } from 'react';
+import { Suspense, useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Html } from '@react-three/drei';
+import * as THREE from 'three';
 import type { Property } from '../types';
 import type { Building } from '../../building/types';
 import type { Floor } from '../../floor/types';
@@ -32,7 +33,7 @@ export interface PropertyScene3DProps {
 function SceneLights() {
   return (
     <>
-      <ambientLight intensity={0.6} />
+      <ambientLight intensity={0.65} />
       <directionalLight
         position={[15, 20, 10]}
         intensity={1.5}
@@ -75,6 +76,11 @@ function PropertyZonePad({
   depth?: number;
   onClick: (p: Property) => void;
 }) {
+  const edgesGeo = useMemo(() => {
+    const plane = new THREE.PlaneGeometry(width, depth);
+    return new THREE.EdgesGeometry(plane);
+  }, [width, depth]);
+
   return (
     <group position={position}>
       {/* Zone Ground Plate */}
@@ -84,13 +90,12 @@ function PropertyZonePad({
       </mesh>
 
       {/* Zone Boundary Border */}
-      <lineSegments position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <edgesGeometry args={[new (THREE as any).PlaneGeometry(width, depth)]} />
+      <lineSegments geometry={edgesGeo} position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <lineBasicMaterial color="#f97316" linewidth={2} />
       </lineSegments>
 
       {/* Property Floating Title */}
-      <Html position={[0, 5.5, -depth / 2 + 1]} center distanceFactor={16}>
+      <Html position={[0, 4.8, -depth / 2 + 1]} center distanceFactor={18}>
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -101,16 +106,13 @@ function PropertyZonePad({
           <span>🏛️</span>
           <span>{property.name}</span>
           <span className="text-[10px] text-orange-200 font-normal capitalize">
-            ({property.property_type.replace('_', ' ')})
+            ({property.property_type ? property.property_type.replace('_', ' ') : 'Property'})
           </span>
         </button>
       </Html>
     </group>
   );
 }
-
-// import THREE reference for geometry
-import * as THREE from 'three';
 
 // ─── Main Scene Component ────────────────────────────────────────────────────
 
@@ -134,12 +136,12 @@ export function PropertyScene3D({
     <Canvas
       shadows
       camera={{
-        position: isAllPropertiesMode ? [18, 16, 18] : [10, 8, 10],
-        fov: 48,
+        position: isAllPropertiesMode ? [22, 18, 22] : [12, 10, 12],
+        fov: 42,
       }}
       className="rounded-2xl"
     >
-      <Suspense fallback={<Html center><div className="text-gray-500 font-medium">Loading 3D scene & assets...</div></Html>}>
+      <Suspense fallback={<Html center><div className="text-slate-500 font-medium">Loading 3D scene & assets...</div></Html>}>
         <SceneLights />
         <GroundPlane size={isAllPropertiesMode ? 70 : 40} />
         <gridHelper
@@ -221,7 +223,7 @@ export function PropertyScene3D({
               })
             ) : (
               <Html center>
-                <div className="text-gray-400 text-center bg-white/90 p-4 rounded-xl border shadow-sm">
+                <div className="text-slate-400 text-center bg-white/90 p-4 rounded-xl border shadow-sm">
                   <p className="text-sm font-semibold text-slate-700">No buildings in this property yet.</p>
                   <p className="text-xs text-slate-400 mt-1">Add buildings to view the spatial 3D model.</p>
                 </div>
@@ -234,10 +236,10 @@ export function PropertyScene3D({
           enablePan
           enableZoom
           enableRotate
-          minDistance={3}
-          maxDistance={50}
+          minDistance={2}
+          maxDistance={70}
           maxPolarAngle={Math.PI / 2.05}
-          dampingFactor={0.05}
+          dampingFactor={0.06}
         />
       </Suspense>
     </Canvas>

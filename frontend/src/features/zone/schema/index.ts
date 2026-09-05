@@ -3,10 +3,10 @@
 import { z } from "zod";
 
 export const zoneSchema = z.object({
-  organization_id: z.string(),
+  organization_id: z.string().optional(),
   id: z.string(),
   building_id: z.string(),
-  floor: z.number(),
+  floor: z.coerce.number(),
   name: z.string().max(100),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),

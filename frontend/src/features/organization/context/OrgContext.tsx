@@ -19,6 +19,7 @@ export function OrgProvider({ children }: { children: React.ReactNode }) {
   const [orgs, setOrgs] = useState<Organization[]>([]);
   const [currentOrg, setCurrentOrg] = useState<Organization | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [orgsLoaded, setOrgsLoaded] = useState(false);
   const [orgId, setOrgId] = useState<string | null>(getStoredOrgId());
 
   const fetchOrgs = useCallback(async () => {
@@ -52,19 +53,21 @@ export function OrgProvider({ children }: { children: React.ReactNode }) {
       setOrgs([]);
     } finally {
       setIsLoading(false);
+      setOrgsLoaded(true);
     }
   }, []);
 
   // Sync org fetch with auth state
   useEffect(() => {
     if (authLoading) {
-      // Waiting for auth verification on refresh, keep isLoading true
       setIsLoading(true);
+      setOrgsLoaded(false);
       return;
     }
 
     if (isAuthenticated) {
       setIsLoading(true);
+      setOrgsLoaded(false);
       fetchOrgs();
     } else {
       // Explicitly not authenticated (logout)
@@ -73,6 +76,7 @@ export function OrgProvider({ children }: { children: React.ReactNode }) {
       setOrgId(null);
       clearStoredOrgId();
       setIsLoading(false);
+      setOrgsLoaded(false);
     }
   }, [isAuthenticated, authLoading, fetchOrgs]);
 
@@ -91,7 +95,7 @@ export function OrgProvider({ children }: { children: React.ReactNode }) {
         currentOrg,
         orgs,
         orgId,
-        isLoading: authLoading || isLoading,
+        isLoading: authLoading || isLoading || (isAuthenticated && !orgsLoaded),
         switchOrg,
         refreshOrgs: fetchOrgs,
       }}

@@ -10,6 +10,9 @@ import {
   Layers,
   RefreshCw,
   Globe2,
+  PanelRightClose,
+  PanelRightOpen,
+  DoorOpen,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { usePropertys } from '../hooks';
@@ -25,6 +28,7 @@ import { PropertyScene3D, type PropertyGroup } from '../components/PropertyScene
 export default function PropertyInteractiveView() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isInspectorOpen, setIsInspectorOpen] = useState(true);
 
   // Fetch all properties
   const { data: propertyData, isLoading: isLoadingProps } = usePropertys({ page: 1, per_page: 100 });
@@ -154,7 +158,7 @@ export default function PropertyInteractiveView() {
   if (isLoadingProps || isLoadingBuildings) {
     return (
       <div className="flex items-center justify-center min-h-[450px]">
-        <div className="text-gray-400 flex items-center gap-2">
+        <div className="text-slate-400 flex items-center gap-2">
           <RefreshCw className="animate-spin" size={18} /> Loading spatial property map...
         </div>
       </div>
@@ -176,7 +180,7 @@ export default function PropertyInteractiveView() {
           {!isFullscreen && (
             <Link
               to="/dashboard/properties"
-              className="p-2 hover:bg-gray-200 rounded-full transition-colors text-slate-700"
+              className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-700"
             >
               <ChevronLeft size={24} />
             </Link>
@@ -278,20 +282,38 @@ export default function PropertyInteractiveView() {
           )}
         </div>
 
-        {/* Action quick links */}
+        {/* Dynamic Create Button — changes based on selection level */}
         <div className="flex items-center gap-2">
-          <Link
-            to="/dashboard/buildings/new"
-            className="px-3 py-1.5 rounded-lg bg-orange text-white font-medium hover:bg-orange/90 transition-colors flex items-center gap-1"
-          >
-            <Box size={13} />
-            + New Building (3D Drop)
-          </Link>
+          {selectedFloor ? (
+            <Link
+              to={`/dashboard/rooms/new?property_id=${selectedProperty?.id ?? ''}&floor_id=${selectedFloor.id}`}
+              className="px-3 py-1.5 rounded-lg bg-orange text-white font-medium hover:bg-orange/90 transition-colors flex items-center gap-1"
+            >
+              <DoorOpen size={13} />
+              + New Room
+            </Link>
+          ) : selectedBuilding ? (
+            <Link
+              to={`/dashboard/floors/new?building_id=${selectedBuilding.id}`}
+              className="px-3 py-1.5 rounded-lg bg-orange text-white font-medium hover:bg-orange/90 transition-colors flex items-center gap-1"
+            >
+              <Layers size={13} />
+              + New Floor
+            </Link>
+          ) : (
+            <Link
+              to={`/dashboard/buildings/new${selectedProperty ? `?property_id=${selectedProperty.id}` : ''}`}
+              className="px-3 py-1.5 rounded-lg bg-orange text-white font-medium hover:bg-orange/90 transition-colors flex items-center gap-1"
+            >
+              <Box size={13} />
+              + New Building
+            </Link>
+          )}
         </div>
       </div>
 
       {properties.length === 0 ? (
-        <div className="bg-white rounded-3xl border shadow-sm flex flex-col items-center justify-center text-gray-400 p-12 text-center min-h-[500px]">
+        <div className="bg-white rounded-3xl border shadow-sm flex flex-col items-center justify-center text-slate-400 p-12 text-center min-h-[500px]">
           <Building2 size={64} className="mb-4 opacity-20" />
           <h3 className="text-xl font-medium mb-2 text-slate-800">No Properties Found</h3>
           <p className="text-sm text-slate-500 max-w-sm mb-4">
@@ -299,18 +321,18 @@ export default function PropertyInteractiveView() {
           </p>
           <Link
             to="/dashboard/properties/new"
-            className="px-6 py-2.5 bg-black text-white rounded-xl text-sm font-semibold hover:bg-gray-800 transition-colors"
+            className="px-6 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-semibold hover:bg-gray-800 transition-colors"
           >
             Create First Property
           </Link>
         </div>
       ) : (
         /* Main Spatial Grid & Info Split Layout */
-        <div className={`grid grid-cols-1 lg:grid-cols-4 gap-5 ${isFullscreen ? 'flex-1 min-h-0' : ''}`}>
-          {/* 3D Canvas Area (Expanded size: 760px) */}
+        <div className={`grid grid-cols-1 ${isInspectorOpen ? 'lg:grid-cols-4' : 'lg:grid-cols-1'} gap-5 ${isFullscreen ? 'flex-1 min-h-0' : ''}`}>
+          {/* 3D Canvas Area (Expanded size: 800px / Fullscreen / Wide mode) */}
           <div
-            className={`col-span-1 lg:col-span-3 bg-slate-950 rounded-2xl border border-slate-800 shadow-xl overflow-hidden relative ${
-              isFullscreen ? 'h-full' : 'h-[750px]'
+            className={`col-span-1 ${isInspectorOpen ? 'lg:col-span-3' : 'lg:col-span-1'} bg-slate-950 rounded-2xl border border-slate-800 shadow-xl overflow-hidden relative transition-all duration-300 ${
+              isFullscreen ? 'h-full' : 'h-[800px]'
             }`}
           >
             {/* Top Toolbar Overlay inside 3D Canvas */}
@@ -333,8 +355,26 @@ export default function PropertyInteractiveView() {
                 )}
               </div>
 
-              {/* Fullscreen Button */}
+              {/* Action Buttons: Toggle Inspector & Fullscreen */}
               <div className="flex items-center gap-2 pointer-events-auto">
+                <button
+                  onClick={() => setIsInspectorOpen((prev) => !prev)}
+                  className="px-3 py-1.5 bg-slate-900/90 hover:bg-slate-800 text-white border border-slate-700 rounded-xl text-xs font-semibold backdrop-blur shadow-md flex items-center gap-1.5 transition-all"
+                  title={isInspectorOpen ? 'Collapse sidebar (Focus 3D Canvas)' : 'Show details inspector'}
+                >
+                  {isInspectorOpen ? (
+                    <>
+                      <PanelRightClose size={14} className="text-orange" />
+                      <span className="hidden sm:inline">Focus Canvas</span>
+                    </>
+                  ) : (
+                    <>
+                      <PanelRightOpen size={14} className="text-orange" />
+                      <span className="hidden sm:inline">Show Details</span>
+                    </>
+                  )}
+                </button>
+
                 <button
                   onClick={toggleFullscreen}
                   className="px-3 py-1.5 bg-slate-900/90 hover:bg-slate-800 text-white border border-slate-700 rounded-xl text-xs font-semibold backdrop-blur shadow-md flex items-center gap-1.5 transition-all"
@@ -392,7 +432,8 @@ export default function PropertyInteractiveView() {
           </div>
 
           {/* RIGHT: Properties & Buildings Inspector Panel */}
-          <div className="col-span-1 space-y-4 overflow-y-auto max-h-[750px] pr-1">
+          {isInspectorOpen && (
+            <div className="col-span-1 space-y-4 overflow-y-auto max-h-[800px] pr-1 animate-in fade-in slide-in-from-right-2 duration-200">
             {/* GROUPED LIST OF BUILDINGS BY PROPERTY */}
             {!selectedBuilding ? (
               <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
@@ -582,8 +623,8 @@ export default function PropertyInteractiveView() {
                               <span
                                 className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                                   r.is_available
-                                    ? 'bg-green-100 text-green-700'
-                                    : 'bg-red-100 text-red-700'
+                                    ? 'bg-green-50 text-green-700 border border-green-200'
+                                    : 'bg-red-50 text-red-700 border border-red-200'
                                 }`}
                               >
                                 {r.is_available ? 'Available' : 'Occupied'}
@@ -597,6 +638,7 @@ export default function PropertyInteractiveView() {
               </>
             )}
           </div>
+          )}
         </div>
       )}
     </div>

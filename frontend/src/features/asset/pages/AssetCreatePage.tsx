@@ -16,17 +16,17 @@ export function AssetCreatePage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 text-sm text-black/40">
-        <Link to="/dashboard" className="hover:text-black/60">Dashboard</Link>
+      <div className="flex items-center gap-2 text-sm text-slate-500">
+        <Link to="/dashboard" className="hover:text-slate-600">Dashboard</Link>
         <ChevronRight size={14} />
-        <Link to="/dashboard/assets" className="hover:text-black/60">Assets</Link>
+        <Link to="/dashboard/assets" className="hover:text-slate-600">Assets</Link>
         <ChevronRight size={14} />
-        <span className="text-black/60">New</span>
+        <span className="text-slate-600">New</span>
       </div>
 
       <h1 className="text-2xl font-bold">New Asset</h1>
       
-      <div className="max-w-2xl bg-white rounded-xl border border-black/5 p-6">
+      <div className="max-w-2xl bg-white rounded-xl border border-slate-200 p-6">
         <AssetForm
           onSubmit={handleSubmit}
           isSubmitting={createMutation.isPending}

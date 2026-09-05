@@ -30,17 +30,17 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     if (error) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-[#f2efe9] p-6">
-          <div className="max-w-lg w-full bg-white rounded-2xl border border-black/10 shadow-sm p-8 text-center space-y-4">
+          <div className="max-w-lg w-full bg-white rounded-2xl border border-slate-300 shadow-sm p-8 text-center space-y-4">
             <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center mx-auto">
               <AlertTriangle size={28} className="text-red-500" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-black/80">Something went wrong</h1>
-              <p className="text-sm text-black/50 mt-1">
+              <h1 className="text-lg font-bold text-slate-800">Something went wrong</h1>
+              <p className="text-sm text-slate-500 mt-1">
                 This page ran into an unexpected error. You can try reloading it below.
               </p>
             </div>
-            <pre className="text-left text-xs bg-black/5 rounded-lg p-3 overflow-auto max-h-40 text-red-600 whitespace-pre-wrap">
+            <pre className="text-left text-xs bg-slate-100 rounded-lg p-3 overflow-auto max-h-40 text-red-600 whitespace-pre-wrap">
               {error.message}
             </pre>
             <div className="flex items-center justify-center gap-3 pt-2">
@@ -53,7 +53,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               </button>
               <button
                 onClick={() => window.location.assign("/dashboard")}
-                className="px-4 py-2 rounded-lg border border-black/10 text-sm font-medium hover:bg-black/5 transition-colors"
+                className="px-4 py-2 rounded-lg border border-slate-300 text-sm font-medium hover:bg-slate-100 transition-colors"
               >
                 Go to Dashboard
               </button>

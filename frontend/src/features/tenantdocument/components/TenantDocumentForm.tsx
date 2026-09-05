@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTenants } from "@/features/tenant/hooks";
 import {
   createTenantDocumentSchema,
   type CreateTenantDocumentFormData,
@@ -27,43 +28,66 @@ export function TenantDocumentForm({
     formState: { errors },
   } = useForm<CreateTenantDocumentFormData>({
     resolver: zodResolver(createTenantDocumentSchema),
-    defaultValues,
+    defaultValues: {
+      document_type: "IDCard",
+      ...defaultValues,
+    },
   });
 
+  const { data: tenantsData } = useTenants({ per_page: 100 });
+  const tenants = tenantsData?.data || [];
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="tenant_id">TenantId</Label>
-        <Input
+        <Label htmlFor="tenant_id">Tenant</Label>
+        <select
           id="tenant_id"
           {...register("tenant_id")}
-        />
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange"
+        >
+          <option value="">Select a tenant...</option>
+          {tenants.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.full_name} ({t.email || t.phone})
+            </option>
+          ))}
+        </select>
         {errors.tenant_id && (
-          <p className="text-sm text-red-500">{errors.tenant_id.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.tenant_id.message}</p>
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="document_type">DocumentType</Label>
-        <Input
+        <Label htmlFor="document_type">Document Type</Label>
+        <select
           id="document_type"
           {...register("document_type")}
-        />
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange"
+        >
+          <option value="IDCard">ID Card / KTP</option>
+          <option value="Passport">Passport</option>
+          <option value="DriverLicense">Driver License / SIM</option>
+          <option value="ProofOfIncome">Proof of Income / Slip Gaji</option>
+          <option value="FamilyCard">Family Card / Kartu Keluarga</option>
+          <option value="Other">Other</option>
+        </select>
         {errors.document_type && (
-          <p className="text-sm text-red-500">{errors.document_type.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.document_type.message}</p>
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="file_url">FileUrl</Label>
+        <Label htmlFor="file_url">File URL</Label>
         <Input
           id="file_url"
+          placeholder="https://... or /uploads/..."
           {...register("file_url")}
         />
         {errors.file_url && (
-          <p className="text-sm text-red-500">{errors.file_url.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.file_url.message}</p>
         )}
       </div>
 
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} className="bg-orange hover:bg-orange/90 text-white w-full sm:w-auto">
         {isSubmitting ? "Saving..." : "Save"}
       </Button>
     </form>

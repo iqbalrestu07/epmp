@@ -15,8 +15,8 @@ export function BuildingDetailPage() {
     });
   };
 
-  if (isLoading) return <div>Loading...</div>;
-  if (!data) return <div>Not found</div>;
+  if (isLoading) return <div className="text-center py-12 text-slate-400">Loading...</div>;
+  if (!data) return <div className="text-center py-12 text-slate-400">Not found</div>;
 
   return (
     <div className="space-y-6">
@@ -35,28 +35,28 @@ export function BuildingDetailPage() {
         </div>
       </div>
 
-      <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <dl className="grid grid-cols-1 gap-5 sm:grid-cols-2 bg-white rounded-xl border border-slate-200 shadow-sm p-6">
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">Name</dt>
-          <dd className="text-sm">{data.name}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Name</dt>
+          <dd className="text-sm text-slate-800 mt-1">{data.name}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">Total Floors</dt>
-          <dd className="text-sm">{data.total_floors}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Floors</dt>
+          <dd className="text-sm text-slate-800 mt-1">{data.total_floors}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">Property ID</dt>
-          <dd className="text-sm text-gray-600">{data.property_id}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Property ID</dt>
+          <dd className="text-sm text-slate-600">{data.property_id}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">Created At</dt>
-          <dd className="text-sm">{new Date(data.created_at).toLocaleString()}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Created At</dt>
+          <dd className="text-sm text-slate-800 mt-1">{new Date(data.created_at).toLocaleString()}</dd>
         </div>
       </dl>
 
       <div className="border-t pt-4">
         <h2 className="text-lg font-semibold mb-2">Floors in this Building</h2>
-        <p className="text-sm text-gray-400">Floors linked to this building will appear here.</p>
+        <p className="text-sm text-slate-400">Floors linked to this building will appear here.</p>
         <Button
           variant="outline"
           className="mt-3"

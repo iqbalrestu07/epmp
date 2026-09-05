@@ -3,7 +3,7 @@
 import { z } from "zod";
 
 export const tenantIdentitySchema = z.object({
-  organization_id: z.string(),
+  organization_id: z.string().optional(),
   id: z.string(),
   tenant_id: z.string(),
   identity_type: z.enum(["KTP", "Passport"]),

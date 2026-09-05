@@ -3,7 +3,7 @@
 import { z } from "zod";
 
 export const assetInspectionSchema = z.object({
-  organization_id: z.string(),
+  organization_id: z.string().optional(),
   id: z.string(),
   asset_id: z.string(),
   inspection_date: z.string(),

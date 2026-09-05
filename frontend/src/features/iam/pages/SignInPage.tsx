@@ -72,7 +72,7 @@ export default function SignInPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="mt-4 bg-orange text-black font-bold py-3 rounded-xl hover:bg-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="mt-4 bg-orange text-slate-900 font-bold py-3 rounded-xl hover:bg-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {isSubmitting ? (
             <>

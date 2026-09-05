@@ -17,8 +17,8 @@ export function RefundDetailPage() {
     });
   };
 
-  if (isLoading) return <div>Loading...</div>;
-  if (!data) return <div>Not found</div>;
+  if (isLoading) return <div className="text-center py-12 text-slate-400">Loading...</div>;
+  if (!data) return <div className="text-center py-12 text-slate-400">Not found</div>;
 
   return (
     <div className="space-y-6">
@@ -37,38 +37,38 @@ export function RefundDetailPage() {
         </div>
       </div>
 
-      <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <dl className="grid grid-cols-1 gap-5 sm:grid-cols-2 bg-white rounded-xl border border-slate-200 shadow-sm p-6">
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">OrganizationId</dt>
-          <dd className="text-sm">{String(data.organization_id ?? "—")}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">OrganizationId</dt>
+          <dd className="text-sm text-slate-800 mt-1">{String(data.organization_id ?? "—")}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">Id</dt>
-          <dd className="text-sm">{String(data.id ?? "—")}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Id</dt>
+          <dd className="text-sm text-slate-800 mt-1">{String(data.id ?? "—")}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">PaymentId</dt>
-          <dd className="text-sm">{String(data.payment_id ?? "—")}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">PaymentId</dt>
+          <dd className="text-sm text-slate-800 mt-1">{String(data.payment_id ?? "—")}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">TenantId</dt>
-          <dd className="text-sm">{String(data.tenant_id ?? "—")}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">TenantId</dt>
+          <dd className="text-sm text-slate-800 mt-1">{String(data.tenant_id ?? "—")}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">Amount</dt>
-          <dd className="text-sm">{String(data.amount ?? "—")}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Amount</dt>
+          <dd className="text-sm text-slate-800 mt-1">{String(data.amount ?? "—")}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">Status</dt>
-          <dd className="text-sm">{String(data.status ?? "—")}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</dt>
+          <dd className="text-sm text-slate-800 mt-1">{String(data.status ?? "—")}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">RefundDate</dt>
-          <dd className="text-sm">{String(data.refund_date ?? "—")}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">RefundDate</dt>
+          <dd className="text-sm text-slate-800 mt-1">{String(data.refund_date ?? "—")}</dd>
         </div>
         <div className="space-y-1">
-          <dt className="text-sm font-medium text-gray-500">Reason</dt>
-          <dd className="text-sm">{String(data.reason ?? "—")}</dd>
+          <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Reason</dt>
+          <dd className="text-sm text-slate-800 mt-1">{String(data.reason ?? "—")}</dd>
         </div>
       </dl>
     </div>

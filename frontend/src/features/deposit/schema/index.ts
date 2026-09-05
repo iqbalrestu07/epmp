@@ -3,11 +3,11 @@
 import { z } from "zod";
 
 export const depositSchema = z.object({
-  organization_id: z.string(),
+  organization_id: z.string().optional(),
   id: z.string(),
   contract_id: z.string(),
   tenant_id: z.string(),
-  amount: z.number(),
+  amount: z.coerce.number().min(0, "Amount must be positive"),
   status: z.enum(["Collected", "Returned", "Forfeited"]),
   collection_date: z.string(),
   refund_date: z.string().optional(),

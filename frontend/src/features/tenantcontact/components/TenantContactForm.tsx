@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTenants } from "@/features/tenant/hooks";
 import {
   createTenantContactSchema,
   type CreateTenantContactFormData,
@@ -27,53 +28,76 @@ export function TenantContactForm({
     formState: { errors },
   } = useForm<CreateTenantContactFormData>({
     resolver: zodResolver(createTenantContactSchema),
-    defaultValues,
+    defaultValues: {
+      contact_type: "Phone",
+      is_primary: false,
+      ...defaultValues,
+    },
   });
 
+  const { data: tenantsData } = useTenants({ per_page: 100 });
+  const tenants = tenantsData?.data || [];
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="tenant_id">TenantId</Label>
-        <Input
+        <Label htmlFor="tenant_id">Tenant</Label>
+        <select
           id="tenant_id"
           {...register("tenant_id")}
-        />
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange"
+        >
+          <option value="">Select a tenant...</option>
+          {tenants.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.full_name} ({t.email || t.phone})
+            </option>
+          ))}
+        </select>
         {errors.tenant_id && (
-          <p className="text-sm text-red-500">{errors.tenant_id.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.tenant_id.message}</p>
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="contact_type">ContactType</Label>
-        <Input
+        <Label htmlFor="contact_type">Contact Type</Label>
+        <select
           id="contact_type"
           {...register("contact_type")}
-        />
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange"
+        >
+          <option value="Phone">Phone</option>
+          <option value="Email">Email</option>
+          <option value="Emergency">Emergency</option>
+        </select>
         {errors.contact_type && (
-          <p className="text-sm text-red-500">{errors.contact_type.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.contact_type.message}</p>
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="contact_value">ContactValue</Label>
+        <Label htmlFor="contact_value">Contact Value</Label>
         <Input
           id="contact_value"
+          placeholder="e.g. +628123456789 or emergency@example.com"
           {...register("contact_value")}
         />
         {errors.contact_value && (
-          <p className="text-sm text-red-500">{errors.contact_value.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.contact_value.message}</p>
         )}
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="is_primary">IsPrimary</Label>
-        <Input
+      <div className="flex items-center space-x-2">
+        <input
           id="is_primary"
+          type="checkbox"
           {...register("is_primary")}
+          className="h-4 w-4 rounded border-gray-300 text-orange focus:ring-orange"
         />
+        <Label htmlFor="is_primary" className="cursor-pointer">Is Primary Contact?</Label>
         {errors.is_primary && (
-          <p className="text-sm text-red-500">{errors.is_primary.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.is_primary.message}</p>
         )}
       </div>
 
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} className="bg-orange hover:bg-orange/90 text-white w-full sm:w-auto">
         {isSubmitting ? "Saving..." : "Save"}
       </Button>
     </form>

@@ -28,8 +28,8 @@ export function OrganizationDetailPage() {
     });
   };
 
-  if (isLoading) return <div className="p-8 text-center text-gray-500">Loading organization details...</div>;
-  if (!data) return <div className="p-8 text-center text-gray-500">Organization not found</div>;
+  if (isLoading) return <div className="p-8 text-center text-slate-500">Loading organization details...</div>;
+  if (!data) return <div className="p-8 text-center text-slate-500">Organization not found</div>;
 
   return (
     <div className="space-y-6">
@@ -37,11 +37,11 @@ export function OrganizationDetailPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border shadow-sm">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-gray-900">{data.name}</h1>
+            <h1 className="text-2xl font-bold text-slate-900">{data.name}</h1>
             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
               data.is_active
-                ? "bg-green-100 text-green-700"
-                : "bg-red-100 text-red-700"
+                ? "bg-green-50 text-green-700 border border-green-200"
+                : "bg-red-50 text-red-700 border border-red-200"
             }`}>
               {data.is_active ? "Active" : "Inactive"}
             </span>
@@ -51,7 +51,7 @@ export function OrganizationDetailPage() {
               </span>
             )}
           </div>
-          <p className="text-sm text-gray-500 mt-1">Domain: <span className="font-mono text-gray-700">{data.domain || "—"}</span></p>
+          <p className="text-sm text-slate-500 mt-1">Domain: <span className="font-mono text-slate-700">{data.domain || "—"}</span></p>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
@@ -85,12 +85,12 @@ export function OrganizationDetailPage() {
           <div>
             <div className="flex items-center gap-2">
               <Building2 className="text-orange" size={20} />
-              <h2 className="text-lg font-bold text-gray-900">Properties in this Organization</h2>
-              <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold">
+              <h2 className="text-lg font-bold text-slate-900">Properties in this Organization</h2>
+              <span className="px-2 py-0.5 bg-slate-100 text-slate-700 rounded-full text-xs font-semibold">
                 {properties.length}
               </span>
             </div>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               List of all properties and estates managed under {data.name}.
             </p>
           </div>
@@ -118,12 +118,12 @@ export function OrganizationDetailPage() {
 
         {/* Property List / Grid */}
         {isLoadingProperties ? (
-          <div className="py-8 text-center text-gray-400 text-sm">Loading properties...</div>
+          <div className="py-8 text-center text-slate-400 text-sm">Loading properties...</div>
         ) : properties.length === 0 ? (
-          <div className="py-12 text-center rounded-xl border border-dashed border-gray-200">
+          <div className="py-12 text-center rounded-xl border border-dashed border-slate-200">
             <Building2 className="mx-auto text-gray-300 mb-2" size={36} />
-            <p className="text-gray-700 font-medium">No properties found in this organization</p>
-            <p className="text-xs text-gray-400 mt-1 mb-4">Create your first property to start adding buildings, floors, and rooms.</p>
+            <p className="text-slate-700 font-medium">No properties found in this organization</p>
+            <p className="text-xs text-slate-400 mt-1 mb-4">Create your first property to start adding buildings, floors, and rooms.</p>
             <Button
               size="sm"
               onClick={() => navigate("/dashboard/properties/new")}
@@ -137,11 +137,11 @@ export function OrganizationDetailPage() {
             {properties.map((property) => (
               <div
                 key={property.id}
-                className="group p-4 rounded-xl border border-gray-200 hover:border-orange/50 hover:shadow-md transition-all bg-white flex flex-col justify-between"
+                className="group p-4 rounded-xl border border-slate-200 hover:border-orange/50 hover:shadow-md transition-all bg-white flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="font-semibold text-gray-900 group-hover:text-orange transition-colors">
+                    <h3 className="font-semibold text-slate-900 group-hover:text-orange transition-colors">
                       {property.name}
                     </h3>
                     <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 capitalize shrink-0">
@@ -149,13 +149,13 @@ export function OrganizationDetailPage() {
                     </span>
                   </div>
                   {property.address && (
-                    <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
-                      <MapPin size={12} className="text-gray-400 shrink-0" />
+                    <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                      <MapPin size={12} className="text-slate-400 shrink-0" />
                       <span className="truncate">{property.address}</span>
                     </p>
                   )}
                   {property.description && (
-                    <p className="text-xs text-gray-400 mt-2 line-clamp-2">
+                    <p className="text-xs text-slate-400 mt-2 line-clamp-2">
                       {property.description}
                     </p>
                   )}
@@ -170,7 +170,7 @@ export function OrganizationDetailPage() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => navigate(`/dashboard/properties/${property.id}`)}
-                      className="font-medium text-gray-600 hover:text-black flex items-center gap-0.5"
+                      className="font-medium text-slate-600 hover:text-slate-900 flex items-center gap-0.5"
                     >
                       Detail <ArrowRight size={12} />
                     </button>

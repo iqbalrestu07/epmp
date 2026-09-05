@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useInvoices } from "@/features/billing/hooks";
 import {
   createAdjustmentSchema,
   type CreateAdjustmentFormData,
@@ -27,63 +28,88 @@ export function AdjustmentForm({
     formState: { errors },
   } = useForm<CreateAdjustmentFormData>({
     resolver: zodResolver(createAdjustmentSchema),
-    defaultValues,
+    defaultValues: {
+      adjustment_type: "Credit",
+      adjustment_date: new Date().toISOString().split("T")[0],
+      ...defaultValues,
+    },
   });
 
+  const { data: invoicesData } = useInvoices({ per_page: 100 });
+  const invoices = invoicesData?.data || [];
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="invoice_id">InvoiceId</Label>
-        <Input
+        <Label htmlFor="invoice_id">Invoice</Label>
+        <select
           id="invoice_id"
           {...register("invoice_id")}
-        />
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange"
+        >
+          <option value="">Select an invoice...</option>
+          {invoices.map((inv) => (
+            <option key={inv.id} value={inv.id}>
+              Invoice #{inv.id.slice(0, 8)} - Rp {Number(inv.amount || 0).toLocaleString()} ({inv.status})
+            </option>
+          ))}
+        </select>
         {errors.invoice_id && (
-          <p className="text-sm text-red-500">{errors.invoice_id.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.invoice_id.message}</p>
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="adjustment_type">AdjustmentType</Label>
-        <Input
+        <Label htmlFor="adjustment_type">Adjustment Type</Label>
+        <select
           id="adjustment_type"
           {...register("adjustment_type")}
-        />
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange"
+        >
+          <option value="Credit">Credit</option>
+          <option value="Debit">Debit</option>
+        </select>
         {errors.adjustment_type && (
-          <p className="text-sm text-red-500">{errors.adjustment_type.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.adjustment_type.message}</p>
         )}
       </div>
       <div className="space-y-2">
         <Label htmlFor="amount">Amount</Label>
         <Input
           id="amount"
-          {...register("amount")}
+          type="number"
+          step="any"
+          min="0"
+          placeholder="0.00"
+          {...register("amount", { valueAsNumber: true })}
         />
         {errors.amount && (
-          <p className="text-sm text-red-500">{errors.amount.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.amount.message}</p>
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="adjustment_date">AdjustmentDate</Label>
+        <Label htmlFor="adjustment_date">Adjustment Date</Label>
         <Input
           id="adjustment_date"
+          type="date"
           {...register("adjustment_date")}
         />
         {errors.adjustment_date && (
-          <p className="text-sm text-red-500">{errors.adjustment_date.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.adjustment_date.message}</p>
         )}
       </div>
       <div className="space-y-2">
         <Label htmlFor="reason">Reason</Label>
         <Input
           id="reason"
+          placeholder="Reason for adjustment"
           {...register("reason")}
         />
         {errors.reason && (
-          <p className="text-sm text-red-500">{errors.reason.message}</p>
+          <p className="text-xs text-red-600 mt-1">{errors.reason.message}</p>
         )}
       </div>
 
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} className="bg-orange hover:bg-orange/90 text-white w-full sm:w-auto">
         {isSubmitting ? "Saving..." : "Save"}
       </Button>
     </form>

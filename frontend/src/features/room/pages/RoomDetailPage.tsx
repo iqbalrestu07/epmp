@@ -16,17 +16,17 @@ export function RoomDetailPage() {
     });
   };
 
-  if (isLoading) return <div className="text-center py-12 text-black/30">Loading…</div>;
-  if (!data) return <div className="text-center py-12 text-black/30">Not found</div>;
+  if (isLoading) return <div className="text-center py-12 text-slate-400">Loading…</div>;
+  if (!data) return <div className="text-center py-12 text-slate-400">Not found</div>;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 text-sm text-black/40">
-        <Link to="/dashboard" className="hover:text-black/60">Dashboard</Link>
+      <div className="flex items-center gap-2 text-sm text-slate-500">
+        <Link to="/dashboard" className="hover:text-slate-600">Dashboard</Link>
         <ChevronRight size={14} />
-        <Link to="/dashboard/rooms" className="hover:text-black/60">Rooms</Link>
+        <Link to="/dashboard/rooms" className="hover:text-slate-600">Rooms</Link>
         <ChevronRight size={14} />
-        <span className="text-black/60 truncate max-w-32">{data.name}</span>
+        <span className="text-slate-600 truncate max-w-32">{data.name}</span>
       </div>
 
       <div className="flex items-center justify-between">
@@ -36,7 +36,7 @@ export function RoomDetailPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold">{data.name}</h1>
-            <p className="text-sm text-black/40">
+            <p className="text-sm text-slate-500">
               <span className="inline-flex items-center gap-1">
                 <Users size={14} /> {data.capacity} guests
               </span>
@@ -63,52 +63,52 @@ export function RoomDetailPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-black/5 p-6">
-        <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="bg-white rounded-xl border border-slate-200 p-6">
+        <dl className="grid grid-cols-1 gap-5 sm:grid-cols-2 bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div className="space-y-1">
-            <dt className="text-xs font-semibold text-black/40 uppercase tracking-wider">Capacity</dt>
+            <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Capacity</dt>
             <dd className="text-sm font-medium">{data.capacity} guests</dd>
           </div>
           <div className="space-y-1">
-            <dt className="text-xs font-semibold text-black/40 uppercase tracking-wider">Price</dt>
+            <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Price</dt>
             <dd className="text-sm font-medium">{data.price.toLocaleString()}</dd>
           </div>
           <div className="space-y-1">
-            <dt className="text-xs font-semibold text-black/40 uppercase tracking-wider">Property ID</dt>
-            <dd className="text-sm font-mono text-black/60">{data.property_id}</dd>
+            <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Property ID</dt>
+            <dd className="text-sm font-mono text-slate-600">{data.property_id}</dd>
           </div>
           <div className="space-y-1">
-            <dt className="text-xs font-semibold text-black/40 uppercase tracking-wider">Floor ID</dt>
-            <dd className="text-sm font-mono text-black/60">{data.floor_id}</dd>
+            <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Floor ID</dt>
+            <dd className="text-sm font-mono text-slate-600">{data.floor_id}</dd>
           </div>
           <div className="space-y-1">
-            <dt className="text-xs font-semibold text-black/40 uppercase tracking-wider">Status</dt>
+            <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</dt>
             <dd>
               <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
                 data.is_available
-                  ? "bg-green-100 text-green-700"
-                  : "bg-red-100 text-red-700"
+                  ? "bg-green-50 text-green-700 border border-green-200"
+                  : "bg-red-50 text-red-700 border border-red-200"
               }`}>
                 {data.is_available ? "Available" : "Occupied"}
               </span>
             </dd>
           </div>
           <div className="space-y-1">
-            <dt className="text-xs font-semibold text-black/40 uppercase tracking-wider">Room ID</dt>
-            <dd className="text-sm font-mono text-black/60">{data.id}</dd>
+            <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Room ID</dt>
+            <dd className="text-sm font-mono text-slate-600">{data.id}</dd>
           </div>
           <div className="space-y-1">
-            <dt className="text-xs font-semibold text-black/40 uppercase tracking-wider">Created At</dt>
-            <dd className="text-sm text-black/60">{new Date(data.created_at).toLocaleString()}</dd>
+            <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Created At</dt>
+            <dd className="text-sm text-slate-600">{new Date(data.created_at).toLocaleString()}</dd>
           </div>
           <div className="space-y-1">
-            <dt className="text-xs font-semibold text-black/40 uppercase tracking-wider">Updated At</dt>
-            <dd className="text-sm text-black/60">{new Date(data.updated_at).toLocaleString()}</dd>
+            <dt className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Updated At</dt>
+            <dd className="text-sm text-slate-600">{new Date(data.updated_at).toLocaleString()}</dd>
           </div>
         </dl>
       </div>
 
-      <div className="bg-white rounded-xl border border-black/5 p-6">
+      <div className="bg-white rounded-xl border border-slate-200 p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold flex items-center gap-2">
             <Layers size={18} className="text-orange" />
@@ -124,7 +124,7 @@ export function RoomDetailPage() {
             </Button>
           )}
         </div>
-        <p className="text-sm text-black/30 font-mono">{data.floor_id || "No floor assigned"}</p>
+        <p className="text-sm text-slate-400 font-mono">{data.floor_id || "No floor assigned"}</p>
       </div>
     </div>
   );
