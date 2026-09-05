@@ -67,6 +67,9 @@ func (h *PropertyHandler) List(c echo.Context) error {
 	}
 	search := c.QueryParam("search")
 	orgID := mw.GetOrgID(c)
+	if qOrg := c.QueryParam("organization_id"); qOrg != "" {
+		orgID = qOrg
+	}
 
 	result, err := h.svc.List(c.Request().Context(), page, perPage, search, orgID)
 	if err != nil {

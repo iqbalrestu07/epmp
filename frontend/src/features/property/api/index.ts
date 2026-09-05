@@ -17,6 +17,7 @@ export async function fetchPropertys(params?: PropertyQueryParams): Promise<Prop
   if (params?.sort) query.set("sort", params.sort);
   if (params?.order) query.set("order", params.order);
   if (params?.search) query.set("search", params.search);
+  if (params?.organization_id) query.set("organization_id", params.organization_id);
   const qs = query.toString();
   const res = await api.get<{ success: boolean; data: PropertyListResponse }>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
   return res.data;

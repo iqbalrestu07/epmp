@@ -1,45 +1,16 @@
 import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Html } from '@react-three/drei';
+import type { Property } from '../types';
 import type { Building } from '../../building/types';
 import type { Floor } from '../../floor/types';
 import type { Room } from '../../room/types';
 import { Building3D, Floor3D } from './3d';
 
-// ─── Scene Lights & Environment ──────────────────────────────────────────────
-
-function SceneLights() {
-  return (
-    <>
-      <ambientLight intensity={0.5} />
-      <directionalLight
-        position={[10, 10, 5]}
-        intensity={1}
-        castShadow
-        shadow-mapSize={[2048, 2048]}
-        shadow-camera-far={50}
-        shadow-camera-left={-10}
-        shadow-camera-right={10}
-        shadow-camera-top={10}
-        shadow-camera-bottom={-10}
-      />
-      <directionalLight position={[-10, 5, -5]} intensity={0.3} />
-    </>
-  );
+export interface PropertyGroup {
+  property: Property;
+  buildings: Building[];
 }
-
-// ─── Ground Plane ────────────────────────────────────────────────────────────
-
-function GroundPlane() {
-  return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]} receiveShadow>
-      <planeGeometry args={[30, 30]} />
-      <meshStandardMaterial color="#e2e8f0" />
-    </mesh>
-  );
-}
-
-// ─── Main Scene Component ────────────────────────────────────────────────────
 
 export interface PropertyScene3DProps {
   buildings: Building[];
@@ -50,7 +21,98 @@ export interface PropertyScene3DProps {
   onBuildingClick: (b: Building) => void;
   onFloorClick: (f: Floor) => void;
   onRoomClick: (r: Room) => void;
+  propertyGroups?: PropertyGroup[];
+  isAllPropertiesMode?: boolean;
+  onPropertyClick?: (p: Property) => void;
+  buildingModelOverrides?: Record<string, 'building' | 'hotel'>;
 }
+
+// ─── Scene Lights & Environment ──────────────────────────────────────────────
+
+function SceneLights() {
+  return (
+    <>
+      <ambientLight intensity={0.6} />
+      <directionalLight
+        position={[15, 20, 10]}
+        intensity={1.5}
+        castShadow
+        shadow-mapSize={[2048, 2048]}
+        shadow-camera-far={60}
+        shadow-camera-left={-25}
+        shadow-camera-right={25}
+        shadow-camera-top={25}
+        shadow-camera-bottom={-25}
+      />
+      <directionalLight position={[-15, 10, -10]} intensity={0.4} />
+    </>
+  );
+}
+
+// ─── Ground Plane ────────────────────────────────────────────────────────────
+
+function GroundPlane({ size = 50 }: { size?: number }) {
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]} receiveShadow>
+      <planeGeometry args={[size, size]} />
+      <meshStandardMaterial color="#e2e8f0" roughness={0.8} />
+    </mesh>
+  );
+}
+
+// ─── Property Zone Pad (in All Properties grouped view) ──────────────────────
+
+function PropertyZonePad({
+  property,
+  position,
+  width = 14,
+  depth = 14,
+  onClick,
+}: {
+  property: Property;
+  position: [number, number, number];
+  width?: number;
+  depth?: number;
+  onClick: (p: Property) => void;
+}) {
+  return (
+    <group position={position}>
+      {/* Zone Ground Plate */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]} receiveShadow>
+        <planeGeometry args={[width, depth]} />
+        <meshStandardMaterial color="#f1f5f9" roughness={0.6} />
+      </mesh>
+
+      {/* Zone Boundary Border */}
+      <lineSegments position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <edgesGeometry args={[new (THREE as any).PlaneGeometry(width, depth)]} />
+        <lineBasicMaterial color="#f97316" linewidth={2} />
+      </lineSegments>
+
+      {/* Property Floating Title */}
+      <Html position={[0, 5.5, -depth / 2 + 1]} center distanceFactor={16}>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onClick(property);
+          }}
+          className="px-3 py-1.5 rounded-xl bg-slate-900/90 hover:bg-orange text-white text-xs font-bold shadow-xl border border-white/20 transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+        >
+          <span>🏛️</span>
+          <span>{property.name}</span>
+          <span className="text-[10px] text-orange-200 font-normal capitalize">
+            ({property.property_type.replace('_', ' ')})
+          </span>
+        </button>
+      </Html>
+    </group>
+  );
+}
+
+// import THREE reference for geometry
+import * as THREE from 'three';
+
+// ─── Main Scene Component ────────────────────────────────────────────────────
 
 export function PropertyScene3D({
   buildings,
@@ -61,48 +123,31 @@ export function PropertyScene3D({
   onBuildingClick,
   onFloorClick,
   onRoomClick,
+  propertyGroups = [],
+  isAllPropertiesMode = false,
+  onPropertyClick,
+  buildingModelOverrides = {},
 }: PropertyScene3DProps) {
   const showFloorStack = selectedBuildingId !== null;
 
   return (
     <Canvas
       shadows
-      camera={{ position: [8, 6, 8], fov: 50 }}
+      camera={{
+        position: isAllPropertiesMode ? [18, 16, 18] : [10, 8, 10],
+        fov: 48,
+      }}
       className="rounded-2xl"
     >
-      <Suspense fallback={<Html center><div className="text-gray-500">Loading 3D model...</div></Html>}>
+      <Suspense fallback={<Html center><div className="text-gray-500 font-medium">Loading 3D scene & assets...</div></Html>}>
         <SceneLights />
-        <GroundPlane />
+        <GroundPlane size={isAllPropertiesMode ? 70 : 40} />
+        <gridHelper
+          args={[isAllPropertiesMode ? 70 : 40, isAllPropertiesMode ? 70 : 40, '#94a3b8', '#cbd5e1']}
+          position={[0, 0.02, 0]}
+        />
 
-        {!showFloorStack ? (
-          <group>
-            {buildings.length > 0 ? (
-              buildings.map((b, idx) => {
-                const cols = Math.ceil(Math.sqrt(buildings.length));
-                const col = idx % cols;
-                const row = Math.floor(idx / cols);
-                const x = (col - (cols - 1) / 2) * 5;
-                const z = (row - (cols - 1) / 2) * 5;
-                return (
-                  <Building3D
-                    key={b.id}
-                    building={b}
-                    position={[x, 0, z]}
-                    onClick={onBuildingClick}
-                    selected={selectedBuildingId === b.id}
-                  />
-                );
-              })
-            ) : (
-              <Html center>
-                <div className="text-gray-400 text-center">
-                  <p className="text-sm">No buildings yet.</p>
-                  <p className="text-xs mt-1">Add buildings to see the 3D model.</p>
-                </div>
-              </Html>
-            )}
-          </group>
-        ) : (
+        {showFloorStack ? (
           <Floor3D
             floors={floors}
             rooms={rooms}
@@ -110,6 +155,79 @@ export function PropertyScene3D({
             onFloorClick={onFloorClick}
             onRoomClick={onRoomClick}
           />
+        ) : isAllPropertiesMode && propertyGroups.length > 0 ? (
+          // Grouped Multi-Property Spatial Clusters
+          <group>
+            {propertyGroups.map((group, pIdx) => {
+              const count = propertyGroups.length;
+              const spacing = 18;
+              const cols = Math.ceil(Math.sqrt(count));
+              const col = pIdx % cols;
+              const row = Math.floor(pIdx / cols);
+              const zoneX = (col - (cols - 1) / 2) * spacing;
+              const zoneZ = (row - (cols - 1) / 2) * spacing;
+
+              return (
+                <group key={group.property.id}>
+                  <PropertyZonePad
+                    property={group.property}
+                    position={[zoneX, 0, zoneZ]}
+                    onClick={(p) => onPropertyClick?.(p)}
+                  />
+
+                  {/* Buildings inside this property's zone */}
+                  {group.buildings.map((b, bIdx) => {
+                    const bCols = Math.ceil(Math.sqrt(Math.max(group.buildings.length, 1)));
+                    const bCol = bIdx % bCols;
+                    const bRow = Math.floor(bIdx / bCols);
+                    const bx = zoneX + (bCol - (bCols - 1) / 2) * 5;
+                    const bz = zoneZ + (bRow - (bCols - 1) / 2) * 5;
+
+                    return (
+                      <Building3D
+                        key={b.id}
+                        building={b}
+                        position={[bx, 0, bz]}
+                        onClick={onBuildingClick}
+                        selected={selectedBuildingId === b.id}
+                        modelStyle={buildingModelOverrides[b.id] ?? 'auto'}
+                      />
+                    );
+                  })}
+                </group>
+              );
+            })}
+          </group>
+        ) : (
+          // Single Selected Property's Buildings
+          <group>
+            {buildings.length > 0 ? (
+              buildings.map((b, idx) => {
+                const cols = Math.ceil(Math.sqrt(buildings.length));
+                const col = idx % cols;
+                const row = Math.floor(idx / cols);
+                const x = (col - (cols - 1) / 2) * 6;
+                const z = (row - (cols - 1) / 2) * 6;
+                return (
+                  <Building3D
+                    key={b.id}
+                    building={b}
+                    position={[x, 0, z]}
+                    onClick={onBuildingClick}
+                    selected={selectedBuildingId === b.id}
+                    modelStyle={buildingModelOverrides[b.id] ?? 'auto'}
+                  />
+                );
+              })
+            ) : (
+              <Html center>
+                <div className="text-gray-400 text-center bg-white/90 p-4 rounded-xl border shadow-sm">
+                  <p className="text-sm font-semibold text-slate-700">No buildings in this property yet.</p>
+                  <p className="text-xs text-slate-400 mt-1">Add buildings to view the spatial 3D model.</p>
+                </div>
+              </Html>
+            )}
+          </group>
         )}
 
         <OrbitControls
@@ -117,8 +235,9 @@ export function PropertyScene3D({
           enableZoom
           enableRotate
           minDistance={3}
-          maxDistance={25}
-          maxPolarAngle={Math.PI / 2.1}
+          maxDistance={50}
+          maxPolarAngle={Math.PI / 2.05}
+          dampingFactor={0.05}
         />
       </Suspense>
     </Canvas>

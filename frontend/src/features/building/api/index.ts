@@ -17,6 +17,7 @@ export async function fetchBuildings(params?: BuildingQueryParams): Promise<Buil
   if (params?.sort) query.set("sort", params.sort);
   if (params?.order) query.set("order", params.order);
   if (params?.search) query.set("search", params.search);
+  if (params?.property_id) query.set("property_id", params.property_id);
   const qs = query.toString();
   const res = await api.get<{ success: boolean; data: BuildingListResponse }>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
   return res.data;

@@ -3,19 +3,20 @@ import { Html, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import type { Building } from '../../../building/types';
 
-// Preload the building GLB model
+// Preload both 3D models
 useGLTF.preload('/3d-models/buildings/building.glb');
+useGLTF.preload('/3d-models/buildings/hotel.glb');
 
 export interface Building3DProps {
   building: Building;
   position: [number, number, number];
   onClick: (b: Building) => void;
   selected: boolean;
+  modelStyle?: 'building' | 'hotel' | 'auto';
 }
 
-// GLB Model loader component
-function GLBBuildingModel() {
-  const { scene } = useGLTF('/3d-models/buildings/building.glb');
+function DynamicGLBModel({ path, scale }: { path: string; scale: [number, number, number] }) {
+  const { scene } = useGLTF(path);
   const cloned = scene.clone(true);
 
   cloned.traverse((child) => {
@@ -26,13 +27,38 @@ function GLBBuildingModel() {
   });
 
   return (
-    <primitive object={cloned} scale={[0.6, 0.6, 0.6]} position={[0, 0, 0]} />
+    <primitive object={cloned} scale={scale} position={[0, 0, 0]} />
   );
 }
 
-export function Building3D({ building, position, onClick, selected }: Building3DProps) {
+export function Building3D({ building, position, onClick, selected, modelStyle = 'auto' }: Building3DProps) {
   const meshRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
+
+  // Check stored preference or name heuristics
+  let isHotel = false;
+  if (modelStyle === 'hotel') {
+    isHotel = true;
+  } else if (modelStyle === 'building') {
+    isHotel = false;
+  } else {
+    try {
+      const pref = localStorage.getItem(`building_model_pref_${building.name}`);
+      if (pref === 'hotel_resort') {
+        isHotel = true;
+      } else {
+        const lower = building.name.toLowerCase();
+        isHotel = lower.includes('hotel') || lower.includes('resort') || lower.includes('suite');
+      }
+    } catch {
+      const lower = building.name.toLowerCase();
+      isHotel = lower.includes('hotel') || lower.includes('resort') || lower.includes('suite');
+    }
+  }
+
+  const modelPath = isHotel ? '/3d-models/buildings/hotel.glb' : '/3d-models/buildings/building.glb';
+  const modelScale: [number, number, number] = isHotel ? [0.55, 0.55, 0.55] : [0.6, 0.6, 0.6];
+  const modelIcon = isHotel ? '🏨' : '🏢';
 
   return (
     <group
@@ -64,7 +90,7 @@ export function Building3D({ building, position, onClick, selected }: Building3D
           </mesh>
         }
       >
-        <GLBBuildingModel />
+        <DynamicGLBModel key={modelPath} path={modelPath} scale={modelScale} />
       </Suspense>
 
       {/* Selected Indicator Ring */}
@@ -75,15 +101,18 @@ export function Building3D({ building, position, onClick, selected }: Building3D
         </mesh>
       )}
 
-      {/* Building Label */}
-      <Html position={[0, 3.5, 0]} center distanceFactor={12}>
-        <div className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap shadow-lg border transition-all pointer-events-none ${
+      {/* Building Label with Model Icon */}
+      <Html position={[0, 3.8, 0]} center distanceFactor={13}>
+        <div className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap shadow-lg border transition-all pointer-events-none flex items-center gap-1.5 ${
           selected
             ? 'bg-orange text-white border-orange shadow-orange/30'
-            : 'bg-black/80 text-white border-white/10'
+            : 'bg-black/85 text-white border-white/10'
         }`}>
-          {building.name}
-          <span className="block text-[10px] opacity-75 font-normal">{building.total_floors} floors</span>
+          <span>{modelIcon}</span>
+          <div>
+            <span>{building.name}</span>
+            <span className="block text-[10px] opacity-75 font-normal">{building.total_floors} floors</span>
+          </div>
         </div>
       </Html>
     </group>
