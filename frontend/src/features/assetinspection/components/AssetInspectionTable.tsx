@@ -7,30 +7,10 @@ import {
   createColumnHelper,
 } from "@tanstack/react-table";
 import type { AssetInspection } from "../types";
+import { useAssets } from "../../asset/hooks";
 
 const columnHelper = createColumnHelper<AssetInspection>();
 
-const columns = [  columnHelper.accessor("id", {
-    header: "Id",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("asset_id", {
-    header: "AssetId",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("inspection_date", {
-    header: "InspectionDate",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("condition", {
-    header: "Condition",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("notes", {
-    header: "Notes",
-    cell: (info) => info.getValue(),
-  }),
-];
 
 interface AssetInspectionTableProps {
   data: AssetInspection[];
@@ -38,6 +18,35 @@ interface AssetInspectionTableProps {
 }
 
 export function AssetInspectionTable({ data, onRowClick }: AssetInspectionTableProps) {
+  const { data: assetsData } = useAssets({ per_page: 100 });
+  const assetsMap = new Map(
+    (Array.isArray(assetsData?.data) ? assetsData.data : Array.isArray(assetsData) ? assetsData : [])
+      .map((item: any) => [item.id, item.name])
+  );
+
+  const columns = [
+    columnHelper.accessor("asset_id", {
+      header: "Asset",
+      cell: (info) => {
+        const id = info.getValue() as string;
+        if (!id) return <span className="text-slate-400">—</span>;
+        return assetsMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+      },
+    }),
+    columnHelper.accessor("inspection_date", {
+      header: "InspectionDate",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("condition", {
+      header: "Condition",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("notes", {
+      header: "Notes",
+      cell: (info) => info.getValue(),
+    }),
+  ];
+
   const table = useReactTable({
     data: data || [],
     columns,

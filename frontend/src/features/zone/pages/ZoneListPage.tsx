@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ZoneTable } from "../components/ZoneTable";
 import { useZones, useDeleteZone } from "../hooks";
+import { Plus } from "lucide-react";
 import type { Zone } from "../types";
 
 export function ZoneListPage() {

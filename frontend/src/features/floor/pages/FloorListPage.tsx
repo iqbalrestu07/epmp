@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Layers, Plus } from "lucide-react";
@@ -10,10 +10,13 @@ import type { Floor } from "../types";
 
 export function FloorListPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const buildingIdFromUrl = searchParams.get("building_id") ?? "";
+
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
-  const [buildingId, setBuildingId] = useState("");
+  const [buildingId, setBuildingId] = useState(buildingIdFromUrl);
 
   const { data, isLoading } = useFloors({
     page,

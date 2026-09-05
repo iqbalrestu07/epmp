@@ -82,13 +82,42 @@ async function request<T>(
   return json as T;
 }
 
+function normalizeDatePayload(obj: unknown): unknown {
+  if (!obj || typeof obj !== "object") return obj;
+  if (Array.isArray(obj)) return obj.map(normalizeDatePayload);
+  const result: Record<string, unknown> = {};
+  for (const [key, val] of Object.entries(obj as Record<string, unknown>)) {
+    if (typeof val === "string") {
+      const isDateField = key.includes("date") || key.includes("time") || key.endsWith("_at");
+      if (val === "" && isDateField) {
+        // Omit empty date/time strings so Go json.Unmarshal does not fail on ""
+        continue;
+      }
+      if (/^\d{4}-\d{2}-\d{2}$/.test(val)) {
+        result[key] = `${val}T00:00:00Z`;
+      } else if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(val)) {
+        result[key] = `${val}:00Z`;
+      } else if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(val)) {
+        result[key] = `${val}Z`;
+      } else {
+        result[key] = val;
+      }
+    } else if (typeof val === "object" && val !== null) {
+      result[key] = normalizeDatePayload(val);
+    } else {
+      result[key] = val;
+    }
+  }
+  return result;
+}
+
 export const api = {
   get: <T>(path: string) => request<T>(path),
   post: <T>(path: string, body: unknown) =>
-    request<T>(path, { method: "POST", body: JSON.stringify(body) }),
+    request<T>(path, { method: "POST", body: JSON.stringify(normalizeDatePayload(body)) }),
   put: <T>(path: string, body: unknown) =>
-    request<T>(path, { method: "PUT", body: JSON.stringify(body) }),
+    request<T>(path, { method: "PUT", body: JSON.stringify(normalizeDatePayload(body)) }),
   patch: <T>(path: string, body: unknown) =>
-    request<T>(path, { method: "PATCH", body: JSON.stringify(body) }),
+    request<T>(path, { method: "PATCH", body: JSON.stringify(normalizeDatePayload(body)) }),
   delete: <T>(path: string) => request<T>(path, { method: "DELETE" }),
 };

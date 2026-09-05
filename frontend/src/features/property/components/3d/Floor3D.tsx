@@ -8,11 +8,12 @@ export interface Floor3DProps {
   floors: Floor[];
   rooms: Room[];
   selectedFloorId: string | null;
+  selectedRoomId: string | null;
   onFloorClick: (f: Floor) => void;
   onRoomClick: (r: Room) => void;
 }
 
-export function Floor3D({ floors, rooms, selectedFloorId, onFloorClick, onRoomClick }: Floor3DProps) {
+export function Floor3D({ floors, rooms, selectedFloorId, selectedRoomId, onFloorClick, onRoomClick }: Floor3DProps) {
   const [hoveredFloor, setHoveredFloor] = useState<string | null>(null);
 
   const sortedFloors = [...floors].sort((a, b) => a.floor_number - b.floor_number);
@@ -77,6 +78,7 @@ export function Floor3D({ floors, rooms, selectedFloorId, onFloorClick, onRoomCl
                       key={room.id}
                       room={room}
                       position={[x, 0.3, z]}
+                      selected={selectedRoomId === room.id}
                       onClick={onRoomClick}
                     />
                   );

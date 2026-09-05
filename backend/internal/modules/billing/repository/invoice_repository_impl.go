@@ -25,23 +25,27 @@ func NewInvoiceRepositoryImpl(db *pgxpool.Pool) *InvoiceRepositoryImpl {
 var _ InvoiceRepository = (*InvoiceRepositoryImpl)(nil)
 
 func (r *InvoiceRepositoryImpl) Save(ctx context.Context, e *entity.Invoice) error {
+	var paidDate interface{} = e.PaidDate
+	if e.PaidDate.IsZero() {
+		paidDate = nil
+	}
+
 	if e.Id == "" {
 		// INSERT
 		err := r.db.QueryRow(ctx, `
 			INSERT INTO invoices (organization_id, contract_id, tenant_id, amount, status, due_date, paid_date, payment_method, notes)
 			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 			RETURNING id`,
-			e.OrganizationId, e.ContractId, e.TenantId, e.Amount, e.Status, e.DueDate, e.PaidDate, e.PaymentMethod, e.Notes,
+			e.OrganizationId, e.ContractId, e.TenantId, e.Amount, e.Status, e.DueDate, paidDate, e.PaymentMethod, e.Notes,
 		).Scan(&e.Id)
 		return err
 	}
 	// UPDATE
-	// Note: id is dynamically added as the last argument in Exec for UPDATE
 	_, err := r.db.Exec(ctx, `
 		UPDATE invoices
 		SET    organization_id=$1, contract_id=$2, tenant_id=$3, amount=$4, status=$5, due_date=$6, paid_date=$7, payment_method=$8, notes=$9
 		WHERE  id=$10 AND deleted_at IS NULL`,
-		e.OrganizationId, e.ContractId, e.TenantId, e.Amount, e.Status, e.DueDate, e.PaidDate, e.PaymentMethod, e.Notes, e.Id,
+		e.OrganizationId, e.ContractId, e.TenantId, e.Amount, e.Status, e.DueDate, paidDate, e.PaymentMethod, e.Notes, e.Id,
 	)
 	return err
 }
@@ -49,7 +53,7 @@ func (r *InvoiceRepositoryImpl) Save(ctx context.Context, e *entity.Invoice) err
 func (r *InvoiceRepositoryImpl) FindByID(ctx context.Context, id string) (*entity.Invoice, error) {
 	e := &entity.Invoice{}
 	err := r.db.QueryRow(ctx, `
-		SELECT organization_id, id, contract_id, tenant_id, amount, status, due_date, paid_date, payment_method, notes, deleted_at
+		SELECT organization_id, id, contract_id, tenant_id, amount, status, due_date, COALESCE(paid_date, '0001-01-01 00:00:00+00'::timestamptz), payment_method, notes, deleted_at
 		FROM   invoices
 		WHERE  id = $1 AND deleted_at IS NULL`,
 		id,
@@ -63,7 +67,7 @@ func (r *InvoiceRepositoryImpl) FindByID(ctx context.Context, id string) (*entit
 
 func (r *InvoiceRepositoryImpl) FindAll(ctx context.Context, limit, offset int) ([]*entity.Invoice, error) {
 	rows, err := r.db.Query(ctx, `
-		SELECT organization_id, id, contract_id, tenant_id, amount, status, due_date, paid_date, payment_method, notes, deleted_at
+		SELECT organization_id, id, contract_id, tenant_id, amount, status, due_date, COALESCE(paid_date, '0001-01-01 00:00:00+00'::timestamptz), payment_method, notes, deleted_at
 		FROM   invoices
 		WHERE  deleted_at IS NULL
 		ORDER BY created_at DESC

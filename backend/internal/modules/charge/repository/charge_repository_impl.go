@@ -26,7 +26,7 @@ func (r *ChargeRepositoryImpl) Save(ctx context.Context, e *entity.Charge) error
 	if e.Id == "" {
 		err := r.db.QueryRow(ctx, `
 			INSERT INTO charges (organization_id, contract_id, invoice_id, charge_type, amount, status, charge_date, notes)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+			VALUES ($1, $2, NULLIF($3, '')::uuid, $4, $5, $6, $7, $8)
 			RETURNING id, created_at, updated_at`,
 			e.OrganizationId, e.ContractId, e.InvoiceId, e.ChargeType, e.Amount, e.Status, e.ChargeDate, e.Notes,
 		).Scan(&e.Id, &e.CreatedAt, &e.UpdatedAt)
@@ -34,7 +34,7 @@ func (r *ChargeRepositoryImpl) Save(ctx context.Context, e *entity.Charge) error
 	}
 	err := r.db.QueryRow(ctx, `
 		UPDATE charges
-		SET    contract_id=$1, invoice_id=$2, charge_type=$3, amount=$4, status=$5, charge_date=$6, notes=$7
+		SET    contract_id=$1, invoice_id=NULLIF($2, '')::uuid, charge_type=$3, amount=$4, status=$5, charge_date=$6, notes=$7
 		WHERE  id=$8 AND organization_id=$9 AND deleted_at IS NULL
 		RETURNING updated_at`,
 		e.ContractId, e.InvoiceId, e.ChargeType, e.Amount, e.Status, e.ChargeDate, e.Notes, e.Id, e.OrganizationId,
@@ -45,7 +45,7 @@ func (r *ChargeRepositoryImpl) Save(ctx context.Context, e *entity.Charge) error
 func (r *ChargeRepositoryImpl) FindByID(ctx context.Context, id, orgID string) (*entity.Charge, error) {
 	e := &entity.Charge{}
 	err := r.db.QueryRow(ctx, `
-		SELECT organization_id, id, contract_id, invoice_id, charge_type, amount, status, charge_date, notes, deleted_at, created_at, updated_at
+		SELECT organization_id, id, contract_id, COALESCE(invoice_id::text, ''), charge_type, amount, status, charge_date, notes, deleted_at, created_at, updated_at
 		FROM   charges
 		WHERE  id = $1 AND organization_id = $2 AND deleted_at IS NULL`,
 		id, orgID,
@@ -59,7 +59,7 @@ func (r *ChargeRepositoryImpl) FindByID(ctx context.Context, id, orgID string) (
 
 func (r *ChargeRepositoryImpl) FindAll(ctx context.Context, limit, offset int, search, orgID string) ([]*entity.Charge, error) {
 	query := `
-		SELECT organization_id, id, contract_id, invoice_id, charge_type, amount, status, charge_date, notes, deleted_at, created_at, updated_at
+		SELECT organization_id, id, contract_id, COALESCE(invoice_id::text, ''), charge_type, amount, status, charge_date, notes, deleted_at, created_at, updated_at
 		FROM   charges
 		WHERE  deleted_at IS NULL AND organization_id = $1`
 	args := []interface{}{orgID}

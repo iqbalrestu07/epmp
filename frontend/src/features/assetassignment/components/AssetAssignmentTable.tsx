@@ -7,26 +7,11 @@ import {
   createColumnHelper,
 } from "@tanstack/react-table";
 import type { AssetAssignment } from "../types";
+import { useAssets } from "../../asset/hooks";
+import { useRooms } from "../../room/hooks";
 
 const columnHelper = createColumnHelper<AssetAssignment>();
 
-const columns = [  columnHelper.accessor("id", {
-    header: "Id",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("asset_id", {
-    header: "AssetId",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("room_id", {
-    header: "RoomId",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("assigned_date", {
-    header: "AssignedDate",
-    cell: (info) => info.getValue(),
-  }),
-];
 
 interface AssetAssignmentTableProps {
   data: AssetAssignment[];
@@ -34,6 +19,40 @@ interface AssetAssignmentTableProps {
 }
 
 export function AssetAssignmentTable({ data, onRowClick }: AssetAssignmentTableProps) {
+  const { data: assetsData } = useAssets({ per_page: 100 });
+  const { data: roomsData } = useRooms({ per_page: 100 });
+  const assetsMap = new Map(
+    (Array.isArray(assetsData?.data) ? assetsData.data : Array.isArray(assetsData) ? assetsData : [])
+      .map((item: any) => [item.id, item.name])
+  );
+  const roomsMap = new Map(
+    (Array.isArray(roomsData?.data) ? roomsData.data : Array.isArray(roomsData) ? roomsData : [])
+      .map((item: any) => [item.id, item.name])
+  );
+
+  const columns = [
+    columnHelper.accessor("asset_id", {
+      header: "Asset",
+      cell: (info) => {
+        const id = info.getValue() as string;
+        if (!id) return <span className="text-slate-400">—</span>;
+        return assetsMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+      },
+    }),
+    columnHelper.accessor("room_id", {
+      header: "Room",
+      cell: (info) => {
+        const id = info.getValue() as string;
+        if (!id) return <span className="text-slate-400">—</span>;
+        return roomsMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+      },
+    }),
+    columnHelper.accessor("assigned_date", {
+      header: "AssignedDate",
+      cell: (info) => info.getValue(),
+    }),
+  ];
+
   const table = useReactTable({
     data: data || [],
     columns,

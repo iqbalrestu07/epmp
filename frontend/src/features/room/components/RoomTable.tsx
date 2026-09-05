@@ -7,19 +7,27 @@ import {
 import { DoorOpen, Eye, Pencil, Trash2, Users, DollarSign } from "lucide-react";
 import type { Room } from "../types";
 import type { Floor } from "../../floor/types";
+import type { Building } from "../../building/types";
+import type { Property } from "../../property/types";
 
 const columnHelper = createColumnHelper<Room>();
 
 interface RoomTableProps {
   data: Room[];
   floors?: Floor[];
+  buildings?: Building[];
+  properties?: Property[];
   onRowClick?: (row: Room) => void;
   onEdit?: (row: Room) => void;
   onDelete?: (row: Room) => void;
 }
 
-export function RoomTable({ data, floors = [], onRowClick, onEdit, onDelete }: RoomTableProps) {
+export function RoomTable({ data, floors = [], buildings = [], properties = [], onRowClick, onEdit, onDelete }: RoomTableProps) {
   const floorNameById = new Map(floors.map((f) => [f.id, f.name]));
+  const floorBuildingById = new Map(floors.map((f) => [f.id, f.building_id]));
+  const buildingNameById = new Map(buildings.map((b) => [b.id, b.name]));
+  const propertyNameById = new Map(properties.map((p) => [p.id, p.name]));
+
   const columns = [
     columnHelper.accessor("name", {
       header: "Name",
@@ -31,6 +39,34 @@ export function RoomTable({ data, floors = [], onRowClick, onEdit, onDelete }: R
           <span className="font-medium">{info.getValue()}</span>
         </div>
       ),
+    }),
+    columnHelper.accessor("property_id", {
+      header: "Property",
+      cell: (info) => {
+        const id = info.getValue() as string;
+        if (!id) return <span className="text-slate-400">—</span>;
+        return <span className="text-sm text-slate-600">{propertyNameById.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>}</span>;
+      },
+    }),
+    columnHelper.accessor("floor_id", {
+      id: "building",
+      header: "Building",
+      cell: (info) => {
+        const floorId = info.getValue() as string;
+        if (!floorId) return <span className="text-slate-400">—</span>;
+        const buildingId = floorBuildingById.get(floorId);
+        if (!buildingId) return <span className="text-slate-400">—</span>;
+        return <span className="text-sm text-slate-600">{buildingNameById.get(buildingId) || <span className="text-slate-400 font-mono text-xs">#{buildingId.slice(0, 8)}</span>}</span>;
+      },
+    }),
+    columnHelper.accessor("floor_id", {
+      id: "floor",
+      header: "Floor",
+      cell: (info) => {
+        const id = info.getValue() as string;
+        if (!id) return <span className="text-slate-400">—</span>;
+        return <span className="text-sm text-slate-600">{floorNameById.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>}</span>;
+      },
     }),
     columnHelper.accessor("capacity", {
       header: "Capacity",
@@ -47,14 +83,6 @@ export function RoomTable({ data, floors = [], onRowClick, onEdit, onDelete }: R
         <span className="inline-flex items-center gap-1 text-sm font-medium">
           <DollarSign size={14} className="text-slate-400" />
           {info.getValue().toLocaleString()}
-        </span>
-      ),
-    }),
-    columnHelper.accessor("floor_id", {
-      header: "Floor",
-      cell: (info) => (
-        <span className="text-sm text-slate-600">
-          {floorNameById.get(info.getValue()) ?? "—"}
         </span>
       ),
     }),
@@ -108,14 +136,17 @@ export function RoomTable({ data, floors = [], onRowClick, onEdit, onDelete }: R
   });
 
   return (
-    <div className="rounded-xl border border-slate-200 overflow-hidden bg-white">
+    <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm">
       <table className="w-full text-sm text-left">
-        <thead className="border-b border-slate-200 bg-slate-50/75">
+        <thead className="border-b border-slate-200 bg-slate-50/75 text-slate-600 font-semibold">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <th key={header.id} className="px-5 py-3.5">
-                  {flexRender(header.column.columnDef.header, header.getContext())}
+                  {flexRender(
+                    header.column.columnDef.header,
+                    header.getContext()
+                  )}
                 </th>
               ))}
             </tr>

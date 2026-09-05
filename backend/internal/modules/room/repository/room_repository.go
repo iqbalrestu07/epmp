@@ -17,11 +17,13 @@ type RoomRepository interface {
 
 	// FindAll retrieves a paginated list of Room entities.
 	// If orgID is non-empty, results are filtered to that organization.
-	FindAll(ctx context.Context, limit, offset int, search, floorId, orgID string) ([]*entity.Room, error)
+	// propertyId and buildingId are optional cascading filters.
+	FindAll(ctx context.Context, limit, offset int, search, floorId, propertyId, buildingId, orgID string) ([]*entity.Room, error)
 
 	// Count returns the total number of non-deleted rooms.
 	// If orgID is non-empty, count is filtered to that organization.
-	Count(ctx context.Context, search, floorId, orgID string) (int64, error)
+	// propertyId and buildingId are optional cascading filters.
+	Count(ctx context.Context, search, floorId, propertyId, buildingId, orgID string) (int64, error)
 
 	// Delete removes a Room by its primary key.
 	Delete(ctx context.Context, id string) error

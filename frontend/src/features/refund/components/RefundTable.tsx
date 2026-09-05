@@ -7,38 +7,11 @@ import {
   createColumnHelper,
 } from "@tanstack/react-table";
 import type { Refund } from "../types";
+import { usePayments } from "../../payment/hooks";
+import { useTenants } from "../../tenant/hooks";
 
 const columnHelper = createColumnHelper<Refund>();
 
-const columns = [  columnHelper.accessor("id", {
-    header: "Id",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("payment_id", {
-    header: "PaymentId",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("tenant_id", {
-    header: "TenantId",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("amount", {
-    header: "Amount",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("status", {
-    header: "Status",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("refund_date", {
-    header: "RefundDate",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("reason", {
-    header: "Reason",
-    cell: (info) => info.getValue(),
-  }),
-];
 
 interface RefundTableProps {
   data: Refund[];
@@ -46,6 +19,52 @@ interface RefundTableProps {
 }
 
 export function RefundTable({ data, onRowClick }: RefundTableProps) {
+  const { data: paymentsData } = usePayments({ per_page: 100 });
+  const { data: tenantsData } = useTenants({ per_page: 100 });
+  const paymentsMap = new Map(
+    (Array.isArray(paymentsData?.data) ? paymentsData.data : Array.isArray(paymentsData) ? paymentsData : [])
+      .map((item: any) => [item.id, `#` + item.id.slice(0, 8)])
+  );
+  const tenantsMap = new Map(
+    (Array.isArray(tenantsData?.data) ? tenantsData.data : Array.isArray(tenantsData) ? tenantsData : [])
+      .map((item: any) => [item.id, item.full_name])
+  );
+
+  const columns = [
+    columnHelper.accessor("payment_id", {
+      header: "Payment",
+      cell: (info) => {
+        const id = info.getValue() as string;
+        if (!id) return <span className="text-slate-400">—</span>;
+        return paymentsMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+      },
+    }),
+    columnHelper.accessor("tenant_id", {
+      header: "Tenant",
+      cell: (info) => {
+        const id = info.getValue() as string;
+        if (!id) return <span className="text-slate-400">—</span>;
+        return tenantsMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+      },
+    }),
+    columnHelper.accessor("amount", {
+      header: "Amount",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("status", {
+      header: "Status",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("refund_date", {
+      header: "RefundDate",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("reason", {
+      header: "Reason",
+      cell: (info) => info.getValue(),
+    }),
+  ];
+
   const table = useReactTable({
     data: data || [],
     columns,

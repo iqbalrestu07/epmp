@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AdjustmentTable } from "../components/AdjustmentTable";
 import { useAdjustments, useDeleteAdjustment } from "../hooks";
+import { Plus } from "lucide-react";
 import type { Adjustment } from "../types";
 
 export function AdjustmentListPage() {

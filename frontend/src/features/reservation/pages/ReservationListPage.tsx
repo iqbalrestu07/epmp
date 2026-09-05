@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ReservationTable } from "../components/ReservationTable";
 import { useReservations, useDeleteReservation } from "../hooks";
+import { Plus } from "lucide-react";
 import type { Reservation } from "../types";
 
 export function ReservationListPage() {

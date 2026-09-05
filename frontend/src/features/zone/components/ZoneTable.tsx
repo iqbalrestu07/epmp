@@ -7,26 +7,10 @@ import {
   createColumnHelper,
 } from "@tanstack/react-table";
 import type { Zone } from "../types";
+import { useBuildings } from "../../building/hooks";
 
 const columnHelper = createColumnHelper<Zone>();
 
-const columns = [  columnHelper.accessor("id", {
-    header: "Id",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("building_id", {
-    header: "BuildingId",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("floor", {
-    header: "Floor",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("name", {
-    header: "Name",
-    cell: (info) => info.getValue(),
-  }),
-];
 
 interface ZoneTableProps {
   data: Zone[];
@@ -34,6 +18,31 @@ interface ZoneTableProps {
 }
 
 export function ZoneTable({ data, onRowClick }: ZoneTableProps) {
+  const { data: buildingsData } = useBuildings({ per_page: 100 });
+  const buildingsMap = new Map(
+    (Array.isArray(buildingsData?.data) ? buildingsData.data : Array.isArray(buildingsData) ? buildingsData : [])
+      .map((item: any) => [item.id, item.name])
+  );
+
+  const columns = [
+    columnHelper.accessor("building_id", {
+      header: "Building",
+      cell: (info) => {
+        const id = info.getValue() as string;
+        if (!id) return <span className="text-slate-400">—</span>;
+        return buildingsMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+      },
+    }),
+    columnHelper.accessor("floor", {
+      header: "Floor",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("name", {
+      header: "Name",
+      cell: (info) => info.getValue(),
+    }),
+  ];
+
   const table = useReactTable({
     data: data || [],
     columns,

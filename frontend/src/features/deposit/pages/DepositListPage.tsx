@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DepositTable } from "../components/DepositTable";
 import { useDeposits, useDeleteDeposit } from "../hooks";
+import { Plus } from "lucide-react";
 import type { Deposit } from "../types";
 
 export function DepositListPage() {

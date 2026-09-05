@@ -1,21 +1,22 @@
 package uid
 
 import (
-	"crypto/rand"
-	"time"
-
-	"github.com/oklog/ulid/v2"
+	"github.com/google/uuid"
 )
 
-// New generates a new ULID as an uppercase string (26 chars).
-// ULIDs are lexicographically sortable and time-ordered.
-// Stored in PostgreSQL as TEXT.
+// New generates a new time-ordered UUIDv7 string (36 chars with hyphens).
+// UUIDv7 is compliant with RFC 9562, combines 48-bit UNIX timestamp (ordered)
+// and cryptographically random data, stored in PostgreSQL as native UUID.
 func New() string {
-	return ulid.MustNew(ulid.Timestamp(time.Now()), rand.Reader).String()
+	id, err := uuid.NewV7()
+	if err != nil {
+		return uuid.New().String()
+	}
+	return id.String()
 }
 
-// IsValid checks whether a string is a valid ULID.
+// IsValid checks whether a string is a valid UUID.
 func IsValid(s string) bool {
-	_, err := ulid.ParseStrict(s)
+	_, err := uuid.Parse(s)
 	return err == nil
 }

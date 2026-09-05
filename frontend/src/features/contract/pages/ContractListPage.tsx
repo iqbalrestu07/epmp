@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ContractTable } from "../components/ContractTable";
 import { useContracts, useDeleteContract } from "../hooks";
+import { Plus } from "lucide-react";
 import type { Contract } from "../types";
 
 export function ContractListPage() {

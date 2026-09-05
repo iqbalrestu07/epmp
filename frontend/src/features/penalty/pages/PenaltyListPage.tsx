@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PenaltyTable } from "../components/PenaltyTable";
 import { usePenaltys, useDeletePenalty } from "../hooks";
+import { Plus } from "lucide-react";
 import type { Penalty } from "../types";
 
 export function PenaltyListPage() {

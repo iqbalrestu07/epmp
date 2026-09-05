@@ -7,26 +7,10 @@ import {
   createColumnHelper,
 } from "@tanstack/react-table";
 import type { TenantDocument } from "../types";
+import { useTenants } from "../../tenant/hooks";
 
 const columnHelper = createColumnHelper<TenantDocument>();
 
-const columns = [  columnHelper.accessor("id", {
-    header: "Id",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("tenant_id", {
-    header: "TenantId",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("document_type", {
-    header: "DocumentType",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("file_url", {
-    header: "FileUrl",
-    cell: (info) => info.getValue(),
-  }),
-];
 
 interface TenantDocumentTableProps {
   data: TenantDocument[];
@@ -34,6 +18,31 @@ interface TenantDocumentTableProps {
 }
 
 export function TenantDocumentTable({ data, onRowClick }: TenantDocumentTableProps) {
+  const { data: tenantsData } = useTenants({ per_page: 100 });
+  const tenantsMap = new Map(
+    (Array.isArray(tenantsData?.data) ? tenantsData.data : Array.isArray(tenantsData) ? tenantsData : [])
+      .map((item: any) => [item.id, item.full_name])
+  );
+
+  const columns = [
+    columnHelper.accessor("tenant_id", {
+      header: "Tenant",
+      cell: (info) => {
+        const id = info.getValue() as string;
+        if (!id) return <span className="text-slate-400">—</span>;
+        return tenantsMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+      },
+    }),
+    columnHelper.accessor("document_type", {
+      header: "DocumentType",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("file_url", {
+      header: "FileUrl",
+      cell: (info) => info.getValue(),
+    }),
+  ];
+
   const table = useReactTable({
     data: data || [],
     columns,

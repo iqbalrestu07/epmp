@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RefundTable } from "../components/RefundTable";
 import { useRefunds, useDeleteRefund } from "../hooks";
+import { Plus } from "lucide-react";
 import type { Refund } from "../types";
 
 export function RefundListPage() {

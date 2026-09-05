@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AssetAssignmentTable } from "../components/AssetAssignmentTable";
 import { useAssetAssignments, useDeleteAssetAssignment } from "../hooks";
+import { Plus } from "lucide-react";
 import type { AssetAssignment } from "../types";
 
 export function AssetAssignmentListPage() {

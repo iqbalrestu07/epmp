@@ -23,12 +23,17 @@ func NewOccupancyRepositoryImpl(db *pgxpool.Pool) *OccupancyRepositoryImpl {
 var _ OccupancyRepository = (*OccupancyRepositoryImpl)(nil)
 
 func (r *OccupancyRepositoryImpl) Save(ctx context.Context, e *entity.Occupancy) error {
+	var checkOutTime interface{} = e.CheckOutTime
+	if e.CheckOutTime.IsZero() {
+		checkOutTime = nil
+	}
+
 	if e.Id == "" {
 		err := r.db.QueryRow(ctx, `
 			INSERT INTO occupancies (organization_id, contract_id, room_id, tenant_id, status, check_in_time, check_out_time, notes)
 			VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 			RETURNING id, created_at, updated_at`,
-			e.OrganizationId, e.ContractId, e.RoomId, e.TenantId, e.Status, e.CheckInTime, e.CheckOutTime, e.Notes,
+			e.OrganizationId, e.ContractId, e.RoomId, e.TenantId, e.Status, e.CheckInTime, checkOutTime, e.Notes,
 		).Scan(&e.Id, &e.CreatedAt, &e.UpdatedAt)
 		return err
 	}
@@ -37,7 +42,7 @@ func (r *OccupancyRepositoryImpl) Save(ctx context.Context, e *entity.Occupancy)
 		SET    contract_id=$1, room_id=$2, tenant_id=$3, status=$4, check_in_time=$5, check_out_time=$6, notes=$7
 		WHERE  id=$8 AND organization_id=$9 AND deleted_at IS NULL
 		RETURNING updated_at`,
-		e.ContractId, e.RoomId, e.TenantId, e.Status, e.CheckInTime, e.CheckOutTime, e.Notes, e.Id, e.OrganizationId,
+		e.ContractId, e.RoomId, e.TenantId, e.Status, e.CheckInTime, checkOutTime, e.Notes, e.Id, e.OrganizationId,
 	).Scan(&e.UpdatedAt)
 	return err
 }
@@ -45,7 +50,7 @@ func (r *OccupancyRepositoryImpl) Save(ctx context.Context, e *entity.Occupancy)
 func (r *OccupancyRepositoryImpl) FindByID(ctx context.Context, id, orgID string) (*entity.Occupancy, error) {
 	e := &entity.Occupancy{}
 	err := r.db.QueryRow(ctx, `
-		SELECT organization_id, id, contract_id, room_id, tenant_id, status, check_in_time, check_out_time, notes, deleted_at, created_at, updated_at
+		SELECT organization_id, id, contract_id, room_id, tenant_id, status, check_in_time, COALESCE(check_out_time, '0001-01-01 00:00:00+00'::timestamptz), notes, deleted_at, created_at, updated_at
 		FROM   occupancies
 		WHERE  id = $1 AND organization_id = $2 AND deleted_at IS NULL`,
 		id, orgID,
@@ -59,7 +64,7 @@ func (r *OccupancyRepositoryImpl) FindByID(ctx context.Context, id, orgID string
 
 func (r *OccupancyRepositoryImpl) FindAll(ctx context.Context, limit, offset int, search, orgID string) ([]*entity.Occupancy, error) {
 	query := `
-		SELECT organization_id, id, contract_id, room_id, tenant_id, status, check_in_time, check_out_time, notes, deleted_at, created_at, updated_at
+		SELECT organization_id, id, contract_id, room_id, tenant_id, status, check_in_time, COALESCE(check_out_time, '0001-01-01 00:00:00+00'::timestamptz), notes, deleted_at, created_at, updated_at
 		FROM   occupancies
 		WHERE  deleted_at IS NULL AND organization_id = $1`
 	args := []interface{}{orgID}

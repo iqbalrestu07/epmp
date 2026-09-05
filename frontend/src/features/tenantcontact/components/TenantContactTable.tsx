@@ -7,30 +7,10 @@ import {
   createColumnHelper,
 } from "@tanstack/react-table";
 import type { TenantContact } from "../types";
+import { useTenants } from "../../tenant/hooks";
 
 const columnHelper = createColumnHelper<TenantContact>();
 
-const columns = [  columnHelper.accessor("id", {
-    header: "Id",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("tenant_id", {
-    header: "TenantId",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("contact_type", {
-    header: "ContactType",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("contact_value", {
-    header: "ContactValue",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("is_primary", {
-    header: "IsPrimary",
-    cell: (info) => info.getValue(),
-  }),
-];
 
 interface TenantContactTableProps {
   data: TenantContact[];
@@ -38,6 +18,35 @@ interface TenantContactTableProps {
 }
 
 export function TenantContactTable({ data, onRowClick }: TenantContactTableProps) {
+  const { data: tenantsData } = useTenants({ per_page: 100 });
+  const tenantsMap = new Map(
+    (Array.isArray(tenantsData?.data) ? tenantsData.data : Array.isArray(tenantsData) ? tenantsData : [])
+      .map((item: any) => [item.id, item.full_name])
+  );
+
+  const columns = [
+    columnHelper.accessor("tenant_id", {
+      header: "Tenant",
+      cell: (info) => {
+        const id = info.getValue() as string;
+        if (!id) return <span className="text-slate-400">—</span>;
+        return tenantsMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+      },
+    }),
+    columnHelper.accessor("contact_type", {
+      header: "ContactType",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("contact_value", {
+      header: "ContactValue",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("is_primary", {
+      header: "IsPrimary",
+      cell: (info) => info.getValue(),
+    }),
+  ];
+
   const table = useReactTable({
     data: data || [],
     columns,

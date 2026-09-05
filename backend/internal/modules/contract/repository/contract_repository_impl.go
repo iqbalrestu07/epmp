@@ -26,7 +26,7 @@ func (r *ContractRepositoryImpl) Save(ctx context.Context, e *entity.Contract) e
 	if e.Id == "" {
 		err := r.db.QueryRow(ctx, `
 			INSERT INTO contracts (organization_id, reservation_id, tenant_id, property_id, room_id, status, start_date, end_date, monthly_rent, deposit_amount, terms)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+			VALUES ($1, NULLIF($2, '')::uuid, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 			RETURNING id, created_at, updated_at`,
 			e.OrganizationId, e.ReservationId, e.TenantId, e.PropertyId, e.RoomId, e.Status, e.StartDate, e.EndDate, e.MonthlyRent, e.DepositAmount, e.Terms,
 		).Scan(&e.Id, &e.CreatedAt, &e.UpdatedAt)
@@ -34,7 +34,7 @@ func (r *ContractRepositoryImpl) Save(ctx context.Context, e *entity.Contract) e
 	}
 	err := r.db.QueryRow(ctx, `
 		UPDATE contracts
-		SET    reservation_id=$1, tenant_id=$2, property_id=$3, room_id=$4, status=$5, start_date=$6, end_date=$7, monthly_rent=$8, deposit_amount=$9, terms=$10
+		SET    reservation_id=NULLIF($1, '')::uuid, tenant_id=$2, property_id=$3, room_id=$4, status=$5, start_date=$6, end_date=$7, monthly_rent=$8, deposit_amount=$9, terms=$10
 		WHERE  id=$11 AND organization_id=$12 AND deleted_at IS NULL
 		RETURNING updated_at`,
 		e.ReservationId, e.TenantId, e.PropertyId, e.RoomId, e.Status, e.StartDate, e.EndDate, e.MonthlyRent, e.DepositAmount, e.Terms, e.Id, e.OrganizationId,
@@ -45,7 +45,7 @@ func (r *ContractRepositoryImpl) Save(ctx context.Context, e *entity.Contract) e
 func (r *ContractRepositoryImpl) FindByID(ctx context.Context, id, orgID string) (*entity.Contract, error) {
 	e := &entity.Contract{}
 	err := r.db.QueryRow(ctx, `
-		SELECT organization_id, id, reservation_id, tenant_id, property_id, room_id, status, start_date, end_date, monthly_rent, deposit_amount, terms, deleted_at, created_at, updated_at
+		SELECT organization_id, id, COALESCE(reservation_id::text, ''), tenant_id, property_id, room_id, status, start_date, end_date, monthly_rent, deposit_amount, terms, deleted_at, created_at, updated_at
 		FROM   contracts
 		WHERE  id = $1 AND organization_id = $2 AND deleted_at IS NULL`,
 		id, orgID,
@@ -59,7 +59,7 @@ func (r *ContractRepositoryImpl) FindByID(ctx context.Context, id, orgID string)
 
 func (r *ContractRepositoryImpl) FindAll(ctx context.Context, limit, offset int, search, orgID string) ([]*entity.Contract, error) {
 	query := `
-		SELECT organization_id, id, reservation_id, tenant_id, property_id, room_id, status, start_date, end_date, monthly_rent, deposit_amount, terms, deleted_at, created_at, updated_at
+		SELECT organization_id, id, COALESCE(reservation_id::text, ''), tenant_id, property_id, room_id, status, start_date, end_date, monthly_rent, deposit_amount, terms, deleted_at, created_at, updated_at
 		FROM   contracts
 		WHERE  deleted_at IS NULL AND organization_id = $1`
 	args := []interface{}{orgID}

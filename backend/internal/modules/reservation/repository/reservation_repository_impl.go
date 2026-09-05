@@ -23,12 +23,17 @@ func NewReservationRepositoryImpl(db *pgxpool.Pool) *ReservationRepositoryImpl {
 var _ ReservationRepository = (*ReservationRepositoryImpl)(nil)
 
 func (r *ReservationRepositoryImpl) Save(ctx context.Context, e *entity.Reservation) error {
+	var checkOutDate interface{} = e.CheckOutDate
+	if e.CheckOutDate.IsZero() {
+		checkOutDate = nil
+	}
+
 	if e.Id == "" {
 		err := r.db.QueryRow(ctx, `
 			INSERT INTO reservations (organization_id, tenant_id, property_id, room_id, status, check_in_date, check_out_date, booking_fee, notes)
 			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 			RETURNING id, created_at, updated_at`,
-			e.OrganizationId, e.TenantId, e.PropertyId, e.RoomId, e.Status, e.CheckInDate, e.CheckOutDate, e.BookingFee, e.Notes,
+			e.OrganizationId, e.TenantId, e.PropertyId, e.RoomId, e.Status, e.CheckInDate, checkOutDate, e.BookingFee, e.Notes,
 		).Scan(&e.Id, &e.CreatedAt, &e.UpdatedAt)
 		return err
 	}
@@ -37,7 +42,7 @@ func (r *ReservationRepositoryImpl) Save(ctx context.Context, e *entity.Reservat
 		SET    tenant_id=$1, property_id=$2, room_id=$3, status=$4, check_in_date=$5, check_out_date=$6, booking_fee=$7, notes=$8
 		WHERE  id=$9 AND organization_id=$10 AND deleted_at IS NULL
 		RETURNING updated_at`,
-		e.TenantId, e.PropertyId, e.RoomId, e.Status, e.CheckInDate, e.CheckOutDate, e.BookingFee, e.Notes, e.Id, e.OrganizationId,
+		e.TenantId, e.PropertyId, e.RoomId, e.Status, e.CheckInDate, checkOutDate, e.BookingFee, e.Notes, e.Id, e.OrganizationId,
 	).Scan(&e.UpdatedAt)
 	return err
 }
@@ -45,7 +50,7 @@ func (r *ReservationRepositoryImpl) Save(ctx context.Context, e *entity.Reservat
 func (r *ReservationRepositoryImpl) FindByID(ctx context.Context, id, orgID string) (*entity.Reservation, error) {
 	e := &entity.Reservation{}
 	err := r.db.QueryRow(ctx, `
-		SELECT organization_id, id, tenant_id, property_id, room_id, status, check_in_date, check_out_date, booking_fee, notes, deleted_at, created_at, updated_at
+		SELECT organization_id, id, tenant_id, property_id, room_id, status, check_in_date, COALESCE(check_out_date, '0001-01-01 00:00:00+00'::timestamptz), booking_fee, notes, deleted_at, created_at, updated_at
 		FROM   reservations
 		WHERE  id = $1 AND organization_id = $2 AND deleted_at IS NULL`,
 		id, orgID,
@@ -59,7 +64,7 @@ func (r *ReservationRepositoryImpl) FindByID(ctx context.Context, id, orgID stri
 
 func (r *ReservationRepositoryImpl) FindAll(ctx context.Context, limit, offset int, search, orgID string) ([]*entity.Reservation, error) {
 	query := `
-		SELECT organization_id, id, tenant_id, property_id, room_id, status, check_in_date, check_out_date, booking_fee, notes, deleted_at, created_at, updated_at
+		SELECT organization_id, id, tenant_id, property_id, room_id, status, check_in_date, COALESCE(check_out_date, '0001-01-01 00:00:00+00'::timestamptz), booking_fee, notes, deleted_at, created_at, updated_at
 		FROM   reservations
 		WHERE  deleted_at IS NULL AND organization_id = $1`
 	args := []interface{}{orgID}

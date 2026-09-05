@@ -8,7 +8,6 @@ import (
 	"github.com/epmp/backend/internal/modules/asset/dto"
 	"github.com/epmp/backend/internal/modules/asset/entity"
 	"github.com/epmp/backend/internal/modules/asset/repository"
-	"github.com/oklog/ulid/v2"
 )
 
 // AssetService implements the application layer for Asset.
@@ -26,7 +25,6 @@ func (s *AssetService) Create(ctx context.Context, orgID string, req *dto.Create
 		return nil, fmt.Errorf("asset service: create: organization ID required")
 	}
 	e := entity.NewAsset()
-	e.Id = ulid.Make().String()
 	e.OrganizationId = orgID
 	e.PropertyId = req.PropertyId
 	e.Name = req.Name

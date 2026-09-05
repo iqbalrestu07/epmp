@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BedTable } from "../components/BedTable";
 import { useBeds, useDeleteBed } from "../hooks";
+import { Plus } from "lucide-react";
 import type { Bed } from "../types";
 
 export function BedListPage() {

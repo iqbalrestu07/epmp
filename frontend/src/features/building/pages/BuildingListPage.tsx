@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BuildingTable } from "../components/BuildingTable";
@@ -11,10 +11,13 @@ import { Plus, Building2 } from "lucide-react";
 
 export function BuildingListPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const propertyIdFromUrl = searchParams.get("property_id") ?? "";
+
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
-  const [propertyId, setPropertyId] = useState("");
+  const [propertyId, setPropertyId] = useState(propertyIdFromUrl);
 
   const { data, isLoading } = useBuildings({
     page,

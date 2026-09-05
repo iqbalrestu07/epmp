@@ -46,4 +46,6 @@ export interface RoomQueryParams {
   per_page?: number;
   search?: string;
   floor_id?: string;
+  property_id?: string;
+  building_id?: string;
 }

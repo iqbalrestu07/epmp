@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { OccupancyTable } from "../components/OccupancyTable";
 import { useOccupancys, useDeleteOccupancy } from "../hooks";
+import { Plus } from "lucide-react";
 import type { Occupancy } from "../types";
 
 export function OccupancyListPage() {

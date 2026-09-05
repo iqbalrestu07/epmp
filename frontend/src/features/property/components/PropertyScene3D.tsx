@@ -19,6 +19,7 @@ export interface PropertyScene3DProps {
   rooms: Room[];
   selectedBuildingId: string | null;
   selectedFloorId: string | null;
+  selectedRoomId: string | null;
   onBuildingClick: (b: Building) => void;
   onFloorClick: (f: Floor) => void;
   onRoomClick: (r: Room) => void;
@@ -122,6 +123,7 @@ export function PropertyScene3D({
   rooms,
   selectedBuildingId,
   selectedFloorId,
+  selectedRoomId,
   onBuildingClick,
   onFloorClick,
   onRoomClick,
@@ -154,6 +156,7 @@ export function PropertyScene3D({
             floors={floors}
             rooms={rooms}
             selectedFloorId={selectedFloorId}
+            selectedRoomId={selectedRoomId}
             onFloorClick={onFloorClick}
             onRoomClick={onRoomClick}
           />

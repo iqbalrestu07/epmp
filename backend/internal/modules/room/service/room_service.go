@@ -47,7 +47,7 @@ func (s *RoomService) GetByID(ctx context.Context, id, orgID string) (*dto.RoomR
 	return s.toResponse(e), nil
 }
 
-func (s *RoomService) List(ctx context.Context, page, perPage int, search, floorId, orgID string) (*dto.RoomListResponse, error) {
+func (s *RoomService) List(ctx context.Context, page, perPage int, search, floorId, propertyId, buildingId, orgID string) (*dto.RoomListResponse, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -56,12 +56,12 @@ func (s *RoomService) List(ctx context.Context, page, perPage int, search, floor
 	}
 	offset := (page - 1) * perPage
 
-	items, err := s.repo.FindAll(ctx, perPage, offset, search, floorId, orgID)
+	items, err := s.repo.FindAll(ctx, perPage, offset, search, floorId, propertyId, buildingId, orgID)
 	if err != nil {
 		return nil, fmt.Errorf("room service: list: %w", err)
 	}
 
-	total, err := s.repo.Count(ctx, search, floorId, orgID)
+	total, err := s.repo.Count(ctx, search, floorId, propertyId, buildingId, orgID)
 	if err != nil {
 		return nil, fmt.Errorf("room service: list: count: %w", err)
 	}

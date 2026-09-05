@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { WorkOrderTable } from "../components/WorkOrderTable";
 import { useWorkOrders, useDeleteWorkOrder } from "../hooks";
+import { Plus } from "lucide-react";
 import type { WorkOrder } from "../types";
 
 export function WorkOrderListPage() {

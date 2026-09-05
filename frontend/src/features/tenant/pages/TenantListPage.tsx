@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TenantTable } from "../components/TenantTable";
 import { useTenants, useDeleteTenant } from "../hooks";
+import { Plus } from "lucide-react";
 import type { Tenant } from "../types";
 
 export function TenantListPage() {

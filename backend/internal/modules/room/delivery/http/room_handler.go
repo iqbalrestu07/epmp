@@ -70,9 +70,11 @@ func (h *RoomHandler) List(c echo.Context) error {
 	}
 	search := c.QueryParam("search")
 	floorId := c.QueryParam("floor_id")
+	propertyId := c.QueryParam("property_id")
+	buildingId := c.QueryParam("building_id")
 	orgID := mw.GetOrgID(c)
 
-	result, err := h.svc.List(c.Request().Context(), page, perPage, search, floorId, orgID)
+	result, err := h.svc.List(c.Request().Context(), page, perPage, search, floorId, propertyId, buildingId, orgID)
 	if err != nil {
 		return response.InternalError(c, err.Error())
 	}

@@ -14,6 +14,8 @@ export async function fetchRooms(params?: RoomQueryParams): Promise<RoomListResp
   if (params?.per_page) query.set("per_page", String(params.per_page));
   if (params?.search) query.set("search", params.search);
   if (params?.floor_id) query.set("floor_id", params.floor_id);
+  if (params?.property_id) query.set("property_id", params.property_id);
+  if (params?.building_id) query.set("building_id", params.building_id);
   const qs = query.toString();
   const res = await api.get<{ success: boolean; data: RoomListResponse }>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
   return res.data;

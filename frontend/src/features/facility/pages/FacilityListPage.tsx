@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FacilityTable } from "../components/FacilityTable";
 import { useFacilitys, useDeleteFacility } from "../hooks";
+import { Plus } from "lucide-react";
 import type { Facility } from "../types";
 
 export function FacilityListPage() {

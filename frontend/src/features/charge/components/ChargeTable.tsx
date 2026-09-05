@@ -7,42 +7,11 @@ import {
   createColumnHelper,
 } from "@tanstack/react-table";
 import type { Charge } from "../types";
+import { useContracts } from "../../contract/hooks";
+import { useInvoices } from "../../billing/hooks";
 
 const columnHelper = createColumnHelper<Charge>();
 
-const columns = [  columnHelper.accessor("id", {
-    header: "Id",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("contract_id", {
-    header: "ContractId",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("invoice_id", {
-    header: "InvoiceId",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("charge_type", {
-    header: "ChargeType",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("amount", {
-    header: "Amount",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("status", {
-    header: "Status",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("charge_date", {
-    header: "ChargeDate",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("notes", {
-    header: "Notes",
-    cell: (info) => info.getValue(),
-  }),
-];
 
 interface ChargeTableProps {
   data: Charge[];
@@ -50,6 +19,56 @@ interface ChargeTableProps {
 }
 
 export function ChargeTable({ data, onRowClick }: ChargeTableProps) {
+  const { data: contractsData } = useContracts({ per_page: 100 });
+  const { data: invoicesData } = useInvoices({ per_page: 100 });
+  const contractsMap = new Map(
+    (Array.isArray(contractsData?.data) ? contractsData.data : Array.isArray(contractsData) ? contractsData : [])
+      .map((item: any) => [item.id, `#` + item.id.slice(0, 8)])
+  );
+  const invoicesMap = new Map(
+    (Array.isArray(invoicesData?.data) ? invoicesData.data : Array.isArray(invoicesData) ? invoicesData : [])
+      .map((item: any) => [item.id, `#` + item.id.slice(0, 8)])
+  );
+
+  const columns = [
+    columnHelper.accessor("contract_id", {
+      header: "Contract",
+      cell: (info) => {
+        const id = info.getValue() as string;
+        if (!id) return <span className="text-slate-400">—</span>;
+        return contractsMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+      },
+    }),
+    columnHelper.accessor("invoice_id", {
+      header: "Invoice",
+      cell: (info) => {
+        const id = info.getValue() as string;
+        if (!id) return <span className="text-slate-400">—</span>;
+        return invoicesMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+      },
+    }),
+    columnHelper.accessor("charge_type", {
+      header: "ChargeType",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("amount", {
+      header: "Amount",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("status", {
+      header: "Status",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("charge_date", {
+      header: "ChargeDate",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("notes", {
+      header: "Notes",
+      cell: (info) => info.getValue(),
+    }),
+  ];
+
   const table = useReactTable({
     data: data || [],
     columns,

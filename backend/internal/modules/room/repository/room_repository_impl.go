@@ -90,7 +90,7 @@ func (r *RoomRepositoryImpl) FindByID(ctx context.Context, id, orgID string) (*e
 	return e, nil
 }
 
-func (r *RoomRepositoryImpl) FindAll(ctx context.Context, limit, offset int, search, floorId, orgID string) ([]*entity.Room, error) {
+func (r *RoomRepositoryImpl) FindAll(ctx context.Context, limit, offset int, search, floorId, propertyId, buildingId, orgID string) ([]*entity.Room, error) {
 	query := `
 		SELECT organization_id, id, property_id, floor_id, room_type_id, name, capacity, price, is_available,
 		       created_at, updated_at, deleted_at
@@ -107,6 +107,16 @@ func (r *RoomRepositoryImpl) FindAll(ctx context.Context, limit, offset int, sea
 	if floorId != "" {
 		query += fmt.Sprintf(` AND floor_id = $%d`, argIdx)
 		args = append(args, floorId)
+		argIdx++
+	}
+	if propertyId != "" {
+		query += fmt.Sprintf(` AND property_id = $%d`, argIdx)
+		args = append(args, propertyId)
+		argIdx++
+	}
+	if buildingId != "" {
+		query += fmt.Sprintf(` AND floor_id IN (SELECT id FROM floors WHERE building_id = $%d)`, argIdx)
+		args = append(args, buildingId)
 		argIdx++
 	}
 	if orgID != "" {
@@ -151,7 +161,7 @@ func (r *RoomRepositoryImpl) Delete(ctx context.Context, id string) error {
 }
 
 // Count returns the total number of non-deleted rooms.
-func (r *RoomRepositoryImpl) Count(ctx context.Context, search, floorId, orgID string) (int64, error) {
+func (r *RoomRepositoryImpl) Count(ctx context.Context, search, floorId, propertyId, buildingId, orgID string) (int64, error) {
 	query := `SELECT COUNT(*) FROM rooms WHERE deleted_at IS NULL`
 	args := []interface{}{}
 	argIdx := 1
@@ -164,6 +174,16 @@ func (r *RoomRepositoryImpl) Count(ctx context.Context, search, floorId, orgID s
 	if floorId != "" {
 		query += fmt.Sprintf(` AND floor_id = $%d`, argIdx)
 		args = append(args, floorId)
+		argIdx++
+	}
+	if propertyId != "" {
+		query += fmt.Sprintf(` AND property_id = $%d`, argIdx)
+		args = append(args, propertyId)
+		argIdx++
+	}
+	if buildingId != "" {
+		query += fmt.Sprintf(` AND floor_id IN (SELECT id FROM floors WHERE building_id = $%d)`, argIdx)
+		args = append(args, buildingId)
 		argIdx++
 	}
 	if orgID != "" {

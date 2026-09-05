@@ -277,7 +277,18 @@ export default function PropertyInteractiveView() {
           {selectedFloor && (
             <>
               <span>/</span>
-              <span className="font-bold text-orange">{selectedFloor.name}</span>
+              <button
+                onClick={() => handleFloorClick(selectedFloor)}
+                className="hover:text-orange transition-colors font-medium text-slate-700"
+              >
+                {selectedFloor.name}
+              </button>
+            </>
+          )}
+          {selectedRoom && (
+            <>
+              <span>/</span>
+              <span className="font-bold text-orange">{selectedRoom.name}</span>
             </>
           )}
         </div>
@@ -402,6 +413,7 @@ export default function PropertyInteractiveView() {
               rooms={rooms}
               selectedBuildingId={selectedBuilding?.id ?? null}
               selectedFloorId={selectedFloor?.id ?? null}
+              selectedRoomId={selectedRoom?.id ?? null}
               onBuildingClick={handleBuildingClick}
               onFloorClick={handleFloorClick}
               onRoomClick={handleRoomClick}

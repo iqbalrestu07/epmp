@@ -7,34 +7,10 @@ import {
   createColumnHelper,
 } from "@tanstack/react-table";
 import type { Adjustment } from "../types";
+import { useInvoices } from "../../billing/hooks";
 
 const columnHelper = createColumnHelper<Adjustment>();
 
-const columns = [  columnHelper.accessor("id", {
-    header: "Id",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("invoice_id", {
-    header: "InvoiceId",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("adjustment_type", {
-    header: "AdjustmentType",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("amount", {
-    header: "Amount",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("adjustment_date", {
-    header: "AdjustmentDate",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("reason", {
-    header: "Reason",
-    cell: (info) => info.getValue(),
-  }),
-];
 
 interface AdjustmentTableProps {
   data: Adjustment[];
@@ -42,6 +18,39 @@ interface AdjustmentTableProps {
 }
 
 export function AdjustmentTable({ data, onRowClick }: AdjustmentTableProps) {
+  const { data: invoicesData } = useInvoices({ per_page: 100 });
+  const invoicesMap = new Map(
+    (Array.isArray(invoicesData?.data) ? invoicesData.data : Array.isArray(invoicesData) ? invoicesData : [])
+      .map((item: any) => [item.id, `#` + item.id.slice(0, 8)])
+  );
+
+  const columns = [
+    columnHelper.accessor("invoice_id", {
+      header: "Invoice",
+      cell: (info) => {
+        const id = info.getValue() as string;
+        if (!id) return <span className="text-slate-400">—</span>;
+        return invoicesMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+      },
+    }),
+    columnHelper.accessor("adjustment_type", {
+      header: "AdjustmentType",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("amount", {
+      header: "Amount",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("adjustment_date", {
+      header: "AdjustmentDate",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("reason", {
+      header: "Reason",
+      cell: (info) => info.getValue(),
+    }),
+  ];
+
   const table = useReactTable({
     data: data || [],
     columns,

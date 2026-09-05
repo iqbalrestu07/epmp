@@ -7,6 +7,7 @@ import (
 
 	"github.com/epmp/backend/internal/modules/billing/dto"
 	"github.com/epmp/backend/internal/modules/billing/service"
+	mw "github.com/epmp/backend/internal/pkg/middleware"
 	"github.com/epmp/backend/internal/pkg/response"
 
 	"github.com/labstack/echo/v4"
@@ -23,9 +24,13 @@ func NewInvoiceHandler(svc *service.InvoiceService) *InvoiceHandler {
 }
 
 func (h *InvoiceHandler) Create(c echo.Context) error {
+	orgID := mw.GetOrgID(c)
 	var req dto.CreateInvoiceRequest
 	if err := c.Bind(&req); err != nil {
 		return response.BadRequest(c, "invalid request body")
+	}
+	if req.OrganizationId == "" {
+		req.OrganizationId = orgID
 	}
 
 	result, err := h.svc.Create(c.Request().Context(), &req)

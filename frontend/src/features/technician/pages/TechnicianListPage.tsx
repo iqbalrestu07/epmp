@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TechnicianTable } from "../components/TechnicianTable";
 import { useTechnicians, useDeleteTechnician } from "../hooks";
+import { Plus } from "lucide-react";
 import type { Technician } from "../types";
 
 export function TechnicianListPage() {

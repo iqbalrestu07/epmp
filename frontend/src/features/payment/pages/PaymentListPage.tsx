@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PaymentTable } from "../components/PaymentTable";
 import { usePayments, useDeletePayment } from "../hooks";
+import { Plus } from "lucide-react";
 import type { Payment } from "../types";
 
 export function PaymentListPage() {

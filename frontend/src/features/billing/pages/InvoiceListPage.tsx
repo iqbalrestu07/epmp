@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { InvoiceTable } from "../components/InvoiceTable";
 import { useInvoices, useDeleteInvoice } from "../hooks";
+import { Plus } from "lucide-react";
 import type { Invoice } from "../types";
 
 export function InvoiceListPage() {

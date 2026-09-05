@@ -7,34 +7,11 @@ import {
   createColumnHelper,
 } from "@tanstack/react-table";
 import type { WorkOrder } from "../types";
+import { usePropertys } from "../../property/hooks";
+import { useRooms } from "../../room/hooks";
 
 const columnHelper = createColumnHelper<WorkOrder>();
 
-const columns = [  columnHelper.accessor("id", {
-    header: "Id",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("property_id", {
-    header: "PropertyId",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("room_id", {
-    header: "RoomId",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("description", {
-    header: "Description",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("status", {
-    header: "Status",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("priority", {
-    header: "Priority",
-    cell: (info) => info.getValue(),
-  }),
-];
 
 interface WorkOrderTableProps {
   data: WorkOrder[];
@@ -42,6 +19,48 @@ interface WorkOrderTableProps {
 }
 
 export function WorkOrderTable({ data, onRowClick }: WorkOrderTableProps) {
+  const { data: propertiesData } = usePropertys({ per_page: 100 });
+  const { data: roomsData } = useRooms({ per_page: 100 });
+  const propertiesMap = new Map(
+    (Array.isArray(propertiesData?.data) ? propertiesData.data : Array.isArray(propertiesData) ? propertiesData : [])
+      .map((item: any) => [item.id, item.name])
+  );
+  const roomsMap = new Map(
+    (Array.isArray(roomsData?.data) ? roomsData.data : Array.isArray(roomsData) ? roomsData : [])
+      .map((item: any) => [item.id, item.name])
+  );
+
+  const columns = [
+    columnHelper.accessor("property_id", {
+      header: "Property",
+      cell: (info) => {
+        const id = info.getValue() as string;
+        if (!id) return <span className="text-slate-400">—</span>;
+        return propertiesMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+      },
+    }),
+    columnHelper.accessor("room_id", {
+      header: "Room",
+      cell: (info) => {
+        const id = info.getValue() as string;
+        if (!id) return <span className="text-slate-400">—</span>;
+        return roomsMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+      },
+    }),
+    columnHelper.accessor("description", {
+      header: "Description",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("status", {
+      header: "Status",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("priority", {
+      header: "Priority",
+      cell: (info) => info.getValue(),
+    }),
+  ];
+
   const table = useReactTable({
     data: data || [],
     columns,

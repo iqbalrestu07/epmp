@@ -66,7 +66,7 @@ func (r *WorkOrderRepositoryImpl) FindAll(ctx context.Context, limit, offset int
 	argIdx := 2
 
 	if search != "" {
-		query += fmt.Sprintf(" AND (status ILIKE $%d OR priority ILIKE $%d)", argIdx)
+		query += fmt.Sprintf(" AND (status ILIKE $%d OR priority ILIKE $%d)", argIdx, argIdx)
 		args = append(args, "%" + search + "%")
 		argIdx++
 	}
@@ -96,7 +96,7 @@ func (r *WorkOrderRepositoryImpl) Count(ctx context.Context, search, orgID strin
 	args := []interface{}{orgID}
 
 	if search != "" {
-		query += fmt.Sprintf(" AND (status ILIKE $%d OR priority ILIKE $%d)", 2)
+		query += fmt.Sprintf(" AND (status ILIKE $%d OR priority ILIKE $%d)", 2, 2)
 		args = append(args, "%" + search + "%")
 	}
 

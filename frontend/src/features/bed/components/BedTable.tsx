@@ -7,26 +7,10 @@ import {
   createColumnHelper,
 } from "@tanstack/react-table";
 import type { Bed } from "../types";
+import { useRooms } from "../../room/hooks";
 
 const columnHelper = createColumnHelper<Bed>();
 
-const columns = [  columnHelper.accessor("id", {
-    header: "Id",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("room_id", {
-    header: "RoomId",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("name", {
-    header: "Name",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("status", {
-    header: "Status",
-    cell: (info) => info.getValue(),
-  }),
-];
 
 interface BedTableProps {
   data: Bed[];
@@ -34,6 +18,31 @@ interface BedTableProps {
 }
 
 export function BedTable({ data, onRowClick }: BedTableProps) {
+  const { data: roomsData } = useRooms({ per_page: 100 });
+  const roomsMap = new Map(
+    (Array.isArray(roomsData?.data) ? roomsData.data : Array.isArray(roomsData) ? roomsData : [])
+      .map((item: any) => [item.id, item.name])
+  );
+
+  const columns = [
+    columnHelper.accessor("room_id", {
+      header: "Room",
+      cell: (info) => {
+        const id = info.getValue() as string;
+        if (!id) return <span className="text-slate-400">—</span>;
+        return roomsMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+      },
+    }),
+    columnHelper.accessor("name", {
+      header: "Name",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("status", {
+      header: "Status",
+      cell: (info) => info.getValue(),
+    }),
+  ];
+
   const table = useReactTable({
     data: Array.isArray(data) ? data : [],
     columns,

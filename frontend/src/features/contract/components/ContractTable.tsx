@@ -7,54 +7,13 @@ import {
   createColumnHelper,
 } from "@tanstack/react-table";
 import type { Contract } from "../types";
+import { useReservations } from "../../reservation/hooks";
+import { useTenants } from "../../tenant/hooks";
+import { usePropertys } from "../../property/hooks";
+import { useRooms } from "../../room/hooks";
 
 const columnHelper = createColumnHelper<Contract>();
 
-const columns = [  columnHelper.accessor("id", {
-    header: "Id",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("reservation_id", {
-    header: "ReservationId",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("tenant_id", {
-    header: "TenantId",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("property_id", {
-    header: "PropertyId",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("room_id", {
-    header: "RoomId",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("status", {
-    header: "Status",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("start_date", {
-    header: "StartDate",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("end_date", {
-    header: "EndDate",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("monthly_rent", {
-    header: "MonthlyRent",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("deposit_amount", {
-    header: "DepositAmount",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("terms", {
-    header: "Terms",
-    cell: (info) => info.getValue(),
-  }),
-];
 
 interface ContractTableProps {
   data: Contract[];
@@ -62,6 +21,86 @@ interface ContractTableProps {
 }
 
 export function ContractTable({ data, onRowClick }: ContractTableProps) {
+  const { data: reservationsData } = useReservations({ per_page: 100 });
+  const { data: tenantsData } = useTenants({ per_page: 100 });
+  const { data: propertiesData } = usePropertys({ per_page: 100 });
+  const { data: roomsData } = useRooms({ per_page: 100 });
+  const reservationsMap = new Map(
+    (Array.isArray(reservationsData?.data) ? reservationsData.data : Array.isArray(reservationsData) ? reservationsData : [])
+      .map((item: any) => [item.id, `#` + item.id.slice(0, 8)])
+  );
+  const tenantsMap = new Map(
+    (Array.isArray(tenantsData?.data) ? tenantsData.data : Array.isArray(tenantsData) ? tenantsData : [])
+      .map((item: any) => [item.id, item.full_name])
+  );
+  const propertiesMap = new Map(
+    (Array.isArray(propertiesData?.data) ? propertiesData.data : Array.isArray(propertiesData) ? propertiesData : [])
+      .map((item: any) => [item.id, item.name])
+  );
+  const roomsMap = new Map(
+    (Array.isArray(roomsData?.data) ? roomsData.data : Array.isArray(roomsData) ? roomsData : [])
+      .map((item: any) => [item.id, item.name])
+  );
+
+  const columns = [
+    columnHelper.accessor("reservation_id", {
+      header: "Reservation",
+      cell: (info) => {
+        const id = info.getValue() as string;
+        if (!id) return <span className="text-slate-400">—</span>;
+        return reservationsMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+      },
+    }),
+    columnHelper.accessor("tenant_id", {
+      header: "Tenant",
+      cell: (info) => {
+        const id = info.getValue() as string;
+        if (!id) return <span className="text-slate-400">—</span>;
+        return tenantsMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+      },
+    }),
+    columnHelper.accessor("property_id", {
+      header: "Property",
+      cell: (info) => {
+        const id = info.getValue() as string;
+        if (!id) return <span className="text-slate-400">—</span>;
+        return propertiesMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+      },
+    }),
+    columnHelper.accessor("room_id", {
+      header: "Room",
+      cell: (info) => {
+        const id = info.getValue() as string;
+        if (!id) return <span className="text-slate-400">—</span>;
+        return roomsMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+      },
+    }),
+    columnHelper.accessor("status", {
+      header: "Status",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("start_date", {
+      header: "StartDate",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("end_date", {
+      header: "EndDate",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("monthly_rent", {
+      header: "MonthlyRent",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("deposit_amount", {
+      header: "DepositAmount",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("terms", {
+      header: "Terms",
+      cell: (info) => info.getValue(),
+    }),
+  ];
+
   const table = useReactTable({
     data: data || [],
     columns,

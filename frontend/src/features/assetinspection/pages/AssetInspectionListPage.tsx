@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AssetInspectionTable } from "../components/AssetInspectionTable";
 import { useAssetInspections, useDeleteAssetInspection } from "../hooks";
+import { Plus } from "lucide-react";
 import type { AssetInspection } from "../types";
 
 export function AssetInspectionListPage() {

@@ -7,42 +7,12 @@ import {
   createColumnHelper,
 } from "@tanstack/react-table";
 import type { Occupancy } from "../types";
+import { useContracts } from "../../contract/hooks";
+import { useRooms } from "../../room/hooks";
+import { useTenants } from "../../tenant/hooks";
 
 const columnHelper = createColumnHelper<Occupancy>();
 
-const columns = [  columnHelper.accessor("id", {
-    header: "Id",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("contract_id", {
-    header: "ContractId",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("room_id", {
-    header: "RoomId",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("tenant_id", {
-    header: "TenantId",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("status", {
-    header: "Status",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("check_in_time", {
-    header: "CheckInTime",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("check_out_time", {
-    header: "CheckOutTime",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("notes", {
-    header: "Notes",
-    cell: (info) => info.getValue(),
-  }),
-];
 
 interface OccupancyTableProps {
   data: Occupancy[];
@@ -50,6 +20,65 @@ interface OccupancyTableProps {
 }
 
 export function OccupancyTable({ data, onRowClick }: OccupancyTableProps) {
+  const { data: contractsData } = useContracts({ per_page: 100 });
+  const { data: roomsData } = useRooms({ per_page: 100 });
+  const { data: tenantsData } = useTenants({ per_page: 100 });
+  const contractsMap = new Map(
+    (Array.isArray(contractsData?.data) ? contractsData.data : Array.isArray(contractsData) ? contractsData : [])
+      .map((item: any) => [item.id, `#` + item.id.slice(0, 8)])
+  );
+  const roomsMap = new Map(
+    (Array.isArray(roomsData?.data) ? roomsData.data : Array.isArray(roomsData) ? roomsData : [])
+      .map((item: any) => [item.id, item.name])
+  );
+  const tenantsMap = new Map(
+    (Array.isArray(tenantsData?.data) ? tenantsData.data : Array.isArray(tenantsData) ? tenantsData : [])
+      .map((item: any) => [item.id, item.full_name])
+  );
+
+  const columns = [
+    columnHelper.accessor("contract_id", {
+      header: "Contract",
+      cell: (info) => {
+        const id = info.getValue() as string;
+        if (!id) return <span className="text-slate-400">—</span>;
+        return contractsMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+      },
+    }),
+    columnHelper.accessor("room_id", {
+      header: "Room",
+      cell: (info) => {
+        const id = info.getValue() as string;
+        if (!id) return <span className="text-slate-400">—</span>;
+        return roomsMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+      },
+    }),
+    columnHelper.accessor("tenant_id", {
+      header: "Tenant",
+      cell: (info) => {
+        const id = info.getValue() as string;
+        if (!id) return <span className="text-slate-400">—</span>;
+        return tenantsMap.get(id) || <span className="text-slate-400 font-mono text-xs">#{id.slice(0, 8)}</span>;
+      },
+    }),
+    columnHelper.accessor("status", {
+      header: "Status",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("check_in_time", {
+      header: "CheckInTime",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("check_out_time", {
+      header: "CheckOutTime",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("notes", {
+      header: "Notes",
+      cell: (info) => info.getValue(),
+    }),
+  ];
+
   const table = useReactTable({
     data: data || [],
     columns,

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChargeTable } from "../components/ChargeTable";
 import { useCharges, useDeleteCharge } from "../hooks";
+import { Plus } from "lucide-react";
 import type { Charge } from "../types";
 
 export function ChargeListPage() {
