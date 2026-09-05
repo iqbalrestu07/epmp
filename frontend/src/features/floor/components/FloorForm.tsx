@@ -35,7 +35,7 @@ export function FloorForm({
   });
 
   const { data: buildingsData } = useBuildings({ per_page: 100 });
-  const buildings = propBuildings || buildingsData?.data || [];
+  const buildings = propBuildings || (Array.isArray(buildingsData?.data) ? buildingsData.data : Array.isArray(buildingsData) ? buildingsData : []);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">

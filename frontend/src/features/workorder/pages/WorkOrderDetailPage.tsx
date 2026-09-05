@@ -13,7 +13,7 @@ export function WorkOrderDetailPage() {
   const handleDelete = () => {
     if (!confirm("Are you sure you want to delete this workOrder?")) return;
     deleteMutation.mutate(id!, {
-      onSuccess: () => navigate("/workorder"),
+      onSuccess: () => navigate("/dashboard/work-orders"),
     });
   };
 
@@ -25,10 +25,10 @@ export function WorkOrderDetailPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">WorkOrder Detail</h1>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => navigate("/workorder")}>
+          <Button variant="outline" onClick={() => navigate("/dashboard/work-orders")}>
             Back
           </Button>
-          <Button variant="outline" onClick={() => navigate(`/workorder/${id}/edit`)}>
+          <Button variant="outline" onClick={() => navigate(`/dashboard/work-orders/${id}/edit`)}>
             Edit
           </Button>
           <Button variant="destructive" onClick={handleDelete}>

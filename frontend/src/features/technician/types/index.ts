@@ -20,14 +20,12 @@ export interface TechnicianListResponse {
 }
 
 export interface CreateTechnicianRequest {
-  organization_id: string;
   name: string;
   phone: string;
   specialty: string;
 }
 
 export interface UpdateTechnicianRequest {
-  organization_id: string;
   name: string;
   phone: string;
   specialty: string;
@@ -36,9 +34,6 @@ export interface UpdateTechnicianRequest {
 export interface TechnicianQueryParams {
   page?: number;
   per_page?: number;
-  sort?: string;
-  order?: "asc" | "desc";
   search?: string;
-  organization_id?: string;
   name?: string;
 }

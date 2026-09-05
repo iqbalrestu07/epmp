@@ -24,7 +24,7 @@ export function ContractListPage() {
   const deleteMutation = useDeleteContract();
 
   const handleRowClick = (row: Contract) => {
-    navigate(`/contract/${row.id}`);
+    navigate(`/dashboard/contracts/${row.id}`);
   };
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ export function ContractListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Contracts</h1>
-        <Button onClick={() => navigate("/contract/new")}>
+        <Button onClick={() => navigate("/dashboard/contracts/new")}>
           New Contract
         </Button>
       </div>

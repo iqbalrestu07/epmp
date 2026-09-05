@@ -12,7 +12,7 @@ export function ChargeCreatePage() {
 
   const handleSubmit = (data: CreateChargeFormData) => {
     createMutation.mutate(data, {
-      onSuccess: () => navigate("/charge"),
+      onSuccess: () => navigate("/dashboard/charges"),
     });
   };
 

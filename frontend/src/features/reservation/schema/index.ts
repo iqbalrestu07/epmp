@@ -19,6 +19,7 @@ export const reservationSchema = z.object({
 
 export const createReservationSchema = reservationSchema.omit({
   id: true,
+  organization_id: true,
   created_at: true,
   updated_at: true,
 });

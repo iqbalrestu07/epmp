@@ -38,10 +38,9 @@ export function RoomForm({
   });
 
   const { data: propertiesData } = usePropertys({ per_page: 100 });
-  const properties = propProperties || propertiesData?.data || [];
-
+  const properties = propProperties || (Array.isArray(propertiesData?.data) ? propertiesData.data : Array.isArray(propertiesData) ? propertiesData : []);
   const { data: floorsData } = useFloors({ per_page: 100 });
-  const floors = propFloors || floorsData?.data || [];
+  const floors = propFloors || (Array.isArray(floorsData?.data) ? floorsData.data : Array.isArray(floorsData) ? floorsData : []);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">

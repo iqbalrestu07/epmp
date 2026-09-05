@@ -14,20 +14,22 @@ export async function fetchRefunds(params?: RefundQueryParams): Promise<RefundLi
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));
   if (params?.per_page) query.set("per_page", String(params.per_page));
-  if (params?.sort) query.set("sort", params.sort);
-  if (params?.order) query.set("order", params.order);
   if (params?.search) query.set("search", params.search);
   const qs = query.toString();
-  return api.get<RefundListResponse>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  const res = await api.get<{ success: boolean; data: RefundListResponse }>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  return res.data;
 }
 export async function fetchRefundById(id: string): Promise<Refund> {
-  return api.get<Refund>(`${BASE_PATH}/${id}`);
+  const res = await api.get<{ success: boolean; data: Refund }>(`${BASE_PATH}/${id}`);
+  return res.data;
 }
 export async function createRefund(data: CreateRefundRequest): Promise<Refund> {
-  return api.post<Refund>(BASE_PATH, data);
+  const res = await api.post<{ success: boolean; data: Refund }>(BASE_PATH, data);
+  return res.data;
 }
 export async function updateRefund(id: string, data: UpdateRefundRequest): Promise<Refund> {
-  return api.put<Refund>(`${BASE_PATH}/${id}`, data);
+  const res = await api.put<{ success: boolean; data: Refund }>(`${BASE_PATH}/${id}`, data);
+  return res.data;
 }
 export async function deleteRefund(id: string): Promise<void> {
   return api.delete<void>(`${BASE_PATH}/${id}`);

@@ -21,7 +21,6 @@ export interface TenantContactListResponse {
 }
 
 export interface CreateTenantContactRequest {
-  organization_id: string;
   tenant_id: string;
   contact_type: string;
   contact_value: string;
@@ -29,7 +28,6 @@ export interface CreateTenantContactRequest {
 }
 
 export interface UpdateTenantContactRequest {
-  organization_id: string;
   tenant_id: string;
   contact_type: string;
   contact_value: string;
@@ -39,10 +37,7 @@ export interface UpdateTenantContactRequest {
 export interface TenantContactQueryParams {
   page?: number;
   per_page?: number;
-  sort?: string;
-  order?: "asc" | "desc";
   search?: string;
-  organization_id?: string;
   tenant_id?: string;
   contact_value?: string;
 }

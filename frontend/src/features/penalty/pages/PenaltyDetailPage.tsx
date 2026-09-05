@@ -13,7 +13,7 @@ export function PenaltyDetailPage() {
   const handleDelete = () => {
     if (!confirm("Are you sure you want to delete this penalty?")) return;
     deleteMutation.mutate(id!, {
-      onSuccess: () => navigate("/penalty"),
+      onSuccess: () => navigate("/dashboard/penalties"),
     });
   };
 
@@ -25,10 +25,10 @@ export function PenaltyDetailPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Penalty Detail</h1>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => navigate("/penalty")}>
+          <Button variant="outline" onClick={() => navigate("/dashboard/penalties")}>
             Back
           </Button>
-          <Button variant="outline" onClick={() => navigate(`/penalty/${id}/edit`)}>
+          <Button variant="outline" onClick={() => navigate(`/dashboard/penalties/${id}/edit`)}>
             Edit
           </Button>
           <Button variant="destructive" onClick={handleDelete}>

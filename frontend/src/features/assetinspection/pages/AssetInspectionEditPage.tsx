@@ -15,7 +15,7 @@ export function AssetInspectionEditPage() {
   const handleSubmit = (formData: CreateAssetInspectionFormData) => {
     updateMutation.mutate(
       { id: id!, data: formData },
-      { onSuccess: () => navigate(`/assetinspection/${id}`) }
+      { onSuccess: () => navigate(`/dashboard/asset-inspections/${id}`) }
     );
   };
 

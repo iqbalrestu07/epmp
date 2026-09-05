@@ -13,7 +13,7 @@ export function AssetInspectionDetailPage() {
   const handleDelete = () => {
     if (!confirm("Are you sure you want to delete this assetInspection?")) return;
     deleteMutation.mutate(id!, {
-      onSuccess: () => navigate("/assetinspection"),
+      onSuccess: () => navigate("/dashboard/asset-inspections"),
     });
   };
 
@@ -25,10 +25,10 @@ export function AssetInspectionDetailPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">AssetInspection Detail</h1>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => navigate("/assetinspection")}>
+          <Button variant="outline" onClick={() => navigate("/dashboard/asset-inspections")}>
             Back
           </Button>
-          <Button variant="outline" onClick={() => navigate(`/assetinspection/${id}/edit`)}>
+          <Button variant="outline" onClick={() => navigate(`/dashboard/asset-inspections/${id}/edit`)}>
             Edit
           </Button>
           <Button variant="destructive" onClick={handleDelete}>

@@ -24,7 +24,7 @@ export function AssetAssignmentListPage() {
   const deleteMutation = useDeleteAssetAssignment();
 
   const handleRowClick = (row: AssetAssignment) => {
-    navigate(`/assetassignment/${row.id}`);
+    navigate(`/dashboard/asset-assignments/${row.id}`);
   };
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ export function AssetAssignmentListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">AssetAssignments</h1>
-        <Button onClick={() => navigate("/assetassignment/new")}>
+        <Button onClick={() => navigate("/dashboard/asset-assignments/new")}>
           New AssetAssignment
         </Button>
       </div>

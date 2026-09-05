@@ -23,7 +23,6 @@ export interface RefundListResponse {
 }
 
 export interface CreateRefundRequest {
-  organization_id: string;
   payment_id: string;
   tenant_id: string;
   amount: number;
@@ -33,7 +32,6 @@ export interface CreateRefundRequest {
 }
 
 export interface UpdateRefundRequest {
-  organization_id: string;
   payment_id: string;
   tenant_id: string;
   amount: number;
@@ -45,10 +43,7 @@ export interface UpdateRefundRequest {
 export interface RefundQueryParams {
   page?: number;
   per_page?: number;
-  sort?: string;
-  order?: "asc" | "desc";
   search?: string;
-  organization_id?: string;
   payment_id?: string;
   tenant_id?: string;
 }

@@ -24,7 +24,7 @@ export function PenaltyListPage() {
   const deleteMutation = useDeletePenalty();
 
   const handleRowClick = (row: Penalty) => {
-    navigate(`/penalty/${row.id}`);
+    navigate(`/dashboard/penalties/${row.id}`);
   };
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ export function PenaltyListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Penaltys</h1>
-        <Button onClick={() => navigate("/penalty/new")}>
+        <Button onClick={() => navigate("/dashboard/penalties/new")}>
           New Penalty
         </Button>
       </div>

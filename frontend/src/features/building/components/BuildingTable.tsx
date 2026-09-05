@@ -5,34 +5,38 @@ import {
   createColumnHelper,
 } from "@tanstack/react-table";
 import type { Building } from "../types";
+import type { Property } from "../../property/types";
 
 const columnHelper = createColumnHelper<Building>();
 
-const columns = [
-  columnHelper.accessor("name", {
-    header: "Name",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("property_id", {
-    header: "Property",
-    cell: (info) => <span className="text-gray-500 text-xs">{info.getValue().slice(0, 8)}…</span>,
-  }),
-  columnHelper.accessor("total_floors", {
-    header: "Floors",
-    cell: (info) => (
-      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
-        {info.getValue()} floors
-      </span>
-    ),
-  }),
-];
-
 interface BuildingTableProps {
   data: Building[];
+  properties?: Property[];
   onRowClick?: (row: Building) => void;
 }
 
-export function BuildingTable({ data, onRowClick }: BuildingTableProps) {
+export function BuildingTable({ data, properties = [], onRowClick }: BuildingTableProps) {
+  const propertyNameById = new Map(properties.map((p) => [p.id, p.name]));
+
+  const columns = [
+    columnHelper.accessor("name", {
+      header: "Name",
+      cell: (info) => info.getValue(),
+    }),
+    columnHelper.accessor("property_id", {
+      header: "Property",
+      cell: (info) => <span className="text-sm text-black/70">{propertyNameById.get(info.getValue()) ?? "—"}</span>,
+    }),
+    columnHelper.accessor("total_floors", {
+      header: "Floors",
+      cell: (info) => (
+        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+          {info.getValue()} floors
+        </span>
+      ),
+    }),
+  ];
+
   const table = useReactTable({
     data,
     columns,

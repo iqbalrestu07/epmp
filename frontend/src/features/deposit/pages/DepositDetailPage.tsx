@@ -13,7 +13,7 @@ export function DepositDetailPage() {
   const handleDelete = () => {
     if (!confirm("Are you sure you want to delete this deposit?")) return;
     deleteMutation.mutate(id!, {
-      onSuccess: () => navigate("/deposit"),
+      onSuccess: () => navigate("/dashboard/deposits"),
     });
   };
 
@@ -25,10 +25,10 @@ export function DepositDetailPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Deposit Detail</h1>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => navigate("/deposit")}>
+          <Button variant="outline" onClick={() => navigate("/dashboard/deposits")}>
             Back
           </Button>
-          <Button variant="outline" onClick={() => navigate(`/deposit/${id}/edit`)}>
+          <Button variant="outline" onClick={() => navigate(`/dashboard/deposits/${id}/edit`)}>
             Edit
           </Button>
           <Button variant="destructive" onClick={handleDelete}>

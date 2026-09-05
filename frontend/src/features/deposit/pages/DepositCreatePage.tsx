@@ -12,7 +12,7 @@ export function DepositCreatePage() {
 
   const handleSubmit = (data: CreateDepositFormData) => {
     createMutation.mutate(data, {
-      onSuccess: () => navigate("/deposit"),
+      onSuccess: () => navigate("/dashboard/deposits"),
     });
   };
 

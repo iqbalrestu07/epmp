@@ -16,6 +16,7 @@ export const workOrderSchema = z.object({
 
 export const createWorkOrderSchema = workOrderSchema.omit({
   id: true,
+  organization_id: true,
   created_at: true,
   updated_at: true,
 });

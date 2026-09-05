@@ -21,7 +21,6 @@ export interface AssetInspectionListResponse {
 }
 
 export interface CreateAssetInspectionRequest {
-  organization_id: string;
   asset_id: string;
   inspection_date: string;
   condition: string;
@@ -29,7 +28,6 @@ export interface CreateAssetInspectionRequest {
 }
 
 export interface UpdateAssetInspectionRequest {
-  organization_id: string;
   asset_id: string;
   inspection_date: string;
   condition: string;
@@ -39,9 +37,6 @@ export interface UpdateAssetInspectionRequest {
 export interface AssetInspectionQueryParams {
   page?: number;
   per_page?: number;
-  sort?: string;
-  order?: "asc" | "desc";
   search?: string;
-  organization_id?: string;
   asset_id?: string;
 }

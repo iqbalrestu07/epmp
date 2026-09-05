@@ -12,7 +12,7 @@ export function RoomTypeCreatePage() {
 
   const handleSubmit = (data: CreateRoomTypeFormData) => {
     createMutation.mutate(data, {
-      onSuccess: () => navigate("/roomtype"),
+      onSuccess: () => navigate("/dashboard/room-types"),
     });
   };
 

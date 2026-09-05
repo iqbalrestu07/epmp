@@ -16,6 +16,7 @@ export const adjustmentSchema = z.object({
 
 export const createAdjustmentSchema = adjustmentSchema.omit({
   id: true,
+  organization_id: true,
   created_at: true,
   updated_at: true,
 });

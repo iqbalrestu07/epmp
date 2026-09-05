@@ -24,7 +24,7 @@ export function TenantDocumentListPage() {
   const deleteMutation = useDeleteTenantDocument();
 
   const handleRowClick = (row: TenantDocument) => {
-    navigate(`/tenantdocument/${row.id}`);
+    navigate(`/dashboard/tenants/${row.id}`);
   };
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ export function TenantDocumentListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">TenantDocuments</h1>
-        <Button onClick={() => navigate("/tenantdocument/new")}>
+        <Button onClick={() => navigate("/dashboard/tenants/new")}>
           New TenantDocument
         </Button>
       </div>

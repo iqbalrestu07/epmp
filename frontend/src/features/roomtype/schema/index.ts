@@ -14,6 +14,7 @@ export const roomTypeSchema = z.object({
 
 export const createRoomTypeSchema = roomTypeSchema.omit({
   id: true,
+  organization_id: true,
   created_at: true,
   updated_at: true,
 });

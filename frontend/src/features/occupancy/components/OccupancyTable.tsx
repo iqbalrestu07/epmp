@@ -10,12 +10,7 @@ import type { Occupancy } from "../types";
 
 const columnHelper = createColumnHelper<Occupancy>();
 
-const columns = [
-  columnHelper.accessor("organization_id", {
-    header: "OrganizationId",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("id", {
+const columns = [  columnHelper.accessor("id", {
     header: "Id",
     cell: (info) => info.getValue(),
   }),

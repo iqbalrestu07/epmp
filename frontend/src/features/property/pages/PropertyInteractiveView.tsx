@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronLeft, Building2, ArrowLeft, Box } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { usePropertys } from '../hooks';
@@ -20,23 +20,42 @@ export default function PropertyInteractiveView() {
   const [selectedFloor, setSelectedFloor] = useState<Floor | null>(null);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
 
+  // Auto-select first property if available and none currently selected
+  useEffect(() => {
+    if (!selectedProperty && properties.length > 0) {
+      setSelectedProperty(properties[0]);
+    }
+  }, [properties, selectedProperty]);
+
   // Fetch buildings for selected property
   const { data: buildingData } = useBuildings(
     selectedProperty ? { property_id: selectedProperty.id, per_page: 100 } : undefined
   );
-  const buildings: Building[] = buildingData?.data ?? [];
+  const buildings: Building[] = Array.isArray(buildingData?.data)
+    ? buildingData.data
+    : Array.isArray(buildingData)
+    ? buildingData
+    : [];
 
   // Fetch floors for selected building
   const { data: floorData } = useFloors(
     selectedBuilding ? { building_id: selectedBuilding.id, per_page: 100 } : undefined
   );
-  const floors: Floor[] = floorData?.data ?? [];
+  const floors: Floor[] = Array.isArray(floorData?.data)
+    ? floorData.data
+    : Array.isArray(floorData)
+    ? floorData
+    : [];
 
   // Fetch rooms (filter by property_id)
   const { data: roomData } = useRooms(
     selectedProperty ? { per_page: 100 } : undefined
   );
-  const allRooms: Room[] = roomData?.data ?? [];
+  const allRooms: Room[] = Array.isArray(roomData?.data)
+    ? roomData.data
+    : Array.isArray(roomData)
+    ? roomData
+    : [];
   const rooms = allRooms.filter((r) => r.property_id === selectedProperty?.id);
 
   const handlePropertySelect = (p: Property) => {

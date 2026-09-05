@@ -13,7 +13,7 @@ export function SupplierDetailPage() {
   const handleDelete = () => {
     if (!confirm("Are you sure you want to delete this supplier?")) return;
     deleteMutation.mutate(id!, {
-      onSuccess: () => navigate("/supplier"),
+      onSuccess: () => navigate("/dashboard/suppliers"),
     });
   };
 
@@ -25,10 +25,10 @@ export function SupplierDetailPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Supplier Detail</h1>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => navigate("/supplier")}>
+          <Button variant="outline" onClick={() => navigate("/dashboard/suppliers")}>
             Back
           </Button>
-          <Button variant="outline" onClick={() => navigate(`/supplier/${id}/edit`)}>
+          <Button variant="outline" onClick={() => navigate(`/dashboard/suppliers/${id}/edit`)}>
             Edit
           </Button>
           <Button variant="destructive" onClick={handleDelete}>

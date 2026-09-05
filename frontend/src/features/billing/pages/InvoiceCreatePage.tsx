@@ -12,7 +12,7 @@ export function InvoiceCreatePage() {
 
   const handleSubmit = (data: CreateInvoiceFormData) => {
     createMutation.mutate(data, {
-      onSuccess: () => navigate("/billing"),
+      onSuccess: () => navigate("/dashboard/invoices"),
     });
   };
 

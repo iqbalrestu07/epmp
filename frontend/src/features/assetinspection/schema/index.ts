@@ -15,6 +15,7 @@ export const assetInspectionSchema = z.object({
 
 export const createAssetInspectionSchema = assetInspectionSchema.omit({
   id: true,
+  organization_id: true,
   created_at: true,
   updated_at: true,
 });

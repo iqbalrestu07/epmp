@@ -13,7 +13,7 @@ export function FacilityDetailPage() {
   const handleDelete = () => {
     if (!confirm("Are you sure you want to delete this facility?")) return;
     deleteMutation.mutate(id!, {
-      onSuccess: () => navigate("/facility"),
+      onSuccess: () => navigate("/dashboard/facilities"),
     });
   };
 
@@ -25,10 +25,10 @@ export function FacilityDetailPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Facility Detail</h1>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => navigate("/facility")}>
+          <Button variant="outline" onClick={() => navigate("/dashboard/facilities")}>
             Back
           </Button>
-          <Button variant="outline" onClick={() => navigate(`/facility/${id}/edit`)}>
+          <Button variant="outline" onClick={() => navigate(`/dashboard/facilities/${id}/edit`)}>
             Edit
           </Button>
           <Button variant="destructive" onClick={handleDelete}>

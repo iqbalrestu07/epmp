@@ -24,7 +24,7 @@ export function ChargeListPage() {
   const deleteMutation = useDeleteCharge();
 
   const handleRowClick = (row: Charge) => {
-    navigate(`/charge/${row.id}`);
+    navigate(`/dashboard/charges/${row.id}`);
   };
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ export function ChargeListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Charges</h1>
-        <Button onClick={() => navigate("/charge/new")}>
+        <Button onClick={() => navigate("/dashboard/charges/new")}>
           New Charge
         </Button>
       </div>

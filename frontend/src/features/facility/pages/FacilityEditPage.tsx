@@ -15,7 +15,7 @@ export function FacilityEditPage() {
   const handleSubmit = (formData: CreateFacilityFormData) => {
     updateMutation.mutate(
       { id: id!, data: formData },
-      { onSuccess: () => navigate(`/facility/${id}`) }
+      { onSuccess: () => navigate(`/dashboard/facilities/${id}`) }
     );
   };
 

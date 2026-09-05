@@ -8,7 +8,9 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "gltf": "npx gltfjsx@latest -t --transform"
+    "gltf": "npx gltfjsx@latest -t --transform",
+    "test:e2e": "node run_e2e_tests.cjs",
+    "test:e2e:gui": "node run_e2e_tests.cjs --headed"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -38,6 +40,7 @@
     "@types/three": "^0.185.1",
     "@vitejs/plugin-react": "^6.0.4",
     "autoprefixer": "^10.4.20",
+    "playwright": "^1.63.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14",
     "typescript": "^5.6.3",

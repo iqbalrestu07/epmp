@@ -12,7 +12,7 @@ export function SupplierCreatePage() {
 
   const handleSubmit = (data: CreateSupplierFormData) => {
     createMutation.mutate(data, {
-      onSuccess: () => navigate("/supplier"),
+      onSuccess: () => navigate("/dashboard/suppliers"),
     });
   };
 

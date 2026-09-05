@@ -22,7 +22,6 @@ export interface PenaltyListResponse {
 }
 
 export interface CreatePenaltyRequest {
-  organization_id: string;
   invoice_id: string;
   amount: number;
   status: string;
@@ -31,7 +30,6 @@ export interface CreatePenaltyRequest {
 }
 
 export interface UpdatePenaltyRequest {
-  organization_id: string;
   invoice_id: string;
   amount: number;
   status: string;
@@ -42,9 +40,6 @@ export interface UpdatePenaltyRequest {
 export interface PenaltyQueryParams {
   page?: number;
   per_page?: number;
-  sort?: string;
-  order?: "asc" | "desc";
   search?: string;
-  organization_id?: string;
   invoice_id?: string;
 }

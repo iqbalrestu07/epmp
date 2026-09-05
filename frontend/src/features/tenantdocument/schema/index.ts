@@ -14,6 +14,7 @@ export const tenantDocumentSchema = z.object({
 
 export const createTenantDocumentSchema = tenantDocumentSchema.omit({
   id: true,
+  organization_id: true,
   created_at: true,
   updated_at: true,
 });

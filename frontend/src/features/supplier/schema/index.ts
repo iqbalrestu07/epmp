@@ -15,6 +15,7 @@ export const supplierSchema = z.object({
 
 export const createSupplierSchema = supplierSchema.omit({
   id: true,
+  organization_id: true,
   created_at: true,
   updated_at: true,
 });

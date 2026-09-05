@@ -156,8 +156,10 @@ export default function UserListPage() {
         userService.list(),
         roleService.list(),
       ]);
-      setUsers(usersRes.data.data ?? []);
-      setAllRoles(rolesRes.data ?? []);
+      const userList = (usersRes as any)?.data?.data ?? (usersRes as any)?.data ?? usersRes ?? [];
+      setUsers(Array.isArray(userList) ? userList : []);
+      const roleList = (rolesRes as any)?.data ?? rolesRes ?? [];
+      setAllRoles(Array.isArray(roleList) ? roleList : []);
     } catch {
       // keep empty
     } finally {

@@ -12,7 +12,7 @@ export function TenantContactCreatePage() {
 
   const handleSubmit = (data: CreateTenantContactFormData) => {
     createMutation.mutate(data, {
-      onSuccess: () => navigate("/tenantcontact"),
+      onSuccess: () => navigate("/dashboard/tenants"),
     });
   };
 

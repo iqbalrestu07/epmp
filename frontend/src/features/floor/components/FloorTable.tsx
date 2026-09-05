@@ -6,17 +6,20 @@ import {
 } from "@tanstack/react-table";
 import { Layers, Eye, Pencil, Trash2 } from "lucide-react";
 import type { Floor } from "../types";
+import type { Building } from "../../building/types";
 
 const columnHelper = createColumnHelper<Floor>();
 
 interface FloorTableProps {
   data: Floor[];
+  buildings?: Building[];
   onRowClick?: (row: Floor) => void;
   onEdit?: (row: Floor) => void;
   onDelete?: (row: Floor) => void;
 }
 
-export function FloorTable({ data, onRowClick, onEdit, onDelete }: FloorTableProps) {
+export function FloorTable({ data, buildings = [], onRowClick, onEdit, onDelete }: FloorTableProps) {
+  const buildingNameById = new Map(buildings.map((b) => [b.id, b.name]));
   const columns = [
     columnHelper.accessor("name", {
       header: "Name",
@@ -40,8 +43,8 @@ export function FloorTable({ data, onRowClick, onEdit, onDelete }: FloorTablePro
     columnHelper.accessor("building_id", {
       header: "Building",
       cell: (info) => (
-        <span className="text-sm text-black/50 font-mono truncate max-w-32 inline-block">
-          {info.getValue() ? info.getValue().slice(0, 12) + "…" : "—"}
+        <span className="text-sm text-black/70">
+          {buildingNameById.get(info.getValue()) ?? "—"}
         </span>
       ),
     }),

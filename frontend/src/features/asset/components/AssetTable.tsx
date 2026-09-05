@@ -11,7 +11,11 @@ interface AssetTableProps {
 
 export function AssetTable({ data, onRowClick, onEditClick, onDeleteClick }: AssetTableProps) {
   const { data: propData } = usePropertys({ per_page: 100 });
-  const properties = propData?.data ?? [];
+  const properties = Array.isArray(propData?.data)
+    ? propData.data
+    : Array.isArray(propData)
+    ? propData
+    : [];
 
   const getPropertyName = (id: string) => {
     return properties.find(p => p.id === id)?.name || id;
@@ -27,7 +31,9 @@ export function AssetTable({ data, onRowClick, onEditClick, onDeleteClick }: Ass
     }
   };
 
-  if (!data || data.length === 0) {
+  const list: Asset[] = Array.isArray(data) ? data : (data as any)?.data ?? [];
+
+  if (!list || list.length === 0) {
     return <div className="text-center py-12 text-black/50 text-sm">No assets found.</div>;
   }
 
@@ -45,7 +51,7 @@ export function AssetTable({ data, onRowClick, onEditClick, onDeleteClick }: Ass
           </tr>
         </thead>
         <tbody className="divide-y divide-black/5">
-          {data.map((row) => (
+          {list.map((row: Asset) => (
             <tr 
               key={row.id} 
               onClick={() => onRowClick?.(row)}

@@ -19,6 +19,7 @@ export const invoiceSchema = z.object({
 
 export const createInvoiceSchema = invoiceSchema.omit({
   id: true,
+  organization_id: true,
   created_at: true,
   updated_at: true,
 });

@@ -14,6 +14,7 @@ export const facilitySchema = z.object({
 
 export const createFacilitySchema = facilitySchema.omit({
   id: true,
+  organization_id: true,
   created_at: true,
   updated_at: true,
 });

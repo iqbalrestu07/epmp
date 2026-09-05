@@ -213,19 +213,21 @@ export default function RBACPage() {
         roleService.list(),
         permissionService.list(),
       ]);
-      // Fetch permissions for each role
+      const rawRoles = (rolesRes as any)?.data ?? rolesRes ?? [];
+      const rolesList = Array.isArray(rawRoles) ? rawRoles : [];
       const rolesWithPerms = await Promise.all(
-        (rolesRes.data ?? []).map(async (role: Role) => {
+        rolesList.map(async (role: Role) => {
           try {
             const full = await roleService.getById(role.id);
-            return full.data;
+            return (full as any)?.data ?? full;
           } catch {
             return role;
           }
         })
       );
       setRoles(rolesWithPerms);
-      setAllPermissions(permsRes.data ?? []);
+      const rawPerms = (permsRes as any)?.data ?? permsRes ?? [];
+      setAllPermissions(Array.isArray(rawPerms) ? rawPerms : []);
     } catch {
       // keep empty
     } finally {

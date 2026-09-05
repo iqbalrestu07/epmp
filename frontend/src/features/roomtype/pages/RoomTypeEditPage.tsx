@@ -15,7 +15,7 @@ export function RoomTypeEditPage() {
   const handleSubmit = (formData: CreateRoomTypeFormData) => {
     updateMutation.mutate(
       { id: id!, data: formData },
-      { onSuccess: () => navigate(`/roomtype/${id}`) }
+      { onSuccess: () => navigate(`/dashboard/room-types/${id}`) }
     );
   };
 

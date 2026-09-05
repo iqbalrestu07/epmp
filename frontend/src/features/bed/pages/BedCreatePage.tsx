@@ -12,7 +12,7 @@ export function BedCreatePage() {
 
   const handleSubmit = (data: CreateBedFormData) => {
     createMutation.mutate(data, {
-      onSuccess: () => navigate("/bed"),
+      onSuccess: () => navigate("/dashboard/beds"),
     });
   };
 

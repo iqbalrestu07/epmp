@@ -21,7 +21,6 @@ export interface SupplierListResponse {
 }
 
 export interface CreateSupplierRequest {
-  organization_id: string;
   name: string;
   contact_person: string;
   phone: string;
@@ -29,7 +28,6 @@ export interface CreateSupplierRequest {
 }
 
 export interface UpdateSupplierRequest {
-  organization_id: string;
   name: string;
   contact_person: string;
   phone: string;
@@ -39,9 +37,6 @@ export interface UpdateSupplierRequest {
 export interface SupplierQueryParams {
   page?: number;
   per_page?: number;
-  sort?: string;
-  order?: "asc" | "desc";
   search?: string;
-  organization_id?: string;
   name?: string;
 }

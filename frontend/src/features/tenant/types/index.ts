@@ -22,7 +22,6 @@ export interface TenantListResponse {
 }
 
 export interface CreateTenantRequest {
-  organization_id: string;
   full_name: string;
   email: string;
   phone?: string;
@@ -31,7 +30,6 @@ export interface CreateTenantRequest {
 }
 
 export interface UpdateTenantRequest {
-  organization_id: string;
   full_name: string;
   email: string;
   phone?: string;
@@ -42,9 +40,6 @@ export interface UpdateTenantRequest {
 export interface TenantQueryParams {
   page?: number;
   per_page?: number;
-  sort?: string;
-  order?: "asc" | "desc";
   search?: string;
-  organization_id?: string;
   full_name?: string;
 }

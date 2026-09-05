@@ -84,9 +84,9 @@ export default function SignInPage() {
       </form>
 
       <p className="text-center text-sm text-white/60 mt-8">
-        Don't have an organization account?{' '}
+        Don't have an account?{' '}
         <Link to="/auth/signup" className="text-white hover:text-orange font-semibold transition-colors">
-          Register Organization
+          Create Account
         </Link>
       </p>
     </div>

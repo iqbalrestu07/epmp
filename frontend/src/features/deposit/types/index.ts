@@ -24,7 +24,6 @@ export interface DepositListResponse {
 }
 
 export interface CreateDepositRequest {
-  organization_id: string;
   contract_id: string;
   tenant_id: string;
   amount: number;
@@ -35,7 +34,6 @@ export interface CreateDepositRequest {
 }
 
 export interface UpdateDepositRequest {
-  organization_id: string;
   contract_id: string;
   tenant_id: string;
   amount: number;
@@ -48,10 +46,7 @@ export interface UpdateDepositRequest {
 export interface DepositQueryParams {
   page?: number;
   per_page?: number;
-  sort?: string;
-  order?: "asc" | "desc";
   search?: string;
-  organization_id?: string;
   contract_id?: string;
   tenant_id?: string;
 }

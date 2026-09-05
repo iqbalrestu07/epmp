@@ -14,20 +14,22 @@ export async function fetchSuppliers(params?: SupplierQueryParams): Promise<Supp
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));
   if (params?.per_page) query.set("per_page", String(params.per_page));
-  if (params?.sort) query.set("sort", params.sort);
-  if (params?.order) query.set("order", params.order);
   if (params?.search) query.set("search", params.search);
   const qs = query.toString();
-  return api.get<SupplierListResponse>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  const res = await api.get<{ success: boolean; data: SupplierListResponse }>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  return res.data;
 }
 export async function fetchSupplierById(id: string): Promise<Supplier> {
-  return api.get<Supplier>(`${BASE_PATH}/${id}`);
+  const res = await api.get<{ success: boolean; data: Supplier }>(`${BASE_PATH}/${id}`);
+  return res.data;
 }
 export async function createSupplier(data: CreateSupplierRequest): Promise<Supplier> {
-  return api.post<Supplier>(BASE_PATH, data);
+  const res = await api.post<{ success: boolean; data: Supplier }>(BASE_PATH, data);
+  return res.data;
 }
 export async function updateSupplier(id: string, data: UpdateSupplierRequest): Promise<Supplier> {
-  return api.put<Supplier>(`${BASE_PATH}/${id}`, data);
+  const res = await api.put<{ success: boolean; data: Supplier }>(`${BASE_PATH}/${id}`, data);
+  return res.data;
 }
 export async function deleteSupplier(id: string): Promise<void> {
   return api.delete<void>(`${BASE_PATH}/${id}`);

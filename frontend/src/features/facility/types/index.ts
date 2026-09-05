@@ -20,14 +20,12 @@ export interface FacilityListResponse {
 }
 
 export interface CreateFacilityRequest {
-  organization_id: string;
   property_id: string;
   name: string;
   description?: string;
 }
 
 export interface UpdateFacilityRequest {
-  organization_id: string;
   property_id: string;
   name: string;
   description?: string;
@@ -36,10 +34,7 @@ export interface UpdateFacilityRequest {
 export interface FacilityQueryParams {
   page?: number;
   per_page?: number;
-  sort?: string;
-  order?: "asc" | "desc";
   search?: string;
-  organization_id?: string;
   property_id?: string;
   name?: string;
 }

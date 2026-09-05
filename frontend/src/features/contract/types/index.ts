@@ -27,7 +27,6 @@ export interface ContractListResponse {
 }
 
 export interface CreateContractRequest {
-  organization_id: string;
   reservation_id?: string;
   tenant_id: string;
   property_id: string;
@@ -41,7 +40,6 @@ export interface CreateContractRequest {
 }
 
 export interface UpdateContractRequest {
-  organization_id: string;
   reservation_id?: string;
   tenant_id: string;
   property_id: string;
@@ -57,10 +55,7 @@ export interface UpdateContractRequest {
 export interface ContractQueryParams {
   page?: number;
   per_page?: number;
-  sort?: string;
-  order?: "asc" | "desc";
   search?: string;
-  organization_id?: string;
   reservation_id?: string;
   tenant_id?: string;
   property_id?: string;

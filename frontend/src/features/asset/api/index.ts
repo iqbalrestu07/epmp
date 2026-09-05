@@ -14,20 +14,22 @@ export async function fetchAssets(params?: AssetQueryParams): Promise<AssetListR
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));
   if (params?.per_page) query.set("per_page", String(params.per_page));
-  if (params?.sort) query.set("sort", params.sort);
-  if (params?.order) query.set("order", params.order);
   if (params?.search) query.set("search", params.search);
   const qs = query.toString();
-  return api.get<AssetListResponse>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  const res = await api.get<{ success: boolean; data: AssetListResponse }>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  return res.data;
 }
 export async function fetchAssetById(id: string): Promise<Asset> {
-  return api.get<Asset>(`${BASE_PATH}/${id}`);
+  const res = await api.get<{ success: boolean; data: Asset }>(`${BASE_PATH}/${id}`);
+  return res.data;
 }
 export async function createAsset(data: CreateAssetRequest): Promise<Asset> {
-  return api.post<Asset>(BASE_PATH, data);
+  const res = await api.post<{ success: boolean; data: Asset }>(BASE_PATH, data);
+  return res.data;
 }
 export async function updateAsset(id: string, data: UpdateAssetRequest): Promise<Asset> {
-  return api.put<Asset>(`${BASE_PATH}/${id}`, data);
+  const res = await api.put<{ success: boolean; data: Asset }>(`${BASE_PATH}/${id}`, data);
+  return res.data;
 }
 export async function deleteAsset(id: string): Promise<void> {
   return api.delete<void>(`${BASE_PATH}/${id}`);

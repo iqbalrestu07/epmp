@@ -41,8 +41,8 @@ export default function SignUpPage() {
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <h1 className="text-3xl font-display mb-2">Create Workspace.</h1>
-      <p className="text-white/60 mb-8">Register your organization on EPMP.</p>
+      <h1 className="text-3xl font-display mb-2">Create Account.</h1>
+      <p className="text-white/60 mb-8">Register your account on EPMP. You'll create an organization after signing in.</p>
 
       {errorMsg && (
         <div className="mb-5 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
@@ -106,9 +106,9 @@ export default function SignUpPage() {
           {isSubmitting ? (
             <>
               <span className="w-4 h-4 rounded-full border-2 border-black/40 border-t-transparent animate-spin" />
-              Creating workspace…
+              Creating account…
             </>
-          ) : 'Register Organization'}
+          ) : 'Create Account'}
         </button>
       </form>
 

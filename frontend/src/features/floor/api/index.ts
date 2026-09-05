@@ -15,16 +15,20 @@ export async function fetchFloors(params?: FloorQueryParams): Promise<FloorListR
   if (params?.search) query.set("search", params.search);
   if (params?.building_id) query.set("building_id", params.building_id);
   const qs = query.toString();
-  return api.get<FloorListResponse>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  const res = await api.get<{ success: boolean; data: FloorListResponse }>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  return res.data;
 }
 export async function fetchFloorById(id: string): Promise<Floor> {
-  return api.get<Floor>(`${BASE_PATH}/${id}`);
+  const res = await api.get<{ success: boolean; data: Floor }>(`${BASE_PATH}/${id}`);
+  return res.data;
 }
 export async function createFloor(data: CreateFloorRequest): Promise<Floor> {
-  return api.post<Floor>(BASE_PATH, data);
+  const res = await api.post<{ success: boolean; data: Floor }>(BASE_PATH, data);
+  return res.data;
 }
 export async function updateFloor(id: string, data: UpdateFloorRequest): Promise<Floor> {
-  return api.put<Floor>(`${BASE_PATH}/${id}`, data);
+  const res = await api.put<{ success: boolean; data: Floor }>(`${BASE_PATH}/${id}`, data);
+  return res.data;
 }
 export async function deleteFloor(id: string): Promise<void> {
   return api.delete<void>(`${BASE_PATH}/${id}`);

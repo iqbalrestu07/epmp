@@ -27,21 +27,14 @@ export function TenantForm({
     formState: { errors },
   } = useForm<CreateTenantFormData>({
     resolver: zodResolver(createTenantSchema),
-    defaultValues,
-  });
+      defaultValues: {
+        is_active: true,
+        ...defaultValues,
+      },
+    });
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="organization_id">OrganizationId</Label>
-        <Input
-          id="organization_id"
-          {...register("organization_id")}
-        />
-        {errors.organization_id && (
-          <p className="text-sm text-red-500">{errors.organization_id.message}</p>
-        )}
-      </div>
       <div className="space-y-2">
         <Label htmlFor="full_name">FullName</Label>
         <Input
@@ -56,6 +49,7 @@ export function TenantForm({
         <Label htmlFor="email">Email</Label>
         <Input
           id="email"
+          type="email"
           {...register("email")}
         />
         {errors.email && (
@@ -82,15 +76,14 @@ export function TenantForm({
           <p className="text-sm text-red-500">{errors.identity_number.message}</p>
         )}
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="is_active">IsActive</Label>
-        <Input
+      <div className="flex items-center space-x-2 pt-2">
+        <input
           id="is_active"
+          type="checkbox"
           {...register("is_active")}
+          className="h-4 w-4 rounded border-gray-300 text-orange focus:ring-orange accent-orange"
         />
-        {errors.is_active && (
-          <p className="text-sm text-red-500">{errors.is_active.message}</p>
-        )}
+        <Label htmlFor="is_active" className="cursor-pointer">Active</Label>
       </div>
 
       <Button type="submit" disabled={isSubmitting}>

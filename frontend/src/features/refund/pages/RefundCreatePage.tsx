@@ -12,7 +12,7 @@ export function RefundCreatePage() {
 
   const handleSubmit = (data: CreateRefundFormData) => {
     createMutation.mutate(data, {
-      onSuccess: () => navigate("/refund"),
+      onSuccess: () => navigate("/dashboard/refunds"),
     });
   };
 

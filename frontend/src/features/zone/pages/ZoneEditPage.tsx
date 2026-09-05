@@ -15,7 +15,7 @@ export function ZoneEditPage() {
   const handleSubmit = (formData: CreateZoneFormData) => {
     updateMutation.mutate(
       { id: id!, data: formData },
-      { onSuccess: () => navigate(`/zone/${id}`) }
+      { onSuccess: () => navigate(`/dashboard/zones/${id}`) }
     );
   };
 

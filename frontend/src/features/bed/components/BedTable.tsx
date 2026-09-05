@@ -10,12 +10,7 @@ import type { Bed } from "../types";
 
 const columnHelper = createColumnHelper<Bed>();
 
-const columns = [
-  columnHelper.accessor("organization_id", {
-    header: "OrganizationId",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("id", {
+const columns = [  columnHelper.accessor("id", {
     header: "Id",
     cell: (info) => info.getValue(),
   }),
@@ -40,7 +35,7 @@ interface BedTableProps {
 
 export function BedTable({ data, onRowClick }: BedTableProps) {
   const table = useReactTable({
-    data,
+    data: Array.isArray(data) ? data : [],
     columns,
     getCoreRowModel: getCoreRowModel(),
   });

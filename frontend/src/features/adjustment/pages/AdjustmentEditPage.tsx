@@ -15,7 +15,7 @@ export function AdjustmentEditPage() {
   const handleSubmit = (formData: CreateAdjustmentFormData) => {
     updateMutation.mutate(
       { id: id!, data: formData },
-      { onSuccess: () => navigate(`/adjustment/${id}`) }
+      { onSuccess: () => navigate(`/dashboard/adjustments/${id}`) }
     );
   };
 

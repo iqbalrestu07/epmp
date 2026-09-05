@@ -25,7 +25,6 @@ export interface InvoiceListResponse {
 }
 
 export interface CreateInvoiceRequest {
-  organization_id: string;
   contract_id: string;
   tenant_id: string;
   amount: number;
@@ -37,7 +36,6 @@ export interface CreateInvoiceRequest {
 }
 
 export interface UpdateInvoiceRequest {
-  organization_id: string;
   contract_id: string;
   tenant_id: string;
   amount: number;
@@ -51,10 +49,7 @@ export interface UpdateInvoiceRequest {
 export interface InvoiceQueryParams {
   page?: number;
   per_page?: number;
-  sort?: string;
-  order?: "asc" | "desc";
   search?: string;
-  organization_id?: string;
   contract_id?: string;
   tenant_id?: string;
 }

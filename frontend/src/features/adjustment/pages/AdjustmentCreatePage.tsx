@@ -12,7 +12,7 @@ export function AdjustmentCreatePage() {
 
   const handleSubmit = (data: CreateAdjustmentFormData) => {
     createMutation.mutate(data, {
-      onSuccess: () => navigate("/adjustment"),
+      onSuccess: () => navigate("/dashboard/adjustments"),
     });
   };
 

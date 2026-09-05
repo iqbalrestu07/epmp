@@ -24,7 +24,7 @@ export function AssetInspectionListPage() {
   const deleteMutation = useDeleteAssetInspection();
 
   const handleRowClick = (row: AssetInspection) => {
-    navigate(`/assetinspection/${row.id}`);
+    navigate(`/dashboard/asset-inspections/${row.id}`);
   };
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ export function AssetInspectionListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">AssetInspections</h1>
-        <Button onClick={() => navigate("/assetinspection/new")}>
+        <Button onClick={() => navigate("/dashboard/asset-inspections/new")}>
           New AssetInspection
         </Button>
       </div>

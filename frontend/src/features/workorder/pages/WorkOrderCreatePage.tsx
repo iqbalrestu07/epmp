@@ -12,7 +12,7 @@ export function WorkOrderCreatePage() {
 
   const handleSubmit = (data: CreateWorkOrderFormData) => {
     createMutation.mutate(data, {
-      onSuccess: () => navigate("/workorder"),
+      onSuccess: () => navigate("/dashboard/work-orders"),
     });
   };
 

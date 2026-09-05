@@ -12,7 +12,7 @@ export function PaymentCreatePage() {
 
   const handleSubmit = (data: CreatePaymentFormData) => {
     createMutation.mutate(data, {
-      onSuccess: () => navigate("/payment"),
+      onSuccess: () => navigate("/dashboard/payments"),
     });
   };
 

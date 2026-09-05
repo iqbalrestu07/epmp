@@ -17,6 +17,7 @@ export const refundSchema = z.object({
 
 export const createRefundSchema = refundSchema.omit({
   id: true,
+  organization_id: true,
   created_at: true,
   updated_at: true,
 });

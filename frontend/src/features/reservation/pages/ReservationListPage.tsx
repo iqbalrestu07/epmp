@@ -24,7 +24,7 @@ export function ReservationListPage() {
   const deleteMutation = useDeleteReservation();
 
   const handleRowClick = (row: Reservation) => {
-    navigate(`/reservation/${row.id}`);
+    navigate(`/dashboard/reservations/${row.id}`);
   };
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ export function ReservationListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Reservations</h1>
-        <Button onClick={() => navigate("/reservation/new")}>
+        <Button onClick={() => navigate("/dashboard/reservations/new")}>
           New Reservation
         </Button>
       </div>

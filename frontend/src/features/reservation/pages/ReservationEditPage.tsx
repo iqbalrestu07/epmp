@@ -15,7 +15,7 @@ export function ReservationEditPage() {
   const handleSubmit = (formData: CreateReservationFormData) => {
     updateMutation.mutate(
       { id: id!, data: formData },
-      { onSuccess: () => navigate(`/reservation/${id}`) }
+      { onSuccess: () => navigate(`/dashboard/reservations/${id}`) }
     );
   };
 

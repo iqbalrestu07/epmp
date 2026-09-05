@@ -15,7 +15,7 @@ export function BedEditPage() {
   const handleSubmit = (formData: CreateBedFormData) => {
     updateMutation.mutate(
       { id: id!, data: formData },
-      { onSuccess: () => navigate(`/bed/${id}`) }
+      { onSuccess: () => navigate(`/dashboard/beds/${id}`) }
     );
   };
 

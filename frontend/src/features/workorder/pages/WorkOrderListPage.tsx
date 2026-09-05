@@ -24,7 +24,7 @@ export function WorkOrderListPage() {
   const deleteMutation = useDeleteWorkOrder();
 
   const handleRowClick = (row: WorkOrder) => {
-    navigate(`/workorder/${row.id}`);
+    navigate(`/dashboard/work-orders/${row.id}`);
   };
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ export function WorkOrderListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">WorkOrders</h1>
-        <Button onClick={() => navigate("/workorder/new")}>
+        <Button onClick={() => navigate("/dashboard/work-orders/new")}>
           New WorkOrder
         </Button>
       </div>

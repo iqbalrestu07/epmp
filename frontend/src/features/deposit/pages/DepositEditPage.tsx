@@ -15,7 +15,7 @@ export function DepositEditPage() {
   const handleSubmit = (formData: CreateDepositFormData) => {
     updateMutation.mutate(
       { id: id!, data: formData },
-      { onSuccess: () => navigate(`/deposit/${id}`) }
+      { onSuccess: () => navigate(`/dashboard/deposits/${id}`) }
     );
   };
 

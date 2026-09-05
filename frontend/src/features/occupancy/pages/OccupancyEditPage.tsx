@@ -15,7 +15,7 @@ export function OccupancyEditPage() {
   const handleSubmit = (formData: CreateOccupancyFormData) => {
     updateMutation.mutate(
       { id: id!, data: formData },
-      { onSuccess: () => navigate(`/occupancy/${id}`) }
+      { onSuccess: () => navigate(`/dashboard/occupancies/${id}`) }
     );
   };
 

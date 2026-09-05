@@ -15,16 +15,20 @@ export async function fetchRooms(params?: RoomQueryParams): Promise<RoomListResp
   if (params?.search) query.set("search", params.search);
   if (params?.floor_id) query.set("floor_id", params.floor_id);
   const qs = query.toString();
-  return api.get<RoomListResponse>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  const res = await api.get<{ success: boolean; data: RoomListResponse }>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  return res.data;
 }
 export async function fetchRoomById(id: string): Promise<Room> {
-  return api.get<Room>(`${BASE_PATH}/${id}`);
+  const res = await api.get<{ success: boolean; data: Room }>(`${BASE_PATH}/${id}`);
+  return res.data;
 }
 export async function createRoom(data: CreateRoomRequest): Promise<Room> {
-  return api.post<Room>(BASE_PATH, data);
+  const res = await api.post<{ success: boolean; data: Room }>(BASE_PATH, data);
+  return res.data;
 }
 export async function updateRoom(id: string, data: UpdateRoomRequest): Promise<Room> {
-  return api.put<Room>(`${BASE_PATH}/${id}`, data);
+  const res = await api.put<{ success: boolean; data: Room }>(`${BASE_PATH}/${id}`, data);
+  return res.data;
 }
 export async function deleteRoom(id: string): Promise<void> {
   return api.delete<void>(`${BASE_PATH}/${id}`);

@@ -24,7 +24,7 @@ export function BedListPage() {
   const deleteMutation = useDeleteBed();
 
   const handleRowClick = (row: Bed) => {
-    navigate(`/bed/${row.id}`);
+    navigate(`/dashboard/beds/${row.id}`);
   };
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ export function BedListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Beds</h1>
-        <Button onClick={() => navigate("/bed/new")}>
+        <Button onClick={() => navigate("/dashboard/beds/new")}>
           New Bed
         </Button>
       </div>

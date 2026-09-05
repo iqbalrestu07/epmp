@@ -78,7 +78,8 @@ async function request<T>(
     return undefined as T;
   }
 
-  return res.json() as Promise<T>;
+  const json = await res.json();
+  return json as T;
 }
 
 export const api = {

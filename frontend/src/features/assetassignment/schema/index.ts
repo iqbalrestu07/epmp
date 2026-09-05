@@ -14,6 +14,7 @@ export const assetAssignmentSchema = z.object({
 
 export const createAssetAssignmentSchema = assetAssignmentSchema.omit({
   id: true,
+  organization_id: true,
   created_at: true,
   updated_at: true,
 });

@@ -24,7 +24,7 @@ export function FacilityListPage() {
   const deleteMutation = useDeleteFacility();
 
   const handleRowClick = (row: Facility) => {
-    navigate(`/facility/${row.id}`);
+    navigate(`/dashboard/facilities/${row.id}`);
   };
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ export function FacilityListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Facilitys</h1>
-        <Button onClick={() => navigate("/facility/new")}>
+        <Button onClick={() => navigate("/dashboard/facilities/new")}>
           New Facility
         </Button>
       </div>

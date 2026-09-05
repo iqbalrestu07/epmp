@@ -25,7 +25,6 @@ export interface ReservationListResponse {
 }
 
 export interface CreateReservationRequest {
-  organization_id: string;
   tenant_id: string;
   property_id: string;
   room_id: string;
@@ -37,7 +36,6 @@ export interface CreateReservationRequest {
 }
 
 export interface UpdateReservationRequest {
-  organization_id: string;
   tenant_id: string;
   property_id: string;
   room_id: string;
@@ -51,10 +49,7 @@ export interface UpdateReservationRequest {
 export interface ReservationQueryParams {
   page?: number;
   per_page?: number;
-  sort?: string;
-  order?: "asc" | "desc";
   search?: string;
-  organization_id?: string;
   tenant_id?: string;
   property_id?: string;
   room_id?: string;

@@ -12,7 +12,7 @@ export function ReservationCreatePage() {
 
   const handleSubmit = (data: CreateReservationFormData) => {
     createMutation.mutate(data, {
-      onSuccess: () => navigate("/reservation"),
+      onSuccess: () => navigate("/dashboard/reservations"),
     });
   };
 

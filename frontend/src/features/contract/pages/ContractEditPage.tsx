@@ -15,7 +15,7 @@ export function ContractEditPage() {
   const handleSubmit = (formData: CreateContractFormData) => {
     updateMutation.mutate(
       { id: id!, data: formData },
-      { onSuccess: () => navigate(`/contract/${id}`) }
+      { onSuccess: () => navigate(`/dashboard/contracts/${id}`) }
     );
   };
 

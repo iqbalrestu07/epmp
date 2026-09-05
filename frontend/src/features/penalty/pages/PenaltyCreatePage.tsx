@@ -12,7 +12,7 @@ export function PenaltyCreatePage() {
 
   const handleSubmit = (data: CreatePenaltyFormData) => {
     createMutation.mutate(data, {
-      onSuccess: () => navigate("/penalty"),
+      onSuccess: () => navigate("/dashboard/penalties"),
     });
   };
 

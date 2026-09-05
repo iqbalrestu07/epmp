@@ -1,5 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../features/iam/context/AuthContext';
+import { useOrg } from '../features/organization/context/OrgContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -11,19 +12,6 @@ interface ProtectedRouteProps {
   redirectTo?: string;
 }
 
-/**
- * ProtectedRoute wraps a route that requires authentication.
- * Optionally also enforces a specific permission or role.
- *
- * Usage:
- *   <ProtectedRoute>
- *     <Dashboard />
- *   </ProtectedRoute>
- *
- *   <ProtectedRoute permission="role:read">
- *     <RBACPage />
- *   </ProtectedRoute>
- */
 export default function ProtectedRoute({
   children,
   permission,
@@ -31,14 +19,15 @@ export default function ProtectedRoute({
   redirectTo = '/auth/signin',
 }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading, hasPermission, hasRole } = useAuth();
+  const { orgs, isLoading: orgLoading } = useOrg();
   const location = useLocation();
 
-  if (isLoading) {
+  if (isLoading || orgLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#f2efe9]">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 rounded-full border-2 border-orange border-t-transparent animate-spin" />
-          <p className="text-sm text-black/50">Authenticating…</p>
+          <p className="text-sm text-black/50">Loading…</p>
         </div>
       </div>
     );
@@ -46,6 +35,13 @@ export default function ProtectedRoute({
 
   if (!isAuthenticated) {
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
+  }
+
+  // If user has no organization, force them to create one first
+  // (unless they're already on the organization creation page)
+  const isOnOrgCreate = location.pathname === '/dashboard/organizations/new';
+  if (orgs.length === 0 && !isOnOrgCreate) {
+    return <Navigate to="/dashboard/organizations/new" replace />;
   }
 
   if (permission && !hasPermission(permission)) {

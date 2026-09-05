@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { DoorOpen, Plus, Search, ChevronRight } from "lucide-react";
 import { RoomTable } from "../components/RoomTable";
 import { useRooms, useDeleteRoom } from "../hooks";
+import { useFloors } from "../../floor/hooks";
 import type { Room } from "../types";
 
 export function RoomListPage() {
@@ -23,6 +24,12 @@ export function RoomListPage() {
     search: search || undefined,
     floor_id: floorId || undefined,
   });
+  const { data: floorsData } = useFloors({ per_page: 100 });
+  const floors = Array.isArray(floorsData?.data)
+    ? floorsData.data
+    : Array.isArray(floorsData)
+    ? floorsData
+    : [];
 
   const deleteMutation = useDeleteRoom();
 
@@ -83,12 +90,16 @@ export function RoomListPage() {
           </div>
           <Button type="submit" variant="outline">Search</Button>
         </form>
-        <Input
-          placeholder="Filter by floor ID…"
+        <select
           value={floorId}
           onChange={(e) => { setFloorId(e.target.value); setPage(1); }}
-          className="sm:max-w-xs"
-        />
+          className="sm:max-w-xs rounded-lg border border-black/10 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30"
+        >
+          <option value="">All Floors</option>
+          {floors.map((f) => (
+            <option key={f.id} value={f.id}>{f.name}</option>
+          ))}
+        </select>
       </div>
 
       {isLoading ? (
@@ -97,6 +108,7 @@ export function RoomListPage() {
         <>
           <RoomTable
             data={data?.data ?? []}
+            floors={floors}
             onRowClick={handleRowClick}
             onEdit={handleEdit}
             onDelete={handleDelete}

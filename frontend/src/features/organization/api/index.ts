@@ -18,16 +18,20 @@ export async function fetchOrganizations(params?: OrganizationQueryParams): Prom
   if (params?.order) query.set("order", params.order);
   if (params?.search) query.set("search", params.search);
   const qs = query.toString();
-  return api.get<OrganizationListResponse>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  const res = await api.get<{ success: boolean; data: OrganizationListResponse }>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  return res.data;
 }
 export async function fetchOrganizationById(id: string): Promise<Organization> {
-  return api.get<Organization>(`${BASE_PATH}/${id}`);
+  const res = await api.get<{ success: boolean; data: Organization }>(`${BASE_PATH}/${id}`);
+  return res.data;
 }
 export async function createOrganization(data: CreateOrganizationRequest): Promise<Organization> {
-  return api.post<Organization>(BASE_PATH, data);
+  const res = await api.post<{ success: boolean; data: Organization }>(BASE_PATH, data);
+  return res.data;
 }
 export async function updateOrganization(id: string, data: UpdateOrganizationRequest): Promise<Organization> {
-  return api.put<Organization>(`${BASE_PATH}/${id}`, data);
+  const res = await api.put<{ success: boolean; data: Organization }>(`${BASE_PATH}/${id}`, data);
+  return res.data;
 }
 export async function deleteOrganization(id: string): Promise<void> {
   return api.delete<void>(`${BASE_PATH}/${id}`);

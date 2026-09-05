@@ -13,7 +13,7 @@ export function TenantIdentityDetailPage() {
   const handleDelete = () => {
     if (!confirm("Are you sure you want to delete this tenantIdentity?")) return;
     deleteMutation.mutate(id!, {
-      onSuccess: () => navigate("/tenantidentity"),
+      onSuccess: () => navigate("/dashboard/tenants"),
     });
   };
 
@@ -25,10 +25,10 @@ export function TenantIdentityDetailPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">TenantIdentity Detail</h1>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => navigate("/tenantidentity")}>
+          <Button variant="outline" onClick={() => navigate("/dashboard/tenants")}>
             Back
           </Button>
-          <Button variant="outline" onClick={() => navigate(`/tenantidentity/${id}/edit`)}>
+          <Button variant="outline" onClick={() => navigate(`/dashboard/tenants/${id}/edit`)}>
             Edit
           </Button>
           <Button variant="destructive" onClick={handleDelete}>

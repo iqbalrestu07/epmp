@@ -24,7 +24,7 @@ export function ZoneListPage() {
   const deleteMutation = useDeleteZone();
 
   const handleRowClick = (row: Zone) => {
-    navigate(`/zone/${row.id}`);
+    navigate(`/dashboard/zones/${row.id}`);
   };
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ export function ZoneListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Zones</h1>
-        <Button onClick={() => navigate("/zone/new")}>
+        <Button onClick={() => navigate("/dashboard/zones/new")}>
           New Zone
         </Button>
       </div>

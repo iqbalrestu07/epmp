@@ -24,7 +24,7 @@ export function TenantContactListPage() {
   const deleteMutation = useDeleteTenantContact();
 
   const handleRowClick = (row: TenantContact) => {
-    navigate(`/tenantcontact/${row.id}`);
+    navigate(`/dashboard/tenants/${row.id}`);
   };
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ export function TenantContactListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">TenantContacts</h1>
-        <Button onClick={() => navigate("/tenantcontact/new")}>
+        <Button onClick={() => navigate("/dashboard/tenants/new")}>
           New TenantContact
         </Button>
       </div>

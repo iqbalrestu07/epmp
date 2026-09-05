@@ -14,20 +14,22 @@ export async function fetchWorkOrders(params?: WorkOrderQueryParams): Promise<Wo
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));
   if (params?.per_page) query.set("per_page", String(params.per_page));
-  if (params?.sort) query.set("sort", params.sort);
-  if (params?.order) query.set("order", params.order);
   if (params?.search) query.set("search", params.search);
   const qs = query.toString();
-  return api.get<WorkOrderListResponse>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  const res = await api.get<{ success: boolean; data: WorkOrderListResponse }>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  return res.data;
 }
 export async function fetchWorkOrderById(id: string): Promise<WorkOrder> {
-  return api.get<WorkOrder>(`${BASE_PATH}/${id}`);
+  const res = await api.get<{ success: boolean; data: WorkOrder }>(`${BASE_PATH}/${id}`);
+  return res.data;
 }
 export async function createWorkOrder(data: CreateWorkOrderRequest): Promise<WorkOrder> {
-  return api.post<WorkOrder>(BASE_PATH, data);
+  const res = await api.post<{ success: boolean; data: WorkOrder }>(BASE_PATH, data);
+  return res.data;
 }
 export async function updateWorkOrder(id: string, data: UpdateWorkOrderRequest): Promise<WorkOrder> {
-  return api.put<WorkOrder>(`${BASE_PATH}/${id}`, data);
+  const res = await api.put<{ success: boolean; data: WorkOrder }>(`${BASE_PATH}/${id}`, data);
+  return res.data;
 }
 export async function deleteWorkOrder(id: string): Promise<void> {
   return api.delete<void>(`${BASE_PATH}/${id}`);

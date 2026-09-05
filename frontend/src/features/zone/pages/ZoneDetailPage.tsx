@@ -13,7 +13,7 @@ export function ZoneDetailPage() {
   const handleDelete = () => {
     if (!confirm("Are you sure you want to delete this zone?")) return;
     deleteMutation.mutate(id!, {
-      onSuccess: () => navigate("/zone"),
+      onSuccess: () => navigate("/dashboard/zones"),
     });
   };
 
@@ -25,10 +25,10 @@ export function ZoneDetailPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Zone Detail</h1>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => navigate("/zone")}>
+          <Button variant="outline" onClick={() => navigate("/dashboard/zones")}>
             Back
           </Button>
-          <Button variant="outline" onClick={() => navigate(`/zone/${id}/edit`)}>
+          <Button variant="outline" onClick={() => navigate(`/dashboard/zones/${id}/edit`)}>
             Edit
           </Button>
           <Button variant="destructive" onClick={handleDelete}>

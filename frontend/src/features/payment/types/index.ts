@@ -24,7 +24,6 @@ export interface PaymentListResponse {
 }
 
 export interface CreatePaymentRequest {
-  organization_id: string;
   invoice_id: string;
   tenant_id: string;
   amount: number;
@@ -35,7 +34,6 @@ export interface CreatePaymentRequest {
 }
 
 export interface UpdatePaymentRequest {
-  organization_id: string;
   invoice_id: string;
   tenant_id: string;
   amount: number;
@@ -48,10 +46,7 @@ export interface UpdatePaymentRequest {
 export interface PaymentQueryParams {
   page?: number;
   per_page?: number;
-  sort?: string;
-  order?: "asc" | "desc";
   search?: string;
-  organization_id?: string;
   invoice_id?: string;
   tenant_id?: string;
 }

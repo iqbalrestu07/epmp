@@ -15,6 +15,7 @@ export const tenantContactSchema = z.object({
 
 export const createTenantContactSchema = tenantContactSchema.omit({
   id: true,
+  organization_id: true,
   created_at: true,
   updated_at: true,
 });

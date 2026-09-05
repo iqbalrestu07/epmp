@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Layers, Plus, Search, ChevronRight } from "lucide-react";
 import { FloorTable } from "../components/FloorTable";
 import { useFloors, useDeleteFloor } from "../hooks";
+import { useBuildings } from "../../building/hooks";
 import type { Floor } from "../types";
 
 export function FloorListPage() {
@@ -20,6 +21,12 @@ export function FloorListPage() {
     search: search || undefined,
     building_id: buildingId || undefined,
   });
+  const { data: buildingsData } = useBuildings({ per_page: 100 });
+  const buildings = Array.isArray(buildingsData?.data)
+    ? buildingsData.data
+    : Array.isArray(buildingsData)
+    ? buildingsData
+    : [];
 
   const deleteMutation = useDeleteFloor();
 
@@ -80,12 +87,16 @@ export function FloorListPage() {
           </div>
           <Button type="submit" variant="outline">Search</Button>
         </form>
-        <Input
-          placeholder="Filter by building ID…"
+        <select
           value={buildingId}
           onChange={(e) => { setBuildingId(e.target.value); setPage(1); }}
-          className="sm:max-w-xs"
-        />
+          className="sm:max-w-xs rounded-lg border border-black/10 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange/30"
+        >
+          <option value="">All Buildings</option>
+          {buildings.map((b) => (
+            <option key={b.id} value={b.id}>{b.name}</option>
+          ))}
+        </select>
       </div>
 
       {isLoading ? (
@@ -94,6 +105,7 @@ export function FloorListPage() {
         <>
           <FloorTable
             data={data?.data ?? []}
+            buildings={buildings}
             onRowClick={handleRowClick}
             onEdit={handleEdit}
             onDelete={handleDelete}

@@ -14,20 +14,22 @@ export async function fetchCharges(params?: ChargeQueryParams): Promise<ChargeLi
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));
   if (params?.per_page) query.set("per_page", String(params.per_page));
-  if (params?.sort) query.set("sort", params.sort);
-  if (params?.order) query.set("order", params.order);
   if (params?.search) query.set("search", params.search);
   const qs = query.toString();
-  return api.get<ChargeListResponse>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  const res = await api.get<{ success: boolean; data: ChargeListResponse }>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  return res.data;
 }
 export async function fetchChargeById(id: string): Promise<Charge> {
-  return api.get<Charge>(`${BASE_PATH}/${id}`);
+  const res = await api.get<{ success: boolean; data: Charge }>(`${BASE_PATH}/${id}`);
+  return res.data;
 }
 export async function createCharge(data: CreateChargeRequest): Promise<Charge> {
-  return api.post<Charge>(BASE_PATH, data);
+  const res = await api.post<{ success: boolean; data: Charge }>(BASE_PATH, data);
+  return res.data;
 }
 export async function updateCharge(id: string, data: UpdateChargeRequest): Promise<Charge> {
-  return api.put<Charge>(`${BASE_PATH}/${id}`, data);
+  const res = await api.put<{ success: boolean; data: Charge }>(`${BASE_PATH}/${id}`, data);
+  return res.data;
 }
 export async function deleteCharge(id: string): Promise<void> {
   return api.delete<void>(`${BASE_PATH}/${id}`);

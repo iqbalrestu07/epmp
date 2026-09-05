@@ -24,7 +24,7 @@ export function OccupancyListPage() {
   const deleteMutation = useDeleteOccupancy();
 
   const handleRowClick = (row: Occupancy) => {
-    navigate(`/occupancy/${row.id}`);
+    navigate(`/dashboard/occupancies/${row.id}`);
   };
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ export function OccupancyListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Occupancys</h1>
-        <Button onClick={() => navigate("/occupancy/new")}>
+        <Button onClick={() => navigate("/dashboard/occupancies/new")}>
           New Occupancy
         </Button>
       </div>

@@ -15,7 +15,7 @@ export function TenantEditPage() {
   const handleSubmit = (formData: CreateTenantFormData) => {
     updateMutation.mutate(
       { id: id!, data: formData },
-      { onSuccess: () => navigate(`/tenant/${id}`) }
+      { onSuccess: () => navigate(`/dashboard/tenants/${id}`) }
     );
   };
 

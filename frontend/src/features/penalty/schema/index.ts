@@ -16,6 +16,7 @@ export const penaltySchema = z.object({
 
 export const createPenaltySchema = penaltySchema.omit({
   id: true,
+  organization_id: true,
   created_at: true,
   updated_at: true,
 });

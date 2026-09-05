@@ -15,7 +15,7 @@ export function AssetAssignmentEditPage() {
   const handleSubmit = (formData: CreateAssetAssignmentFormData) => {
     updateMutation.mutate(
       { id: id!, data: formData },
-      { onSuccess: () => navigate(`/assetassignment/${id}`) }
+      { onSuccess: () => navigate(`/dashboard/asset-assignments/${id}`) }
     );
   };
 

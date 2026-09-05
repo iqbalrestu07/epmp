@@ -55,7 +55,8 @@ export function useDeleteTenant() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => deleteTenant(id),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
+      queryClient.removeQueries({ queryKey: [QUERY_KEY, id] });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
     },
   });

@@ -24,7 +24,7 @@ export function RefundListPage() {
   const deleteMutation = useDeleteRefund();
 
   const handleRowClick = (row: Refund) => {
-    navigate(`/refund/${row.id}`);
+    navigate(`/dashboard/refunds/${row.id}`);
   };
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ export function RefundListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Refunds</h1>
-        <Button onClick={() => navigate("/refund/new")}>
+        <Button onClick={() => navigate("/dashboard/refunds/new")}>
           New Refund
         </Button>
       </div>

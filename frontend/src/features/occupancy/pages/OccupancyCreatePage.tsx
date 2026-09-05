@@ -12,7 +12,7 @@ export function OccupancyCreatePage() {
 
   const handleSubmit = (data: CreateOccupancyFormData) => {
     createMutation.mutate(data, {
-      onSuccess: () => navigate("/occupancy"),
+      onSuccess: () => navigate("/dashboard/occupancies"),
     });
   };
 

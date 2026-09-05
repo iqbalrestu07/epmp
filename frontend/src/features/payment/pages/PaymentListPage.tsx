@@ -24,7 +24,7 @@ export function PaymentListPage() {
   const deleteMutation = useDeletePayment();
 
   const handleRowClick = (row: Payment) => {
-    navigate(`/payment/${row.id}`);
+    navigate(`/dashboard/payments/${row.id}`);
   };
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ export function PaymentListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Payments</h1>
-        <Button onClick={() => navigate("/payment/new")}>
+        <Button onClick={() => navigate("/dashboard/payments/new")}>
           New Payment
         </Button>
       </div>

@@ -24,7 +24,6 @@ export interface ChargeListResponse {
 }
 
 export interface CreateChargeRequest {
-  organization_id: string;
   contract_id: string;
   invoice_id?: string;
   charge_type: string;
@@ -35,7 +34,6 @@ export interface CreateChargeRequest {
 }
 
 export interface UpdateChargeRequest {
-  organization_id: string;
   contract_id: string;
   invoice_id?: string;
   charge_type: string;
@@ -48,10 +46,7 @@ export interface UpdateChargeRequest {
 export interface ChargeQueryParams {
   page?: number;
   per_page?: number;
-  sort?: string;
-  order?: "asc" | "desc";
   search?: string;
-  organization_id?: string;
   contract_id?: string;
   invoice_id?: string;
 }

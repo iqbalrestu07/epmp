@@ -20,14 +20,12 @@ export interface TenantDocumentListResponse {
 }
 
 export interface CreateTenantDocumentRequest {
-  organization_id: string;
   tenant_id: string;
   document_type: string;
   file_url: string;
 }
 
 export interface UpdateTenantDocumentRequest {
-  organization_id: string;
   tenant_id: string;
   document_type: string;
   file_url: string;
@@ -36,9 +34,6 @@ export interface UpdateTenantDocumentRequest {
 export interface TenantDocumentQueryParams {
   page?: number;
   per_page?: number;
-  sort?: string;
-  order?: "asc" | "desc";
   search?: string;
-  organization_id?: string;
   tenant_id?: string;
 }

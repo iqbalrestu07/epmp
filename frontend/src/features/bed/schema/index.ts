@@ -14,6 +14,7 @@ export const bedSchema = z.object({
 
 export const createBedSchema = bedSchema.omit({
   id: true,
+  organization_id: true,
   created_at: true,
   updated_at: true,
 });

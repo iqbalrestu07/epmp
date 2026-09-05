@@ -12,7 +12,7 @@ export function TechnicianCreatePage() {
 
   const handleSubmit = (data: CreateTechnicianFormData) => {
     createMutation.mutate(data, {
-      onSuccess: () => navigate("/technician"),
+      onSuccess: () => navigate("/dashboard/technicians"),
     });
   };
 

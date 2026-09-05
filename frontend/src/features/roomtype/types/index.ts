@@ -20,14 +20,12 @@ export interface RoomTypeListResponse {
 }
 
 export interface CreateRoomTypeRequest {
-  organization_id: string;
   name: string;
   description?: string;
   base_price: number;
 }
 
 export interface UpdateRoomTypeRequest {
-  organization_id: string;
   name: string;
   description?: string;
   base_price: number;
@@ -36,9 +34,6 @@ export interface UpdateRoomTypeRequest {
 export interface RoomTypeQueryParams {
   page?: number;
   per_page?: number;
-  sort?: string;
-  order?: "asc" | "desc";
   search?: string;
-  organization_id?: string;
   name?: string;
 }

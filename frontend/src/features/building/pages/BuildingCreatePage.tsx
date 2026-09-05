@@ -1,15 +1,15 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useCreateBuilding } from "../hooks";
 import { BuildingForm } from "../components/BuildingForm";
 import { InteractiveBuildingCreator } from "../components/InteractiveBuildingCreator";
 import type { CreateBuildingFormData } from "../schema";
-import { Button } from "@/components/ui/button";
+import { ChevronRight, Building2, Box, FileText } from "lucide-react";
 
 export function BuildingCreatePage() {
   const navigate = useNavigate();
   const createMutation = useCreateBuilding();
-  const [viewMode, setViewMode] = useState<"basic" | "interactive">("interactive");
+  const [viewMode, setViewMode] = useState<"interactive" | "basic">("interactive");
 
   const handleSubmit = (data: CreateBuildingFormData) => {
     createMutation.mutate(data, {
@@ -18,32 +18,65 @@ export function BuildingCreatePage() {
   };
 
   return (
-    <div className="space-y-4 h-full flex flex-col">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">New Building</h1>
-        <div className="flex gap-2 bg-slate-100 p-1 rounded-md">
-          <Button
-            variant={viewMode === "basic" ? "default" : "ghost"}
-            size="sm"
-            onClick={() => setViewMode("basic")}
-            className="text-sm"
-          >
-            Basic View
-          </Button>
-          <Button
-            variant={viewMode === "interactive" ? "default" : "ghost"}
-            size="sm"
+    <div className="space-y-6 h-full flex flex-col">
+      {/* Breadcrumb Navigation */}
+      <div className="flex items-center gap-2 text-sm text-slate-500">
+        <Link to="/dashboard" className="hover:text-slate-800 transition-colors">Dashboard</Link>
+        <ChevronRight size={14} />
+        <Link to="/dashboard/buildings" className="hover:text-slate-800 transition-colors">Buildings</Link>
+        <ChevronRight size={14} />
+        <span className="text-slate-800 font-medium">New Building</span>
+      </div>
+
+      {/* Page Title & View Switcher */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+            <Building2 className="text-orange" size={26} />
+            Create Building
+          </h1>
+          <p className="text-sm text-slate-500 mt-0.5">
+            {viewMode === "interactive"
+              ? "Position the building in a real 3D environment using the digital twin."
+              : "Standard form mode for quick data entry."}
+          </p>
+        </div>
+
+        {/* View Toggle Tabs */}
+        <div className="flex bg-slate-200/80 p-1 rounded-xl shadow-inner border border-slate-300/60 self-start">
+          <button
+            type="button"
             onClick={() => setViewMode("interactive")}
-            className="text-sm"
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
+              viewMode === "interactive"
+                ? "bg-white text-slate-900 shadow-sm"
+                : "text-slate-600 hover:text-slate-900"
+            }`}
           >
-            Interactive View
-          </Button>
+            <Box size={15} className={viewMode === "interactive" ? "text-orange" : ""} />
+            Interactive 3D View
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("basic")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
+              viewMode === "basic"
+                ? "bg-white text-slate-900 shadow-sm"
+                : "text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            <FileText size={15} className={viewMode === "basic" ? "text-orange" : ""} />
+            Basic View (Form)
+          </button>
         </div>
       </div>
-      
-      <div className="flex-1 min-h-[600px]">
+
+      {/* Content Canvas or Form */}
+      <div className="flex-1">
         {viewMode === "basic" ? (
-          <div className="bg-white p-6 rounded-xl border border-slate-200">
+          <div className="max-w-2xl bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+            <h2 className="text-lg font-bold text-slate-800 mb-2">Building Information</h2>
+            <p className="text-sm text-slate-500 mb-6">Enter the property and floor capacity for this building structure.</p>
             <BuildingForm
               onSubmit={handleSubmit}
               isSubmitting={createMutation.isPending}

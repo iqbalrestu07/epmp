@@ -18,6 +18,7 @@ export const depositSchema = z.object({
 
 export const createDepositSchema = depositSchema.omit({
   id: true,
+  organization_id: true,
   created_at: true,
   updated_at: true,
 });

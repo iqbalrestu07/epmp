@@ -15,7 +15,7 @@ export function TechnicianEditPage() {
   const handleSubmit = (formData: CreateTechnicianFormData) => {
     updateMutation.mutate(
       { id: id!, data: formData },
-      { onSuccess: () => navigate(`/technician/${id}`) }
+      { onSuccess: () => navigate(`/dashboard/technicians/${id}`) }
     );
   };
 

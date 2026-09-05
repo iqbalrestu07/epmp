@@ -24,7 +24,7 @@ export function DepositListPage() {
   const deleteMutation = useDeleteDeposit();
 
   const handleRowClick = (row: Deposit) => {
-    navigate(`/deposit/${row.id}`);
+    navigate(`/dashboard/deposits/${row.id}`);
   };
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ export function DepositListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Deposits</h1>
-        <Button onClick={() => navigate("/deposit/new")}>
+        <Button onClick={() => navigate("/dashboard/deposits/new")}>
           New Deposit
         </Button>
       </div>

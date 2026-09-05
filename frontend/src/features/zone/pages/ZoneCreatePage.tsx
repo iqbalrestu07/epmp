@@ -12,7 +12,7 @@ export function ZoneCreatePage() {
 
   const handleSubmit = (data: CreateZoneFormData) => {
     createMutation.mutate(data, {
-      onSuccess: () => navigate("/zone"),
+      onSuccess: () => navigate("/dashboard/zones"),
     });
   };
 

@@ -15,7 +15,7 @@ export function SupplierEditPage() {
   const handleSubmit = (formData: CreateSupplierFormData) => {
     updateMutation.mutate(
       { id: id!, data: formData },
-      { onSuccess: () => navigate(`/supplier/${id}`) }
+      { onSuccess: () => navigate(`/dashboard/suppliers/${id}`) }
     );
   };
 

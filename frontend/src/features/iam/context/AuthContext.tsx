@@ -5,6 +5,7 @@ import {
   getStoredToken,
   setStoredTokens,
   clearStoredTokens,
+  clearStoredOrgId,
   REFRESH_TOKEN_KEY,
 } from '../../../services/api';
 
@@ -48,7 +49,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     authService
       .me()
       .then(res => {
-        setState({ user: res.data, isAuthenticated: true, isLoading: false });
+        const user = (res as any)?.data ?? res;
+        setState({ user, isAuthenticated: true, isLoading: false });
       })
       .catch(() => {
         // Token might be expired — try refresh
@@ -62,8 +64,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         authService
           .refresh(refreshToken)
           .then(res => {
-            setStoredTokens(res.data.access_token, res.data.refresh_token);
-            setState({ user: res.data.user, isAuthenticated: true, isLoading: false });
+            const data = (res as any)?.data ?? res;
+            setStoredTokens(data.access_token, data.refresh_token);
+            setState({ user: data.user, isAuthenticated: true, isLoading: false });
           })
           .catch(() => {
             clearStoredTokens();
@@ -73,15 +76,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
+    clearStoredOrgId(); // Clear any stale org from previous session
     const res = await authService.login({ email, password });
-    setStoredTokens(res.data.access_token, res.data.refresh_token);
-    setState({ user: res.data.user, isAuthenticated: true, isLoading: false });
+    const data = (res as any)?.data ?? res;
+    setStoredTokens(data.access_token, data.refresh_token);
+    setState({ user: data.user, isAuthenticated: true, isLoading: false });
   }, []);
 
   const register = useCallback(async (name: string, email: string, password: string) => {
+    clearStoredOrgId(); // Clear any stale org from previous session
     const res = await authService.register({ name, email, password });
-    setStoredTokens(res.data.access_token, res.data.refresh_token);
-    setState({ user: res.data.user, isAuthenticated: true, isLoading: false });
+    const data = (res as any)?.data ?? res;
+    setStoredTokens(data.access_token, data.refresh_token);
+    setState({ user: data.user, isAuthenticated: true, isLoading: false });
   }, []);
 
   const logout = useCallback(async () => {

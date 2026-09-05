@@ -24,7 +24,7 @@ export function RoomTypeListPage() {
   const deleteMutation = useDeleteRoomType();
 
   const handleRowClick = (row: RoomType) => {
-    navigate(`/roomtype/${row.id}`);
+    navigate(`/dashboard/room-types/${row.id}`);
   };
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ export function RoomTypeListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">RoomTypes</h1>
-        <Button onClick={() => navigate("/roomtype/new")}>
+        <Button onClick={() => navigate("/dashboard/room-types/new")}>
           New RoomType
         </Button>
       </div>

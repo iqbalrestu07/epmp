@@ -18,6 +18,7 @@ export const chargeSchema = z.object({
 
 export const createChargeSchema = chargeSchema.omit({
   id: true,
+  organization_id: true,
   created_at: true,
   updated_at: true,
 });

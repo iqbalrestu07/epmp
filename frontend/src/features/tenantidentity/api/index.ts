@@ -14,20 +14,22 @@ export async function fetchTenantIdentitys(params?: TenantIdentityQueryParams): 
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));
   if (params?.per_page) query.set("per_page", String(params.per_page));
-  if (params?.sort) query.set("sort", params.sort);
-  if (params?.order) query.set("order", params.order);
   if (params?.search) query.set("search", params.search);
   const qs = query.toString();
-  return api.get<TenantIdentityListResponse>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  const res = await api.get<{ success: boolean; data: TenantIdentityListResponse }>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  return res.data;
 }
 export async function fetchTenantIdentityById(id: string): Promise<TenantIdentity> {
-  return api.get<TenantIdentity>(`${BASE_PATH}/${id}`);
+  const res = await api.get<{ success: boolean; data: TenantIdentity }>(`${BASE_PATH}/${id}`);
+  return res.data;
 }
 export async function createTenantIdentity(data: CreateTenantIdentityRequest): Promise<TenantIdentity> {
-  return api.post<TenantIdentity>(BASE_PATH, data);
+  const res = await api.post<{ success: boolean; data: TenantIdentity }>(BASE_PATH, data);
+  return res.data;
 }
 export async function updateTenantIdentity(id: string, data: UpdateTenantIdentityRequest): Promise<TenantIdentity> {
-  return api.put<TenantIdentity>(`${BASE_PATH}/${id}`, data);
+  const res = await api.put<{ success: boolean; data: TenantIdentity }>(`${BASE_PATH}/${id}`, data);
+  return res.data;
 }
 export async function deleteTenantIdentity(id: string): Promise<void> {
   return api.delete<void>(`${BASE_PATH}/${id}`);

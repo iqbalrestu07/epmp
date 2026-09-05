@@ -14,12 +14,16 @@ const MENU_CONFIG = [
   { label: 'Overview',       path: '/dashboard',                  icon: LayoutDashboard },
   { label: '3D Explorer',      path: '/dashboard/explorer',                 icon: Box },
   { type: 'divider' as const, label: 'CORE' },
-  { label: 'Organizations',  path: '/dashboard/organizations',    icon: Globe2,     requiredPermission: 'property:read' },
-  { label: 'Properties',     path: '/dashboard/properties',       icon: Building2,  requiredPermission: 'property:read' },
-  { label: 'Buildings',      path: '/dashboard/buildings',        icon: Layers,     requiredPermission: 'property:read' },
-  { label: 'Floors',         path: '/dashboard/floors',           icon: Layers,     requiredPermission: 'property:read' },
-  { label: 'Rooms & Units',  path: '/dashboard/rooms',            icon: DoorOpen,   requiredPermission: 'room:read'     },
-  { label: 'Tenants',        path: '/dashboard/tenants',          icon: Users,      requiredPermission: 'tenant:read'   },
+  { label: 'Organizations',  path: '/dashboard/organizations',    icon: Globe2 },
+  { label: 'Properties',     path: '/dashboard/properties',       icon: Building2 },
+  { label: 'Buildings',      path: '/dashboard/buildings',        icon: Layers },
+  { label: 'Floors',         path: '/dashboard/floors',           icon: Layers },
+  { label: 'Zones',          path: '/dashboard/zones',            icon: Layers },
+  { label: 'Rooms & Units',  path: '/dashboard/rooms',            icon: DoorOpen },
+  { label: 'Room Types',     path: '/dashboard/room-types',       icon: DoorOpen },
+  { label: 'Beds',           path: '/dashboard/beds',             icon: Bed },
+  { label: 'Facilities',     path: '/dashboard/facilities',       icon: Building2 },
+  { label: 'Tenants',        path: '/dashboard/tenants',          icon: Users },
   
   { type: 'divider' as const, label: 'OPERATIONS' },
   { label: 'Reservations',   path: '/dashboard/reservations',     icon: CalendarCheck },
@@ -29,10 +33,19 @@ const MENU_CONFIG = [
   { type: 'divider' as const, label: 'FINANCE' },
   { label: 'Invoices',       path: '/dashboard/invoices',         icon: Receipt },
   { label: 'Payments',       path: '/dashboard/payments',         icon: CreditCard },
+  { label: 'Deposits',       path: '/dashboard/deposits',         icon: CreditCard },
+  { label: 'Charges',        path: '/dashboard/charges',          icon: Receipt },
+  { label: 'Refunds',        path: '/dashboard/refunds',          icon: CreditCard },
+  { label: 'Adjustments',    path: '/dashboard/adjustments',      icon: Receipt },
+  { label: 'Penalties',      path: '/dashboard/penalties',        icon: Receipt },
   
   { type: 'divider' as const, label: 'MAINTENANCE & ASSETS' },
   { label: 'Work Orders',    path: '/dashboard/work-orders',      icon: Wrench },
   { label: 'Assets',         path: '/dashboard/assets',           icon: Package },
+  { label: 'Asset Assignments', path: '/dashboard/asset-assignments', icon: Package },
+  { label: 'Asset Inspections', path: '/dashboard/asset-inspections', icon: Package },
+  { label: 'Technicians',    path: '/dashboard/technicians',      icon: Wrench },
+  { label: 'Suppliers',      path: '/dashboard/suppliers',        icon: Package },
 
   { type: 'divider' as const, label: 'COMMUNICATION' },
   { label: 'Blast Message',  path: '/dashboard/messaging/blast',  icon: Megaphone },
@@ -232,7 +245,7 @@ export default function MainLayout() {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-6 md:p-10 bg-[#f2efe9]">
+        <main className="flex-1 overflow-y-auto p-6 md:p-10 bg-[#f2efe9] dashboard-light">
           <div className="max-w-7xl mx-auto">
             <Outlet />
           </div>

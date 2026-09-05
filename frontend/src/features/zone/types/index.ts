@@ -20,14 +20,12 @@ export interface ZoneListResponse {
 }
 
 export interface CreateZoneRequest {
-  organization_id: string;
   building_id: string;
   floor: number;
   name: string;
 }
 
 export interface UpdateZoneRequest {
-  organization_id: string;
   building_id: string;
   floor: number;
   name: string;
@@ -36,10 +34,7 @@ export interface UpdateZoneRequest {
 export interface ZoneQueryParams {
   page?: number;
   per_page?: number;
-  sort?: string;
-  order?: "asc" | "desc";
   search?: string;
-  organization_id?: string;
   building_id?: string;
   name?: string;
 }

@@ -14,20 +14,22 @@ export async function fetchOccupancys(params?: OccupancyQueryParams): Promise<Oc
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));
   if (params?.per_page) query.set("per_page", String(params.per_page));
-  if (params?.sort) query.set("sort", params.sort);
-  if (params?.order) query.set("order", params.order);
   if (params?.search) query.set("search", params.search);
   const qs = query.toString();
-  return api.get<OccupancyListResponse>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  const res = await api.get<{ success: boolean; data: OccupancyListResponse }>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  return res.data;
 }
 export async function fetchOccupancyById(id: string): Promise<Occupancy> {
-  return api.get<Occupancy>(`${BASE_PATH}/${id}`);
+  const res = await api.get<{ success: boolean; data: Occupancy }>(`${BASE_PATH}/${id}`);
+  return res.data;
 }
 export async function createOccupancy(data: CreateOccupancyRequest): Promise<Occupancy> {
-  return api.post<Occupancy>(BASE_PATH, data);
+  const res = await api.post<{ success: boolean; data: Occupancy }>(BASE_PATH, data);
+  return res.data;
 }
 export async function updateOccupancy(id: string, data: UpdateOccupancyRequest): Promise<Occupancy> {
-  return api.put<Occupancy>(`${BASE_PATH}/${id}`, data);
+  const res = await api.put<{ success: boolean; data: Occupancy }>(`${BASE_PATH}/${id}`, data);
+  return res.data;
 }
 export async function deleteOccupancy(id: string): Promise<void> {
   return api.delete<void>(`${BASE_PATH}/${id}`);

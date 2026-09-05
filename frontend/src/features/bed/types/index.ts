@@ -20,14 +20,12 @@ export interface BedListResponse {
 }
 
 export interface CreateBedRequest {
-  organization_id: string;
   room_id: string;
   name: string;
   status: string;
 }
 
 export interface UpdateBedRequest {
-  organization_id: string;
   room_id: string;
   name: string;
   status: string;
@@ -36,10 +34,7 @@ export interface UpdateBedRequest {
 export interface BedQueryParams {
   page?: number;
   per_page?: number;
-  sort?: string;
-  order?: "asc" | "desc";
   search?: string;
-  organization_id?: string;
   room_id?: string;
   name?: string;
 }

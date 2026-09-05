@@ -14,6 +14,7 @@ export const technicianSchema = z.object({
 
 export const createTechnicianSchema = technicianSchema.omit({
   id: true,
+  organization_id: true,
   created_at: true,
   updated_at: true,
 });

@@ -20,14 +20,12 @@ export interface AssetAssignmentListResponse {
 }
 
 export interface CreateAssetAssignmentRequest {
-  organization_id: string;
   asset_id: string;
   room_id: string;
   assigned_date: string;
 }
 
 export interface UpdateAssetAssignmentRequest {
-  organization_id: string;
   asset_id: string;
   room_id: string;
   assigned_date: string;
@@ -36,10 +34,7 @@ export interface UpdateAssetAssignmentRequest {
 export interface AssetAssignmentQueryParams {
   page?: number;
   per_page?: number;
-  sort?: string;
-  order?: "asc" | "desc";
   search?: string;
-  organization_id?: string;
   asset_id?: string;
   room_id?: string;
 }

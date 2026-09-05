@@ -22,7 +22,6 @@ export interface AdjustmentListResponse {
 }
 
 export interface CreateAdjustmentRequest {
-  organization_id: string;
   invoice_id: string;
   adjustment_type: string;
   amount: number;
@@ -31,7 +30,6 @@ export interface CreateAdjustmentRequest {
 }
 
 export interface UpdateAdjustmentRequest {
-  organization_id: string;
   invoice_id: string;
   adjustment_type: string;
   amount: number;
@@ -42,9 +40,6 @@ export interface UpdateAdjustmentRequest {
 export interface AdjustmentQueryParams {
   page?: number;
   per_page?: number;
-  sort?: string;
-  order?: "asc" | "desc";
   search?: string;
-  organization_id?: string;
   invoice_id?: string;
 }

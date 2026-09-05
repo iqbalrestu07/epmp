@@ -12,7 +12,7 @@ export function AssetInspectionCreatePage() {
 
   const handleSubmit = (data: CreateAssetInspectionFormData) => {
     createMutation.mutate(data, {
-      onSuccess: () => navigate("/assetinspection"),
+      onSuccess: () => navigate("/dashboard/asset-inspections"),
     });
   };
 

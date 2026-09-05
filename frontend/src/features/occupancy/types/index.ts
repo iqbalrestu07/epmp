@@ -24,7 +24,6 @@ export interface OccupancyListResponse {
 }
 
 export interface CreateOccupancyRequest {
-  organization_id: string;
   contract_id: string;
   room_id: string;
   tenant_id: string;
@@ -35,7 +34,6 @@ export interface CreateOccupancyRequest {
 }
 
 export interface UpdateOccupancyRequest {
-  organization_id: string;
   contract_id: string;
   room_id: string;
   tenant_id: string;
@@ -48,10 +46,7 @@ export interface UpdateOccupancyRequest {
 export interface OccupancyQueryParams {
   page?: number;
   per_page?: number;
-  sort?: string;
-  order?: "asc" | "desc";
   search?: string;
-  organization_id?: string;
   contract_id?: string;
   room_id?: string;
   tenant_id?: string;

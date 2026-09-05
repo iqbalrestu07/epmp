@@ -18,16 +18,20 @@ export async function fetchBuildings(params?: BuildingQueryParams): Promise<Buil
   if (params?.order) query.set("order", params.order);
   if (params?.search) query.set("search", params.search);
   const qs = query.toString();
-  return api.get<BuildingListResponse>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  const res = await api.get<{ success: boolean; data: BuildingListResponse }>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  return res.data;
 }
 export async function fetchBuildingById(id: string): Promise<Building> {
-  return api.get<Building>(`${BASE_PATH}/${id}`);
+  const res = await api.get<{ success: boolean; data: Building }>(`${BASE_PATH}/${id}`);
+  return res.data;
 }
 export async function createBuilding(data: CreateBuildingRequest): Promise<Building> {
-  return api.post<Building>(BASE_PATH, data);
+  const res = await api.post<{ success: boolean; data: Building }>(BASE_PATH, data);
+  return res.data;
 }
 export async function updateBuilding(id: string, data: UpdateBuildingRequest): Promise<Building> {
-  return api.put<Building>(`${BASE_PATH}/${id}`, data);
+  const res = await api.put<{ success: boolean; data: Building }>(`${BASE_PATH}/${id}`, data);
+  return res.data;
 }
 export async function deleteBuilding(id: string): Promise<void> {
   return api.delete<void>(`${BASE_PATH}/${id}`);

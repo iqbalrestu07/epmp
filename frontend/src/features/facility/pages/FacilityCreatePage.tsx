@@ -12,7 +12,7 @@ export function FacilityCreatePage() {
 
   const handleSubmit = (data: CreateFacilityFormData) => {
     createMutation.mutate(data, {
-      onSuccess: () => navigate("/facility"),
+      onSuccess: () => navigate("/dashboard/facilities"),
     });
   };
 

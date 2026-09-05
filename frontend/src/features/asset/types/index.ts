@@ -38,10 +38,7 @@ export interface UpdateAssetRequest {
 export interface AssetQueryParams {
   page?: number;
   per_page?: number;
-  sort?: string;
-  order?: "asc" | "desc";
   search?: string;
-  organization_id?: string;
   property_id?: string;
   name?: string;
 }

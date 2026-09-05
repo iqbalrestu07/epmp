@@ -24,7 +24,7 @@ export function AdjustmentListPage() {
   const deleteMutation = useDeleteAdjustment();
 
   const handleRowClick = (row: Adjustment) => {
-    navigate(`/adjustment/${row.id}`);
+    navigate(`/dashboard/adjustments/${row.id}`);
   };
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ export function AdjustmentListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Adjustments</h1>
-        <Button onClick={() => navigate("/adjustment/new")}>
+        <Button onClick={() => navigate("/dashboard/adjustments/new")}>
           New Adjustment
         </Button>
       </div>

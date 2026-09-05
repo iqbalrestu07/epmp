@@ -13,7 +13,7 @@ export function TenantContactDetailPage() {
   const handleDelete = () => {
     if (!confirm("Are you sure you want to delete this tenantContact?")) return;
     deleteMutation.mutate(id!, {
-      onSuccess: () => navigate("/tenantcontact"),
+      onSuccess: () => navigate("/dashboard/tenants"),
     });
   };
 
@@ -25,10 +25,10 @@ export function TenantContactDetailPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">TenantContact Detail</h1>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => navigate("/tenantcontact")}>
+          <Button variant="outline" onClick={() => navigate("/dashboard/tenants")}>
             Back
           </Button>
-          <Button variant="outline" onClick={() => navigate(`/tenantcontact/${id}/edit`)}>
+          <Button variant="outline" onClick={() => navigate(`/dashboard/tenants/${id}/edit`)}>
             Edit
           </Button>
           <Button variant="destructive" onClick={handleDelete}>

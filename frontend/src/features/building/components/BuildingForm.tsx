@@ -33,7 +33,11 @@ export function BuildingForm({
   });
 
   const { data: propertiesData } = usePropertys({ per_page: 100 });
-  const properties = propertiesData?.data ?? [];
+  const properties = Array.isArray(propertiesData?.data)
+    ? propertiesData.data
+    : Array.isArray(propertiesData)
+    ? propertiesData
+    : [];
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-md">

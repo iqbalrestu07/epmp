@@ -377,7 +377,29 @@ Every architecture decision should answer the following question.
 
 If the answer is yes,
 
-configuration should always be preferred.
+---
+
+# Quality Assurance & Testing Standards
+
+## Mandatory End-to-End (E2E) Testing Policy
+
+To guarantee enterprise-grade stability and eliminate UI regressions, **every new feature or modification must pass End-to-End (E2E) Testing** before being considered complete (*Definition of Done*).
+
+- **Testing Engine**: Playwright utilizing official system Google Chrome (`channel: 'chrome'`).
+- **Comprehensive Guide**: Refer to [E2E_TESTING.md](E2E_TESTING.md) for full architecture, best practices, and instructions.
+
+### Testing Commands (via root Makefile)
+
+```bash
+# Run automated E2E tests against all 40 routes & 3D canvas
+make test-e2e
+
+# Run backend unit & integration tests
+make test-backend
+
+# Run full test suite (Backend + Frontend Build + E2E)
+make test
+```
 
 ---
 

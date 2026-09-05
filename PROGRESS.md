@@ -144,11 +144,12 @@ All core modules now enforce organization-scoped filtering:
 
 ### Frontend — Remaining
 
-| Task                                      | Status  |
-| ----------------------------------------- | ------- |
-| Floor form: building select from API      | DONE    |
-| Room form: property/floor select from API | DONE    |
-| All remaining modules UI                  | PENDING |
+| Task                                                                         | Status |
+| ---------------------------------------------------------------------------- | ------ |
+| Floor form: building select from API                                         | DONE   |
+| Room form: property/floor select from API                                    | DONE   |
+| Remove organization_id from all frontend Create/Update types, schemas, forms | DONE   |
+| Remove sort/order from API query params                                      | DONE   |
 
 ## Notes
 
@@ -162,3 +163,12 @@ All core modules now enforce organization-scoped filtering:
 - 56 backend tests total (Property: 8, Organization: 8, Building: 10, Floor: 10, Room: 10, Tenant: 10)
 - Soft deletes via `deleted_at` column
 - `organization_id` always from context (X-Organization-ID header), never from request body
+
+## Quality Assurance & End-to-End (E2E) Testing
+
+- **Testing Engine**: Playwright 1.63+ utilizing native system Google Chrome (`channel: 'chrome'`)
+- **Specification Document**: [`E2E_TESTING.md`](E2E_TESTING.md)
+- **Suite Command**: `make test-e2e` (or `npm run test:e2e` in `frontend/`)
+- **Coverage**: 40 dashboard routes, interactive spatial views (Building Drop 3D, Property 3D Map, Explorer), and auth flows.
+- **Current Status**: ✅ 100% Passed (0 Errors).
+- **Mandatory Policy**: Every future feature, form, or route addition must be included in the E2E test suite and pass before merge/completion.

@@ -22,25 +22,29 @@ export async function fetch{{.Name}}s(params?: {{.Name}}QueryParams): Promise<{{
   if (params?.search) query.set("search", params.search);
 {{- end}}
   const qs = query.toString();
-  return api.get<{{.Name}}ListResponse>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  const res = await api.get<{ success: boolean; data: {{.Name}}ListResponse }>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  return res.data;
 }
 {{- end}}
 
 {{- if .HasRead}}
 export async function fetch{{.Name}}ById(id: string): Promise<{{.Name}}> {
-  return api.get<{{.Name}}>(`${BASE_PATH}/${id}`);
+  const res = await api.get<{ success: boolean; data: {{.Name}} }>(`${BASE_PATH}/${id}`);
+  return res.data;
 }
 {{- end}}
 
 {{- if .HasCreate}}
 export async function create{{.Name}}(data: Create{{.Name}}Request): Promise<{{.Name}}> {
-  return api.post<{{.Name}}>(BASE_PATH, data);
+  const res = await api.post<{ success: boolean; data: {{.Name}} }>(BASE_PATH, data);
+  return res.data;
 }
 {{- end}}
 
 {{- if .HasUpdate}}
 export async function update{{.Name}}(id: string, data: Update{{.Name}}Request): Promise<{{.Name}}> {
-  return api.put<{{.Name}}>(`${BASE_PATH}/${id}`, data);
+  const res = await api.put<{ success: boolean; data: {{.Name}} }>(`${BASE_PATH}/${id}`, data);
+  return res.data;
 }
 {{- end}}
 

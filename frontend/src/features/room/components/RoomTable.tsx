@@ -6,17 +6,20 @@ import {
 } from "@tanstack/react-table";
 import { DoorOpen, Eye, Pencil, Trash2, Users, DollarSign } from "lucide-react";
 import type { Room } from "../types";
+import type { Floor } from "../../floor/types";
 
 const columnHelper = createColumnHelper<Room>();
 
 interface RoomTableProps {
   data: Room[];
+  floors?: Floor[];
   onRowClick?: (row: Room) => void;
   onEdit?: (row: Room) => void;
   onDelete?: (row: Room) => void;
 }
 
-export function RoomTable({ data, onRowClick, onEdit, onDelete }: RoomTableProps) {
+export function RoomTable({ data, floors = [], onRowClick, onEdit, onDelete }: RoomTableProps) {
+  const floorNameById = new Map(floors.map((f) => [f.id, f.name]));
   const columns = [
     columnHelper.accessor("name", {
       header: "Name",
@@ -50,8 +53,8 @@ export function RoomTable({ data, onRowClick, onEdit, onDelete }: RoomTableProps
     columnHelper.accessor("floor_id", {
       header: "Floor",
       cell: (info) => (
-        <span className="text-sm text-black/50 font-mono truncate max-w-32 inline-block">
-          {info.getValue() ? info.getValue().slice(0, 12) + "…" : "—"}
+        <span className="text-sm text-black/70">
+          {floorNameById.get(info.getValue()) ?? "—"}
         </span>
       ),
     }),

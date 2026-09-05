@@ -15,7 +15,7 @@ export function PenaltyEditPage() {
   const handleSubmit = (formData: CreatePenaltyFormData) => {
     updateMutation.mutate(
       { id: id!, data: formData },
-      { onSuccess: () => navigate(`/penalty/${id}`) }
+      { onSuccess: () => navigate(`/dashboard/penalties/${id}`) }
     );
   };
 

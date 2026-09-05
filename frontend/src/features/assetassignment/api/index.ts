@@ -14,20 +14,22 @@ export async function fetchAssetAssignments(params?: AssetAssignmentQueryParams)
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));
   if (params?.per_page) query.set("per_page", String(params.per_page));
-  if (params?.sort) query.set("sort", params.sort);
-  if (params?.order) query.set("order", params.order);
   if (params?.search) query.set("search", params.search);
   const qs = query.toString();
-  return api.get<AssetAssignmentListResponse>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  const res = await api.get<{ success: boolean; data: AssetAssignmentListResponse }>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  return res.data;
 }
 export async function fetchAssetAssignmentById(id: string): Promise<AssetAssignment> {
-  return api.get<AssetAssignment>(`${BASE_PATH}/${id}`);
+  const res = await api.get<{ success: boolean; data: AssetAssignment }>(`${BASE_PATH}/${id}`);
+  return res.data;
 }
 export async function createAssetAssignment(data: CreateAssetAssignmentRequest): Promise<AssetAssignment> {
-  return api.post<AssetAssignment>(BASE_PATH, data);
+  const res = await api.post<{ success: boolean; data: AssetAssignment }>(BASE_PATH, data);
+  return res.data;
 }
 export async function updateAssetAssignment(id: string, data: UpdateAssetAssignmentRequest): Promise<AssetAssignment> {
-  return api.put<AssetAssignment>(`${BASE_PATH}/${id}`, data);
+  const res = await api.put<{ success: boolean; data: AssetAssignment }>(`${BASE_PATH}/${id}`, data);
+  return res.data;
 }
 export async function deleteAssetAssignment(id: string): Promise<void> {
   return api.delete<void>(`${BASE_PATH}/${id}`);

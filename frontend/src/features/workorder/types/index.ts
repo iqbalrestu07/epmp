@@ -22,7 +22,6 @@ export interface WorkOrderListResponse {
 }
 
 export interface CreateWorkOrderRequest {
-  organization_id: string;
   property_id: string;
   room_id?: string;
   description: string;
@@ -31,7 +30,6 @@ export interface CreateWorkOrderRequest {
 }
 
 export interface UpdateWorkOrderRequest {
-  organization_id: string;
   property_id: string;
   room_id?: string;
   description: string;
@@ -42,10 +40,7 @@ export interface UpdateWorkOrderRequest {
 export interface WorkOrderQueryParams {
   page?: number;
   per_page?: number;
-  sort?: string;
-  order?: "asc" | "desc";
   search?: string;
-  organization_id?: string;
   property_id?: string;
   room_id?: string;
 }

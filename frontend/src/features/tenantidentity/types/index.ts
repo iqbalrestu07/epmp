@@ -21,7 +21,6 @@ export interface TenantIdentityListResponse {
 }
 
 export interface CreateTenantIdentityRequest {
-  organization_id: string;
   tenant_id: string;
   identity_type: string;
   identity_number: string;
@@ -29,7 +28,6 @@ export interface CreateTenantIdentityRequest {
 }
 
 export interface UpdateTenantIdentityRequest {
-  organization_id: string;
   tenant_id: string;
   identity_type: string;
   identity_number: string;
@@ -39,10 +37,7 @@ export interface UpdateTenantIdentityRequest {
 export interface TenantIdentityQueryParams {
   page?: number;
   per_page?: number;
-  sort?: string;
-  order?: "asc" | "desc";
   search?: string;
-  organization_id?: string;
   tenant_id?: string;
   identity_number?: string;
 }

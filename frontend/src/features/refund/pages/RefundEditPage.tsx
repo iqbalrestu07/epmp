@@ -15,7 +15,7 @@ export function RefundEditPage() {
   const handleSubmit = (formData: CreateRefundFormData) => {
     updateMutation.mutate(
       { id: id!, data: formData },
-      { onSuccess: () => navigate(`/refund/${id}`) }
+      { onSuccess: () => navigate(`/dashboard/refunds/${id}`) }
     );
   };
 

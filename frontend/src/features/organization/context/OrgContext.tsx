@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { api, getStoredOrgId, setStoredOrgId, clearStoredOrgId } from '../../../services/api';
+import { useAuth } from '../../iam/context/AuthContext';
 import type { Organization } from '../types';
 
 interface OrgContextValue {
@@ -14,6 +15,7 @@ interface OrgContextValue {
 const OrgContext = createContext<OrgContextValue | null>(null);
 
 export function OrgProvider({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [orgs, setOrgs] = useState<Organization[]>([]);
   const [currentOrg, setCurrentOrg] = useState<Organization | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,8 +23,8 @@ export function OrgProvider({ children }: { children: React.ReactNode }) {
 
   const fetchOrgs = useCallback(async () => {
     try {
-      const res = await api.get<{ data: Organization[] }>('/organizations/mine');
-      const list = res.data ?? [];
+      const res = await api.get<Organization[]>('/organizations/mine');
+      const list: Organization[] = Array.isArray(res) ? res : (res as any)?.data ?? [];
       setOrgs(list);
 
       const stored = getStoredOrgId();
@@ -46,17 +48,33 @@ export function OrgProvider({ children }: { children: React.ReactNode }) {
         clearStoredOrgId();
       }
     } catch {
+      // Avoid destroying session on transient network error
       setOrgs([]);
-      setCurrentOrg(null);
-      setOrgId(null);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
+  // Sync org fetch with auth state
   useEffect(() => {
-    fetchOrgs();
-  }, [fetchOrgs]);
+    if (authLoading) {
+      // Waiting for auth verification on refresh, keep isLoading true
+      setIsLoading(true);
+      return;
+    }
+
+    if (isAuthenticated) {
+      setIsLoading(true);
+      fetchOrgs();
+    } else {
+      // Explicitly not authenticated (logout)
+      setOrgs([]);
+      setCurrentOrg(null);
+      setOrgId(null);
+      clearStoredOrgId();
+      setIsLoading(false);
+    }
+  }, [isAuthenticated, authLoading, fetchOrgs]);
 
   const switchOrg = useCallback((id: string) => {
     const found = orgs.find(o => o.id === id);
@@ -73,7 +91,7 @@ export function OrgProvider({ children }: { children: React.ReactNode }) {
         currentOrg,
         orgs,
         orgId,
-        isLoading,
+        isLoading: authLoading || isLoading,
         switchOrg,
         refreshOrgs: fetchOrgs,
       }}
@@ -85,6 +103,8 @@ export function OrgProvider({ children }: { children: React.ReactNode }) {
 
 export function useOrg() {
   const ctx = useContext(OrgContext);
-  if (!ctx) throw new Error('useOrg must be used within OrgProvider');
+  if (!ctx) {
+    throw new Error('useOrg must be used within an OrgProvider');
+  }
   return ctx;
 }

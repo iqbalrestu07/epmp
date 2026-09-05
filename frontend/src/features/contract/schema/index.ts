@@ -21,6 +21,7 @@ export const contractSchema = z.object({
 
 export const createContractSchema = contractSchema.omit({
   id: true,
+  organization_id: true,
   created_at: true,
   updated_at: true,
 });

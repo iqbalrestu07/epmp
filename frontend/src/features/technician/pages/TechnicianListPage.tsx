@@ -24,7 +24,7 @@ export function TechnicianListPage() {
   const deleteMutation = useDeleteTechnician();
 
   const handleRowClick = (row: Technician) => {
-    navigate(`/technician/${row.id}`);
+    navigate(`/dashboard/technicians/${row.id}`);
   };
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ export function TechnicianListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Technicians</h1>
-        <Button onClick={() => navigate("/technician/new")}>
+        <Button onClick={() => navigate("/dashboard/technicians/new")}>
           New Technician
         </Button>
       </div>

@@ -10,12 +10,7 @@ import type { Invoice } from "../types";
 
 const columnHelper = createColumnHelper<Invoice>();
 
-const columns = [
-  columnHelper.accessor("organization_id", {
-    header: "OrganizationId",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("id", {
+const columns = [  columnHelper.accessor("id", {
     header: "Id",
     cell: (info) => info.getValue(),
   }),

@@ -18,6 +18,7 @@ export const paymentSchema = z.object({
 
 export const createPaymentSchema = paymentSchema.omit({
   id: true,
+  organization_id: true,
   created_at: true,
   updated_at: true,
 });

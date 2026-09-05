@@ -24,7 +24,7 @@ export function InvoiceListPage() {
   const deleteMutation = useDeleteInvoice();
 
   const handleRowClick = (row: Invoice) => {
-    navigate(`/billing/${row.id}`);
+    navigate(`/dashboard/invoices/${row.id}`);
   };
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ export function InvoiceListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Invoices</h1>
-        <Button onClick={() => navigate("/billing/new")}>
+        <Button onClick={() => navigate("/dashboard/invoices/new")}>
           New Invoice
         </Button>
       </div>

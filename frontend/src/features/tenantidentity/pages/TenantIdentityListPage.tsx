@@ -24,7 +24,7 @@ export function TenantIdentityListPage() {
   const deleteMutation = useDeleteTenantIdentity();
 
   const handleRowClick = (row: TenantIdentity) => {
-    navigate(`/tenantidentity/${row.id}`);
+    navigate(`/dashboard/tenants/${row.id}`);
   };
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ export function TenantIdentityListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">TenantIdentitys</h1>
-        <Button onClick={() => navigate("/tenantidentity/new")}>
+        <Button onClick={() => navigate("/dashboard/tenants/new")}>
           New TenantIdentity
         </Button>
       </div>

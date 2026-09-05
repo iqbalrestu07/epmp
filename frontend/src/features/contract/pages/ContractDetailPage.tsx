@@ -13,7 +13,7 @@ export function ContractDetailPage() {
   const handleDelete = () => {
     if (!confirm("Are you sure you want to delete this contract?")) return;
     deleteMutation.mutate(id!, {
-      onSuccess: () => navigate("/contract"),
+      onSuccess: () => navigate("/dashboard/contracts"),
     });
   };
 
@@ -25,10 +25,10 @@ export function ContractDetailPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Contract Detail</h1>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => navigate("/contract")}>
+          <Button variant="outline" onClick={() => navigate("/dashboard/contracts")}>
             Back
           </Button>
-          <Button variant="outline" onClick={() => navigate(`/contract/${id}/edit`)}>
+          <Button variant="outline" onClick={() => navigate(`/dashboard/contracts/${id}/edit`)}>
             Edit
           </Button>
           <Button variant="destructive" onClick={handleDelete}>

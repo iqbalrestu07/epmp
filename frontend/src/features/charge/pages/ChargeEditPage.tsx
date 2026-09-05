@@ -15,7 +15,7 @@ export function ChargeEditPage() {
   const handleSubmit = (formData: CreateChargeFormData) => {
     updateMutation.mutate(
       { id: id!, data: formData },
-      { onSuccess: () => navigate(`/charge/${id}`) }
+      { onSuccess: () => navigate(`/dashboard/charges/${id}`) }
     );
   };
 

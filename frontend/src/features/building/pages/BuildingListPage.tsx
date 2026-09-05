@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BuildingTable } from "../components/BuildingTable";
 import { useBuildings } from "../hooks";
+import { usePropertys } from "../../property/hooks";
 import type { Building } from "../types";
+import type { Property } from "../../property/types";
 import { Plus, Building2 } from "lucide-react";
 
 export function BuildingListPage() {
@@ -12,12 +14,16 @@ export function BuildingListPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
+  const [propertyId, setPropertyId] = useState("");
 
   const { data, isLoading } = useBuildings({
     page,
     per_page: 20,
     search: search || undefined,
+    property_id: propertyId || undefined,
   });
+  const { data: propertiesData } = usePropertys({ per_page: 100 });
+  const properties = propertiesData?.data ?? [];
 
   const handleRowClick = (row: Building) => {
     navigate(`/dashboard/buildings/${row.id}`);
@@ -58,13 +64,23 @@ export function BuildingListPage() {
           className="max-w-sm"
         />
         <Button type="submit" variant="outline">Search</Button>
+        <select
+          value={propertyId}
+          onChange={(e) => { setPropertyId(e.target.value); setPage(1); }}
+          className="sm:max-w-xs rounded-md border border-gray-300 px-3 py-2 text-sm"
+        >
+          <option value="">All Properties</option>
+          {properties.map((p: Property) => (
+            <option key={p.id} value={p.id}>{p.name}</option>
+          ))}
+        </select>
       </form>
 
       {isLoading ? (
         <div className="text-center py-8">Loading...</div>
       ) : (
         <>
-          <BuildingTable data={data?.data ?? []} onRowClick={handleRowClick} />
+          <BuildingTable data={data?.data ?? []} properties={properties} onRowClick={handleRowClick} />
 
           {data && data.total_pages > 1 && (
             <div className="flex items-center justify-between">

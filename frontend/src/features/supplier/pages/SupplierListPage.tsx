@@ -24,7 +24,7 @@ export function SupplierListPage() {
   const deleteMutation = useDeleteSupplier();
 
   const handleRowClick = (row: Supplier) => {
-    navigate(`/supplier/${row.id}`);
+    navigate(`/dashboard/suppliers/${row.id}`);
   };
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +36,7 @@ export function SupplierListPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Suppliers</h1>
-        <Button onClick={() => navigate("/supplier/new")}>
+        <Button onClick={() => navigate("/dashboard/suppliers/new")}>
           New Supplier
         </Button>
       </div>

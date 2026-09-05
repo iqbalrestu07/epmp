@@ -12,7 +12,7 @@ export function TenantDocumentCreatePage() {
 
   const handleSubmit = (data: CreateTenantDocumentFormData) => {
     createMutation.mutate(data, {
-      onSuccess: () => navigate("/tenantdocument"),
+      onSuccess: () => navigate("/dashboard/tenants"),
     });
   };
 

@@ -15,7 +15,7 @@ export function InvoiceEditPage() {
   const handleSubmit = (formData: CreateInvoiceFormData) => {
     updateMutation.mutate(
       { id: id!, data: formData },
-      { onSuccess: () => navigate(`/billing/${id}`) }
+      { onSuccess: () => navigate(`/dashboard/invoices/${id}`) }
     );
   };
 

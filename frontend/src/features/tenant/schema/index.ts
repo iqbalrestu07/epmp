@@ -16,6 +16,7 @@ export const tenantSchema = z.object({
 
 export const createTenantSchema = tenantSchema.omit({
   id: true,
+  organization_id: true,
   created_at: true,
   updated_at: true,
 });

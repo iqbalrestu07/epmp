@@ -15,7 +15,7 @@ export function WorkOrderEditPage() {
   const handleSubmit = (formData: CreateWorkOrderFormData) => {
     updateMutation.mutate(
       { id: id!, data: formData },
-      { onSuccess: () => navigate(`/workorder/${id}`) }
+      { onSuccess: () => navigate(`/dashboard/work-orders/${id}`) }
     );
   };
 

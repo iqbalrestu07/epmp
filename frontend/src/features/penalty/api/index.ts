@@ -14,20 +14,22 @@ export async function fetchPenaltys(params?: PenaltyQueryParams): Promise<Penalt
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));
   if (params?.per_page) query.set("per_page", String(params.per_page));
-  if (params?.sort) query.set("sort", params.sort);
-  if (params?.order) query.set("order", params.order);
   if (params?.search) query.set("search", params.search);
   const qs = query.toString();
-  return api.get<PenaltyListResponse>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  const res = await api.get<{ success: boolean; data: PenaltyListResponse }>(`${BASE_PATH}${qs ? `?${qs}` : ""}`);
+  return res.data;
 }
 export async function fetchPenaltyById(id: string): Promise<Penalty> {
-  return api.get<Penalty>(`${BASE_PATH}/${id}`);
+  const res = await api.get<{ success: boolean; data: Penalty }>(`${BASE_PATH}/${id}`);
+  return res.data;
 }
 export async function createPenalty(data: CreatePenaltyRequest): Promise<Penalty> {
-  return api.post<Penalty>(BASE_PATH, data);
+  const res = await api.post<{ success: boolean; data: Penalty }>(BASE_PATH, data);
+  return res.data;
 }
 export async function updatePenalty(id: string, data: UpdatePenaltyRequest): Promise<Penalty> {
-  return api.put<Penalty>(`${BASE_PATH}/${id}`, data);
+  const res = await api.put<{ success: boolean; data: Penalty }>(`${BASE_PATH}/${id}`, data);
+  return res.data;
 }
 export async function deletePenalty(id: string): Promise<void> {
   return api.delete<void>(`${BASE_PATH}/${id}`);

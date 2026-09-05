@@ -13,7 +13,7 @@ export function PaymentDetailPage() {
   const handleDelete = () => {
     if (!confirm("Are you sure you want to delete this payment?")) return;
     deleteMutation.mutate(id!, {
-      onSuccess: () => navigate("/payment"),
+      onSuccess: () => navigate("/dashboard/payments"),
     });
   };
 
@@ -25,10 +25,10 @@ export function PaymentDetailPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Payment Detail</h1>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => navigate("/payment")}>
+          <Button variant="outline" onClick={() => navigate("/dashboard/payments")}>
             Back
           </Button>
-          <Button variant="outline" onClick={() => navigate(`/payment/${id}/edit`)}>
+          <Button variant="outline" onClick={() => navigate(`/dashboard/payments/${id}/edit`)}>
             Edit
           </Button>
           <Button variant="destructive" onClick={handleDelete}>

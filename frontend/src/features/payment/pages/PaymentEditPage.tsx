@@ -15,7 +15,7 @@ export function PaymentEditPage() {
   const handleSubmit = (formData: CreatePaymentFormData) => {
     updateMutation.mutate(
       { id: id!, data: formData },
-      { onSuccess: () => navigate(`/payment/${id}`) }
+      { onSuccess: () => navigate(`/dashboard/payments/${id}`) }
     );
   };
 
