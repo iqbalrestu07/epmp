@@ -7,8 +7,8 @@
 ```text
 Document ID    : EPMP-009
 Document Name  : Repository & Solution Structure
-Version        : 1.0.0
-Status         : Draft
+Version        : 1.1.0
+Status         : Implemented & Active
 Owner          : Software Architecture Team
 Dependencies   : EPMP-001 ~ EPMP-008
 Referenced By  : Backend, Frontend, DevOps, CI/CD, Testing
@@ -18,7 +18,7 @@ Referenced By  : Backend, Frontend, DevOps, CI/CD, Testing
 
 # 1. Purpose
 
-Dokumen ini mendefinisikan struktur repository dan organisasi source code EPMP.
+Dokumen ini mendefinisikan struktur repository dan organisasi source code EPMP aktual.
 
 Tujuannya adalah:
 
@@ -28,7 +28,7 @@ Tujuannya adalah:
 - memisahkan business domain dari implementation detail,
 - memungkinkan pertumbuhan proyek tanpa reorganisasi besar.
 
-Dokumen ini tidak membahas implementasi detail setiap modul, tetapi menetapkan aturan bagaimana kode harus diorganisasi.
+Dokumen ini tidak membahas implementasi detail setiap modul, tetapi menetapkan aturan bagaimana kode diorganisasi.
 
 ---
 
@@ -36,15 +36,14 @@ Dokumen ini tidak membahas implementasi detail setiap modul, tetapi menetapkan a
 
 EPMP versi pertama menggunakan **Monorepo**.
 
-Repository akan menyimpan:
+Repository menyimpan:
 
-- Backend (Go)
-- Frontend (React)
-- Documentation
-- Database Migration
-- Infrastructure Configuration
-- API Specification
-- Automation Scripts
+- Backend (Go + Echo + whatsmeow)
+- Frontend (React + Vite + Three.js WebGL Canvas)
+- Documentation (`epmp-docs/`, `README.md`, `PROGRESS.md`)
+- Database Migration (`backend/migrations/*.sql`)
+- End-to-End Test Suite (`frontend/tests/e2e/*.spec.ts`)
+- Infrastructure & Docker (`docker-compose.yml`)
 
 dalam satu repository Git.
 
@@ -62,26 +61,19 @@ dalam satu repository Git.
 
 ```text
 epmp/
-
-├── docs/
-│
-├── backend/
-│
-├── frontend/
-│
-├── database/
-│
-├── infrastructure/
-│
-├── scripts/
-│
-├── tools/
-│
-├── .github/
-│
-├── docker/
-│
-└── README.md
+├── epmp-docs/           # Dokumentasi arsitektur & domain komprehensif
+├── backend/             # Monolith modular Go (Echo framework)
+│   ├── cmd/server/      # Entrypoint aplikasi utama
+│   ├── internal/modules/# Bounded contexts domain
+│   ├── migrations/      # Migrasi database PostgreSQL (termasuk trigger auto-settlement)
+│   └── pkg/             # Shared utilities
+├── frontend/            # Single Page Application React 19 + TypeScript + Three.js
+│   ├── src/features/    # Bounded contexts frontend (pages, components, api, hooks)
+│   └── tests/e2e/       # Playwright E2E test suite (40+ dashboard routes)
+├── docker-compose.yml   # Kontainer PostgreSQL lokal
+├── Makefile             # Automation runner (test-e2e, dev, migrate)
+├── PROGRESS.md          # Log status implementasi & changelog fitur
+└── README.md            # Dokumentasi arsitektur sistem level tinggi
 ```
 
 ---
@@ -91,33 +83,9 @@ epmp/
 Seluruh dokumentasi mengikuti struktur yang telah kita bangun.
 
 ```text
-docs/
-
-README.md
-
-01-foundation/
-
-02-business/
-
-03-architecture/
-
-04-domain/
-
-05-modules/
-
-06-api/
-
-07-database/
-
-08-ui/
-
-09-engineering/
-
-10-devops/
-
-11-testing/
-
-12-adr/
+epmp-docs/
+├── epmp-001.md ~ epmp-012.md   # Core Foundation, Business, & Architecture
+└── epmp-013-notification.md     # Communication & WhatsApp Gateway Specification
 ```
 
 Dokumentasi merupakan bagian dari source code dan wajib diperbarui bersama perubahan implementasi.
@@ -128,40 +96,35 @@ Dokumentasi merupakan bagian dari source code dan wajib diperbarui bersama perub
 
 Backend diorganisasi berdasarkan **bounded context**, bukan berdasarkan layer teknis semata.
 
-Contoh:
-
 ```text
 backend/
-
-cmd/
-internal/
-
-property/
-reservation/
-contract/
-finance/
-asset/
-maintenance/
-tenant/
-configuration/
-shared/
-
-pkg/
-
-configs/
-
-migrations/
-
-test/
+├── cmd/
+│   └── server/          # main.go, server initialization & dependency injection
+├── internal/
+│   ├── app/             # Application container & module registration
+│   ├── middleware/      # Auth JWT, CORS, Logger, Error recovery
+│   └── modules/         # Bounded Contexts
+│       ├── property/    # Property, Building, Floor, Room, Bed Template
+│       ├── tenant/      # Tenant directory & KYC
+│       ├── reservation/ # Unit booking & reservations
+│       ├── contract/    # Lease contracts & terms
+│       ├── occupancy/   # Check-in, check-out, occupancy log
+│       ├── billing/     # Invoicing, multi-currency fees
+│       ├── payment/     # Payments & auto-paid settlement
+│       ├── deposit/     # Security deposit management
+│       ├── communication/# whatsmeow WhatsApp gateway, blast, audit logs
+│       ├── asset/       # Inventory items, asset assignments, inspections
+│       └── maintenance/ # Work orders & technician management
+├── migrations/          # PostgreSQL schema migrations (000001 - 000038)
+└── pkg/                 # Database connection, JWT helper, validator
 ```
 
 ### Penjelasan
 
-- `cmd/` → entry point aplikasi.
-- `internal/` → implementasi utama yang tidak diekspor.
-- Setiap folder domain memiliki struktur internal sendiri (application, domain, infrastructure, interface).
-- `shared/` berisi komponen lintas domain yang telah disetujui.
-- `pkg/` hanya untuk utilitas generik yang benar-benar reusable.
+- `cmd/server/` → entry point aplikasi.
+- `internal/modules/` → implementasi domain modular yang tidak diekspor.
+- `communication/` → integrasi native whatsmeow multi-device WhatsApp, container SQLite session, template resolver, dan auto phone check.
+- `migrations/` → file SQL up/down untuk skema tabel dan database triggers.
 
 ---
 
@@ -263,52 +226,82 @@ Dengan demikian, developer frontend dapat bekerja pada satu domain tanpa bergant
 
 ---
 
+# 7. Frontend Structure
+
+Frontend menggunakan **feature-first architecture** agar selaras dengan bounded context backend.
+
+```text
+frontend/
+├── src/
+│   ├── components/      # Shared UI primitives (Shadcn/Tailwind, Modals, Buttons)
+│   ├── features/        # Feature modules
+│   │   ├── property/    # Properties, Buildings, Floors, Rooms, Bed Templates, 3D WebGL Canvas
+│   │   ├── tenant/      # Tenant directory & onboarding
+│   │   ├── reservation/ # Unit booking & calendar
+│   │   ├── contract/    # Contract agreements & renewals
+│   │   ├── occupancy/   # Check-in, check-out, living logs
+│   │   ├── invoice/     # Billing statements, invoice generation
+│   │   ├── payment/     # Payment recording & settlement
+│   │   ├── deposit/     # Security deposit & deductions
+│   │   ├── communication/# WhatsApp devices (QR pairing), blast campaigns, template editor
+│   │   ├── asset/       # Inventory items, inspections
+│   │   ├── workorder/   # Maintenance tickets & technician assignments
+│   │   └── dashboard/   # Executive summary & quick action shortcuts
+│   ├── hooks/           # Custom React hooks (TanStack query, auth, currency)
+│   ├── lib/             # API client (Axios/fetch with JWT interceptor), utils, currency formatting
+│   ├── types/           # Global TypeScript type declarations
+│   └── App.tsx          # Master routing & Layout providers
+└── tests/
+    └── e2e/             # Playwright E2E tests for all 40 dashboard routes
+```
+
+Setiap fitur memiliki struktur modular:
+```text
+features/<feature-name>/
+├── api/                 # API calls ke endpoint backend
+├── components/          # Komponen UI spesifik (misal: WhatsAppQRModal, BuildingCanvas3D)
+├── hooks/               # React Query hooks (useCreate, useUpdate, useList)
+├── pages/               # ListPage, CreatePage, EditPage, DetailPage
+└── types/               # TypeScript interfaces & DTOs
+```
+
+---
+
 # 8. Shared Components Policy
 
 Komponen bersama hanya dibuat apabila benar-benar digunakan oleh lebih dari satu fitur.
 
 Contoh:
+- `Button`, `Modal`, `Dialog`, `Input`, `Select`, `Badge`
+- `CurrencySelector` & formatters (IDR, USD, EUR, SGD, MYR)
+- `StatusBadge` (Available: Hijau, Reserved: Oranye, Occupied: Merah, Maintenance: Biru)
 
-- Button
-- Modal
-- Table
-- Input
-- Date Picker
-- Dialog
-
-Komponen yang hanya digunakan oleh satu fitur tetap berada di dalam folder fitur tersebut.
+Komponen yang hanya digunakan oleh satu fitur (misal: `Canvas3D`, `QRCodeDisplay`) tetap berada di dalam folder fitur tersebut.
 
 ---
 
-# 9. API Specification Location
+# 9. API Specification & Integration
 
-Seluruh spesifikasi API ditempatkan di:
-
-```text
-docs/06-api/
-```
-
-Implementasi backend dan frontend harus mengacu pada dokumen tersebut.
-
-Jika API berubah, dokumentasi harus diperbarui pada commit yang sama.
+REST API terpusat di backend Go pada prefix `/api/v1/...`.
+Frontend berinteraksi melalui API client seragam dengan penanganan token JWT otomatis, normalisasi tanggal, dan human-readable identifiers.
 
 ---
 
-# 10. Database Structure
+# 10. Database Migrations
 
-Folder `database/` berisi artefak yang berkaitan dengan penyimpanan data.
+Skema database dikelola melalui migration files terurut di `backend/migrations/`:
 
 ```text
-database/
-
-migrations/
-seeds/
-schema/
-views/
-functions/
+backend/migrations/
+├── 000001_create_initial_schema.up.sql
+├── ...
+├── 000035_add_communication_schema.up.sql
+├── 000036_add_bed_templates.up.sql
+├── 000037_add_currency_support.up.sql
+└── 000038_sync_invoice_status.up.sql (Trigger auto-paid pada settlement payment)
 ```
 
-Model domain **bukan** berasal dari skema database. Skema database diturunkan dari model domain yang telah didefinisikan.
+Model domain diimplementasikan di layer Go, sedangkan database migration menjamin integritas relasional, foreign keys, indeks performa, dan trigger database.
 
 ---
 

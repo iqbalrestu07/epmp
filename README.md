@@ -135,6 +135,8 @@ Organization
     │
     ├── Maintenance
     │
+    ├── Communication (WhatsApp Multi-Device Gateway)
+    │
     └── Reports
 ```
 
@@ -342,10 +344,27 @@ The first version of EPMP aims to provide:
 - Deposit Management
 - Asset Management
 - Maintenance Management
+- Communication (WhatsApp Gateway & Blast Messaging)
 - Dashboard
 - Reports
 
 through one integrated platform.
+
+---
+
+# Communication & WhatsApp Gateway (`whatsmeow`)
+
+EPMP includes a native, self-hosted WhatsApp Multi-Device Gateway implemented in Go using `go.mau.fi/whatsmeow`.
+
+### Key Highlights:
+- **Native Multi-Device Pairing**: Generate live WhatsApp Web WebSocket QR codes rendered directly on the browser via `react-qr-code`.
+- **Zero-Manual Phone Input**: Handshake callback automatically detects the authenticated WhatsApp JID (`client.Store.ID.User`) upon scanning and saves it to PostgreSQL.
+- **Pre-Send WhatsApp Verification (`IsOnWhatsApp`)**: Automatically verifies whether recipient phone numbers are registered WhatsApp accounts before sending, avoiding delivery drops and spam penalties.
+- **Indonesian Phone Normalization**: Automatically converts local prefixes (`08...`) into standardized international WhatsApp format (`628...`).
+- **Strict Real Delivery**: Blast messages enforce active device connection; no mock fallbacks. Logs record per-recipient delivery statuses and rejection reasons.
+- **Persistent Session & Auto-Reconnect**: Encrypted session keys stored in PostgreSQL (`whatsmeow_device`), automatically reconnecting on server boot.
+
+For detailed architecture, schema, and API specifications, refer to [epmp-docs/epmp-013-notification.md](epmp-docs/epmp-013-notification.md).
 
 ---
 

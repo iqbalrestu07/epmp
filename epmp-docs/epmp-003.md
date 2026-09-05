@@ -85,39 +85,39 @@ Dokumentasi menjadi sumber kebenaran utama.
 
 # 4. System Context
 
-Versi pertama EPMP difokuskan pada aplikasi web.
+Arsitektur sistem EPMP saat ini mengintegrasikan komponen-komponen berikut:
 
+```text
+┌─────────────────────────────────────────────────────────────┐
+│                      Web Browser Client                     │
+│                                                             │
+│   React 19 + Vite + TailwindCSS + TanStack Query            │
+│   ├── Three.js WebGL (Interactive 3D Spatial Canvas)        │
+│   └── react-qr-code (Live WhatsApp Pairing Code)            │
+└──────────────────────────────┬──────────────────────────────┘
+                               │ HTTPS / REST API
+                               ▼
+┌─────────────────────────────────────────────────────────────┐
+│                     Golang Backend (Echo)                   │
+│                                                             │
+│   Clean Architecture & Modular Monolith                     │
+│   ├── REST API Handlers & Org-Scoped Context                │
+│   ├── Database Trigger Logic (Invoice Auto-Settlement)      │
+│   └── WhatsApp Gateway Manager                              │
+│       (go.mau.fi/whatsmeow Multi-Device Client)             │
+└──────────────┬──────────────────────────────┬───────────────┘
+               │ PostgreSQL Protocol          │ WSS (WebSocket)
+               ▼                              ▼
+┌──────────────────────────────┐ ┌────────────────────────────┐
+│      PostgreSQL Database     │ │      WhatsApp Servers      │
+│                              │ │                            │
+│  - Core Property & Tenant    │ │  wss://web.whatsapp.com    │
+│  - Financial Ledger & Sync   │ │                            │
+│  - whatsmeow Session Stores  │ │  (Official Noise Protocol) │
+└──────────────────────────────┘ └────────────────────────────┘
 ```
-┌────────────────────┐
-│    Web Browser     │
-└─────────┬──────────┘
-          │ HTTPS
-          ▼
-┌────────────────────┐
-│ React Web Frontend │
-└─────────┬──────────┘
-          │ REST API
-          ▼
-┌────────────────────┐
-│   Golang Backend   │
-└─────────┬──────────┘
-          │
-          ▼
-┌────────────────────┐
-│    PostgreSQL      │
-└────────────────────┘
-```
 
-Pada fase berikutnya arsitektur dapat berkembang dengan:
-
-- Mobile Application
-- Public API
-- External Integration
-- Message Broker
-- Cache Layer
-- Object Storage
-
-tanpa mengubah Domain Model.
+Arsitektur ini mendukung integrasi multi-channel tanpa memodifikasi model domain dasar.
 
 ---
 

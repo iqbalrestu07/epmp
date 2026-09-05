@@ -90,49 +90,58 @@ Source code, struktur folder, dan dokumentasi **MUST** mudah dipahami oleh manus
 
 | Area            | Standard                |
 | --------------- | ----------------------- |
-| Language        | Go                      |
+| Language        | Go 1.24+                |
 | HTTP            | net/http                |
-| Router          | echo                    |
+| Router          | echo v4                 |
 | Architecture    | Clean Architecture      |
 | Design          | Domain Driven Design    |
-| Database Access | pgx + sqlc              |
-| Logging         | zerolog                 |
+| Database Access | pgx + sqlx / standard sql |
+| WhatsApp Engine | go.mau.fi/whatsmeow     |
+| Logging         | zerolog / logrus        |
 | Validation      | go-playground/validator |
 | Migration       | golang-migrate          |
-| Configuration   | koanf                   |
+| Configuration   | koanf / viper           |
 | Testing         | testing + testify       |
 
 ---
 
 ## Frontend
 
-| Area         | Standard        |
-| ------------ | --------------- |
-| Framework    | React           |
-| Language     | TypeScript      |
-| Build Tool   | Vite            |
-| Router       | React Router    |
-| Server State | TanStack Query  |
-| Forms        | React Hook Form |
-| Validation   | Zod             |
-| Styling      | Tailwind CSS    |
-| UI Component | shadcn/ui       |
-| Icons        | Lucide          |
-| Tables       | TanStack Table  |
-| Charts       | Recharts        |
+| Area            | Standard                |
+| --------------- | ----------------------- |
+| Framework       | React 19                |
+| Language        | TypeScript              |
+| Build Tool      | Vite                    |
+| Router          | React Router v7         |
+| Server State    | TanStack Query          |
+| Forms           | React Hook Form         |
+| Validation      | Zod                     |
+| Styling         | Tailwind CSS            |
+| UI Component    | shadcn/ui               |
+| Icons           | Lucide React            |
+| 3D Canvas       | Three.js (@react-three/fiber & @react-three/drei) |
+| QR Code Render  | react-qr-code           |
+| Tables          | TanStack Table          |
+| Charts          | Recharts                |
+
+---
+
+## Testing & Quality
+
+| Area            | Standard                |
+| --------------- | ----------------------- |
+| E2E Testing     | Playwright (40+ routes) |
+| Unit Testing    | Go test / Vitest        |
 
 ---
 
 ## Database
 
-Primary Database
+Primary Database:
+- PostgreSQL 16 (Relational DB, ACID, Triggers)
 
-- PostgreSQL
-
-Optional Components
-
-- Redis
-- Object Storage (future)
+WhatsApp Session Storage:
+- whatsmeow container store (SQLite3 / Postgres SQLStore)
 
 ---
 

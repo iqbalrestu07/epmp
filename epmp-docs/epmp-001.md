@@ -5,12 +5,12 @@
 ```text
 Document ID    : EPMP-001
 Document Name  : Project Overview
-Version        : 1.0.0
-Status         : Draft
-Owner           : Product Team
-Reviewer        : -
-Dependencies    : README.md
-Referenced By   : Seluruh dokumentasi EPMP
+Version        : 1.2.0
+Status         : Implemented & Active
+Owner          : Product & Architecture Team
+Reviewer       : -
+Dependencies   : README.md
+Referenced By  : Seluruh dokumentasi EPMP
 ```
 
 ---
@@ -193,85 +193,76 @@ Menjadi fondasi jangka panjang untuk pengembangan produk enterprise.
 
 # 7. Product Scope
 
-Versi awal EPMP mencakup domain berikut.
+Versi implementasi saat ini mencakup domain-domain fungsional berikut:
 
-## Property Management
-
-- Property
-- Building
-- Floor
-- Zone
-- Room
-- Bed
+## Property Management & Spatial Visualization
+- **Property, Building, Floor, Zone, Room**
+- **Bed Management & Templates**: Dukungan sewa kamar privat (*Whole-Room Rental*) maupun sewa tempat tidur (*Bed/Coliving*), dilengkapi template tempat tidur (Single, Queen, King, Bunk).
+- **Interactive Spatial Views**: Visualisasi 3D WebGL interaktif gedung dan denah lantai (*Three.js Building Drop*) dengan indikator status ketersediaan warna real-time (Hijau=Available/Vacant, Oranye=Reserved, Merah=Occupied, Biru=Maintenance).
 
 ---
 
 ## Tenant Management
-
-- Tenant
-- Identity
-- Document
-- Emergency Contact
-- History
+- Tenant Profiles & Multi-tenant isolation (Org-Scoped)
+- Tenant Identity, Documents, dan Emergency Contacts
+- Tenant Rental & Payment History
 
 ---
 
-## Reservation
-
-- Reservation
-- Booking
-- Booking Fee
+## Reservation & Booking
+- Pemesanan kamar/bed sebelum tanggal sewa
+- Validasi ketersediaan dan status transisi otomatis
 
 ---
 
-## Contract
-
-- Contract
-- Renewal
-- Extension
-- Termination
+## Contract & Occupancy
+- Manajemen Kontrak Sewa (Durasi, Nilai Sewa, Tanggal Jatuh Tempo)
+- Siklus Occupancy: Check-In, Active Staying, Check-Out
+- Hubungan terintegrasi: Tenant → Room/Bed → Contract → Occupancy
 
 ---
 
-## Financial
-
-- Invoice
-- Payment
-- Deposit
-- Charge
-- Refund
-
----
-
-## Asset
-
-- Asset
-- Asset Assignment
-- Asset Inspection
+## Financial, Billing & Multi-Currency
+- **Multi-Currency Support**: Dukungan pemilihan mata uang (IDR, USD, EUR, SGD, MYR) untuk fleksibilitas multi-country.
+- **Invoices**: Penagihan otomatis berbasis kontrak & tenant dengan shortcut pembuatan langsung dari detail kontrak.
+- **Payments**: Pencatatan pembayaran dengan **Auto-Sync Status Invoice** (ketika pembayaran lunas, status invoice otomatis berubah menjadi 'Paid' secara real-time via database trigger).
+- **Deposits**: Pengelolaan uang jaminan sewa (Security Deposit).
+- **Charges, Adjustments, Penalties, & Refunds**: Manajemen biaya tambahan, penyesuaian/diskon, denda keterlambatan, dan pengembalian dana.
+- **Human-Readable Presentation**: Penyajian nama referensi eksplisit (Nama Tenant, Nomor Kontrak, Nama Kamar) dan format tanggal lokal yang mudah dibaca (misal: 15 Sep 2026).
 
 ---
 
-## Maintenance
-
-- Work Order
-- Maintenance
-- Vendor
-
----
-
-## Dashboard
-
-- Occupancy
-- Revenue
-- Analytics
+## Communication & WhatsApp Multi-Device Gateway
+- **Native WhatsApp Multi-Device Gateway (`whatsmeow`)**: Terhubung langsung ke protokol resmi WhatsApp tanpa service perantara berbayar.
+- **Live QR Code Pairing**: Menampilkan QR code noise handshake resmi WhatsApp secara real-time menggunakan `react-qr-code`.
+- **Zero-Manual Phone Input**: Mendeteksi nomor handphone secara otomatis melalui callback server WhatsApp saat QR code berhasil dipindai oleh HP.
+- **Verifikasi Nomor WhatsApp Terdaftar (`IsOnWhatsApp`)**: Memvalidasi nomor sebelum pengiriman dan menormalisasi awalan lokal `08...` ke format internasional `628...` guna mencegah pemblokiran atau kegagalan kirim.
+- **Blast Message (Broadcast)**: Pengiriman pesan massal berbasis target audiens (Semua Tenant, Tenant Menunggak) dengan variabel dinamis (`{{tenant_name}}`, `{{invoice_amount}}`, dll.) dan log audit per penerima yang transparan.
 
 ---
 
-## Reports
+## Asset & Inventory Management
+- Master data aset properti
+- Asset Assignment (Penempatan aset ke kamar/gedung)
+- Asset Inspection (Pemeriksaan kondisi aset saat check-in/check-out)
 
-- Operational Reports
-- Financial Reports
-- Occupancy Reports
+---
+
+## Maintenance & Work Orders
+- Pelaporan masalah & perbaikan
+- Work Order lifecycle (Draft, Assigned, In Progress, Completed)
+- Manajemen Teknisi & Supplier pihak ketiga
+
+---
+
+## Dashboard & Analytics
+- Metrik real-time: Tingkat hunian (Occupancy Rate), Total Pendapatan, Properti Aktif, Tenant Aktif
+- Visualisasi ringkasan status sewa dan ketersediaan kamar
+
+---
+
+## Quality Assurance & E2E Testing Standard
+- Pengujian otomatis berbasis Playwright (`make test-e2e`) mencakup 40+ rute dashboard dan visualisasi 3D Three.js.
 
 ---
 

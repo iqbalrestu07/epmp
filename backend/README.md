@@ -14,6 +14,7 @@ Enterprise Property Management Platform — Backend API server.
 | Query Builder   | sqlc                                     | Type-safe SQL queries                            |
 | Logging         | [zerolog](https://github.com/rs/zerolog) | Structured JSON in prod, coloured console in dev |
 | Validation      | go-playground/validator v10              | Struct-tag based validation                      |
+| WhatsApp Client | [whatsmeow](https://go.mau.fi/whatsmeow) | Native Go WhatsApp multi-device client           |
 | Migration       | golang-migrate                           | SQL migration files in `migrations/`             |
 | Testing         | testing + testify                        |                                                  |
 | Architecture    | Clean Architecture + DDD                 |                                                  |

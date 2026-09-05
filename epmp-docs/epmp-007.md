@@ -5,8 +5,8 @@
 ```text
 Document ID    : EPMP-007
 Document Name  : Core Business Processes & Business Event Flow
-Version        : 1.0.0
-Status         : Draft
+Version        : 1.1.0
+Status         : Implemented & Active
 Owner          : Product & Architecture
 Dependencies   : EPMP-001 s.d. EPMP-006
 Referenced By  : Seluruh Domain Specification, Workflow, Automation, API, UI
@@ -28,7 +28,7 @@ Dokumen ini menjadi acuan untuk:
 - API Design
 - UI Flow
 
-Fokus dokumen ini adalah **proses bisnis**, bukan implementasi teknis.
+Fokus dokumen ini adalah **proses bisnis**, model event-driven, dan implementasi lifecycle aktif di platform EPMP.
 
 ---
 
@@ -48,20 +48,21 @@ Setiap proses bisnis di EPMP harus memenuhi prinsip berikut:
 
 EPMP memiliki proses bisnis inti berikut:
 
-| Process            | Domain Utama         |
-| ------------------ | -------------------- |
-| Property Setup     | Property Management  |
-| Room Preparation   | Property / Asset     |
-| Reservation        | Reservation          |
-| Check-In           | Contract + Occupancy |
-| Occupancy          | Occupancy            |
-| Billing Cycle      | Billing & Finance    |
-| Payment Collection | Billing & Finance    |
-| Maintenance        | Maintenance          |
-| Contract Renewal   | Contract             |
-| Check-Out          | Contract + Occupancy |
-| Deposit Settlement | Finance              |
-| Reporting          | Reporting            |
+| Process            | Domain Utama         | Deskripsi Implementasi |
+| ------------------ | -------------------- | ---------------------- |
+| Property Setup     | Property Management  | Registrasi Property, Building, Floor, Room, Bed Template & Bed assignment, visualisasi 3D WebGL. |
+| Room Preparation   | Property / Asset     | Setup aset kamar, inspeksi, dan penentuan ketersediaan awal. |
+| Reservation        | Reservation          | Pemesanan kamar/bed, down payment/booking fee, auto-hold status. |
+| Check-In           | Contract + Occupancy | Aktivasi kontrak, penyerahan kunci/fasilitas, perubahan status kamar menjadi Occupied. |
+| Occupancy          | Occupancy            | Manajemen penghuni, log pergerakan, pelaporan fasilitas. |
+| Billing Cycle      | Billing & Finance    | Penerbitan Invoice tagihan sewa/utilitas berulang berbasis multi-currency (IDR, USD, EUR, SGD, MYR). |
+| Payment Collection | Billing & Finance    | Pencatatan pembayaran, auto-reconciliation & trigger auto-paid pada invoice saat lunas. |
+| Communication      | Communication        | Pairing gateway WhatsApp (whatsmeow), validasi nomor WhatsApp, blast pengumuman & tagihan otomatis. |
+| Maintenance        | Maintenance          | Work order perbaikan fasilitas kamar/gedung, penugasan teknisi, isolasi kamar ke Maintenance state. |
+| Contract Renewal   | Contract             | Perpanjangan masa sewa, penyesuaian tarif rental, re-kontrak. |
+| Check-Out          | Contract + Occupancy | Inspeksi akhir, serah terima aset, pengosongan kamar (Vacant / Available). |
+| Deposit Settlement | Finance              | Pengembalian deposit setelah pemotongan denda/kerusakan aset (refund / adjustment / penalty). |
+| Reporting          | Reporting            | Analitik okupansi, laporan arus kas (cash flow), utilisasi unit 3D. |
 
 ---
 
@@ -133,9 +134,11 @@ Peristiwa utama yang menjadi penghubung antar domain:
 | Reservation      | ReservationCreated, ReservationConfirmed, ReservationCancelled, ReservationExpired |
 | Contract         | ContractCreated, ContractActivated, ContractRenewed, ContractTerminated            |
 | Occupancy        | TenantCheckedIn, TenantCheckedOut, RoomOccupied, RoomVacated                       |
-| Billing          | InvoiceIssued, InvoiceOverdue                                                      |
+| Room Lifecycle   | RoomCreated, RoomAvailabilityChanged (Available, Reserved, Occupied, Maintenance), BedAssigned |
+| Billing          | InvoiceIssued, InvoiceOverdue, InvoiceSettledViaTrigger                            |
 | Payment          | PaymentReceived, PaymentFailed, PaymentRefunded                                    |
 | Deposit          | DepositCollected, DepositReturned, DepositForfeited                                |
+| Communication    | WhatsAppDeviceConnected, WhatsAppDeviceDisconnected, WhatsAppMessageSent, WhatsAppMessageFailed, BlastCompleted |
 | Maintenance      | MaintenanceRequested, WorkOrderCreated, MaintenanceCompleted                       |
 | Asset            | AssetAssigned, AssetReturned, AssetInspected                                       |
 
@@ -146,39 +149,35 @@ Business event ini menjadi kontrak komunikasi antar bounded context.
 # 6. High-Level Workflow per Domain
 
 ### Reservation
-
-1. Pilih Room/Bed yang tersedia.
-2. Buat Reservation.
+1. Pilih Room/Bed yang tersedia (Visual 3D atau list unit).
+2. Buat Reservation dan kunci unit (status berubah ke Reserved).
 3. Validasi aturan bisnis (masa berlaku, booking fee, dsb.).
-4. Konfirmasi atau batalkan.
+4. Konfirmasi atau batalkan (jika batal, status kembali ke Available).
 
-### Contract
+### Contract & Check-In
+1. Buat Draft Contract berbasis penyewa & unit.
+2. Review klausul & termin pembayaran (multi-currency: IDR, USD, EUR, SGD, MYR).
+3. Aktivasi kontrak.
+4. Check-In: unit otomatis berpindah ke status `Occupied` (Merah di kanvas 3D).
 
-1. Buat Draft Contract.
-2. Review.
-3. Aktivasi.
-4. Kelola perubahan (renewal, extension, termination).
+### Billing & Payment Auto-Settlement
+1. Generate Invoice (tagihan sewa, deposit, utilitas).
+2. Kirim notifikasi tagihan melalui WhatsApp Gateway.
+3. Catat penerimaan pembayaran (Payment).
+4. **Auto-Settlement Trigger (`migration 000038`)**: Database trigger menghitung total pembayaran yang sukses (`completed`) untuk invoice terkait. Jika total bayar >= total tagihan, status invoice seketika diubah menjadi `Paid` secara atomik.
 
-### Occupancy
-
-1. Check-In.
-2. Ubah status Room/Bed menjadi Occupied.
-3. Pantau status hingga Check-Out.
-
-### Billing
-
-1. Generate Invoice.
-2. Kirim tagihan.
-3. Catat pembayaran.
-4. Tangani keterlambatan, denda, dan penyesuaian.
+### Communication & WhatsApp Gateway
+1. **Device Pairing**: Scan QR code resmi WhatsApp (protokol whatsmeow multi-device) tanpa input manual nomor telepon.
+2. **Auto-Detection**: Server otomatis menerima event JID login WhatsApp dan menyimpan nomor pemilik perangkat.
+3. **Pre-Verification (`IsOnWhatsApp`)**: Setiap pengiriman pesan massal (Blast) melakukan verifikasi nomor ke server WhatsApp. Nomor yang tidak terdaftar otomatis ditandai `failed` tanpa membuang kuota koneksi.
+4. **Message Dispatch & Templating**: Merender variabel dinamis (`{{tenant_name}}`, `{{room_name}}`, `{{invoice_amount}}`, dsb.) dan mengirim pesan teks/dokumen secara real-time.
+5. **Delivery Audit Log**: Setiap pesan tercatat dalam `wa_message_logs` untuk rekam jejak pengiriman.
 
 ### Maintenance
-
-1. Buat permintaan.
-2. Buat Work Order.
-3. Kerjakan.
-4. Inspeksi.
-5. Selesaikan.
+1. Buat permintaan tiket maintenance (kamar atau fasilitas umum).
+2. Buat Work Order dan tugaskan teknisi.
+3. Unit kamar ditandai sebagai `Maintenance` (Biru di kanvas 3D).
+4. Selesaikan perbaikan, verifikasi hasil, dan kembalikan unit ke `Available`.
 
 ---
 
@@ -186,13 +185,14 @@ Business event ini menjadi kontrak komunikasi antar bounded context.
 
 Beberapa aturan lintas domain yang menjadi dasar implementasi:
 
-- Room tidak dapat di-_check-in_ tanpa Contract yang aktif.
-- Contract tidak dapat diaktifkan tanpa Room/Bed yang valid.
-- Invoice tidak boleh diterbitkan untuk Contract yang belum aktif.
-- Room dalam status Maintenance tidak dapat dipesan.
-- Deposit hanya dapat dikembalikan setelah proses inspeksi selesai.
-
-Detail aturan akan dibahas pada spesifikasi masing-masing domain.
+- **Room Availability Integrity**: Room/Bed tidak dapat di-_check-in_ tanpa Contract yang aktif.
+- **Visual Spatial Sync**: Status ketersediaan kamar (`Available`, `Reserved`, `Occupied`, `Maintenance`) secara otomatis memantulkan kode warna standar pada visualisasi 3D WebGL (Hijau, Oranye, Merah, Biru).
+- **Payment-Invoice Synchronization**: Pembayaran yang berstatus `completed` langsung memicu auto-update status invoice menjadi `Paid` lewat trigger basis data.
+- **WhatsApp Phone Normalization**: Semua nomor tujuan lokal (format `08...`) dinormalisasi secara otomatis menjadi standar internasional `628...` sebelum validasi whatsmeow JID.
+- **Contract Room Validity**: Contract tidak dapat diaktifkan tanpa Room/Bed yang valid dan tersedia.
+- **Invoice Pre-requisite**: Invoice sewa tidak boleh diterbitkan untuk Contract yang belum aktif.
+- **Maintenance Lock**: Room dalam status Maintenance tidak dapat dipesan atau dialokasikan untuk reservasi baru.
+- **Deposit Refund Requirement**: Deposit hanya dapat dikembalikan setelah proses inspeksi aset saat check-out selesai.
 
 ---
 
@@ -200,42 +200,67 @@ Detail aturan akan dibahas pada spesifikasi masing-masing domain.
 
 Setiap proses bisnis harus mengikuti **state transition** yang eksplisit.
 
-Contoh untuk Reservation:
-
+### Room Availability State Machine
 ```text
-Draft
-  │
-  ▼
-Pending
-  │
-  ├──► Confirmed
-  │
-  ├──► Cancelled
-  │
-  └──► Expired
+               ┌───────────────┐
+               │   AVAILABLE   │ (Hijau)
+               └───────┬───────┘
+                       │
+       ┌───────────────┴───────────────┐
+       │ (Reservation)                 │ (Maintenance Request)
+       ▼                               ▼
+┌──────────────┐               ┌──────────────┐
+│   RESERVED   │ (Oranye)      │ MAINTENANCE  │ (Biru)
+└──────┬───────┘               └──────┬───────┘
+       │                              │
+       │ (Check-In)                   │ (Resolved)
+       ▼                              │
+┌──────────────┐                      │
+│   OCCUPIED   │ (Merah)              │
+└──────┬───────┘                      │
+       │                              │
+       │ (Check-Out)                  │
+       └───────────────┬──────────────┘
+                       ▼
+               ┌───────────────┐
+               │   AVAILABLE   │
+               └───────────────┘
 ```
 
-Tidak diperbolehkan melakukan perpindahan state yang tidak didefinisikan.
+### WhatsApp Device State Machine
+```text
+┌─────────────────┐
+│  DISCONNECTED   │
+└────────┬────────┘
+         │ (Initiate Pairing)
+         ▼
+┌─────────────────┐
+│   CONNECTING    │ ───► (Generate QR Channel)
+└────────┬────────┘
+         │ (Successful Scan & Handshake)
+         ▼
+┌─────────────────┐
+│    CONNECTED    │ (Device JID Stored, Ready to Send)
+└─────────────────┘
+```
 
 ---
 
-# 9. Automation Opportunities
+# 9. Automation Opportunities & Active Triggers
 
-EPMP dirancang agar proses tertentu dapat diotomatisasi, misalnya:
+EPMP mengimplementasikan otomasi langsung di tingkat aplikasi dan basis data:
 
-- Mengubah Reservation menjadi Expired ketika melewati batas waktu.
-- Membuat Invoice bulanan secara otomatis.
-- Mengirim pengingat sebelum jatuh tempo.
-- Mengubah status Contract menjadi Expired setelah masa berlaku berakhir.
-- Menjadwalkan inspeksi saat Check-Out selesai.
-
-Dokumen ini hanya mengidentifikasi peluang otomasi. Mekanisme implementasi akan dijelaskan pada dokumen Automation di fase engineering.
+- **Trigger Auto-Settlement (`000038_sync_invoice_status.up.sql`)**: Sinkronisasi instan status tagihan ke `Paid` saat pembayaran lunas tanpa menunggu cron job batch.
+- **Whatsmeow WhatsApp Verification**: Pencegahan blast ke nomor palsu menggunakan pengecekan aktif `IsOnWhatsApp` langsung ke protokol WhatsApp.
+- **Normalization Engine**: Auto-formatting nomor telepon Indonesia (`08...` -> `628...`).
+- **Recurring Invoice Generation**: Penerbitan invoice bulanan berkala untuk kontrak aktif.
+- **Auto-Expiration**: Mengubah Reservation menjadi Expired saat melewati batas waktu pembayaran booking fee.
 
 ---
 
 # 10. Process Ownership
 
-Setiap proses memiliki domain owner yang bertanggung jawab atas aturan bisnisnya.
+Setiap proses memiliki domain owner yang bertanggung jawab atas aturan bisnisnya:
 
 | Process              | Owner                  |
 | -------------------- | ---------------------- |
@@ -244,8 +269,11 @@ Setiap proses memiliki domain owner yang bertanggung jawab atas aturan bisnisnya
 | Contract Lifecycle   | Contract Management    |
 | Occupancy Lifecycle  | Occupancy Management   |
 | Billing Cycle        | Billing & Finance      |
+| Payment Collection   | Billing & Finance      |
+| Communication        | Communication Gateway  |
 | Asset Assignment     | Asset Management       |
 | Maintenance Workflow | Maintenance Management |
+| System Audit & Logs  | Platform Engineering   |
 
 Domain lain dapat berpartisipasi melalui event, tetapi tidak mengambil alih kepemilikan proses.
 
@@ -253,6 +281,7 @@ Domain lain dapat berpartisipasi melalui event, tetapi tidak mengambil alih kepe
 
 # Closing Statement
 
-Core Business Processes & Business Event Flow adalah jembatan antara model bisnis dan implementasi teknis. Dokumen ini memastikan setiap alur operasional memiliki state yang jelas, menghasilkan business event yang konsisten, dan dapat diimplementasikan pada arsitektur Go + React berbasis REST API tanpa mengorbankan modularitas domain.
+Core Business Processes & Business Event Flow adalah jembatan antara model bisnis dan implementasi teknis. Dokumen ini memastikan setiap alur operasional memiliki state yang jelas, menghasilkan business event yang konsisten, dan diimplementasikan secara solid pada arsitektur Go + Echo + whatsmeow + React + Three.js tanpa mengorbankan integritas data dan modularitas domain.
 
 ---
+

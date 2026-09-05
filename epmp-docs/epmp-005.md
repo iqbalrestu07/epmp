@@ -1,12 +1,12 @@
-T# EPMP-005
+# EPMP-005
 
 # Core Domain Model
 
 ```text
 Document ID    : EPMP-005
 Document Name  : Core Domain Model
-Version        : 1.0.0
-Status         : Draft
+Version        : 1.2.0
+Status         : Implemented & Active
 Owner          : Software Architecture Team
 Dependencies   : EPMP-001, EPMP-002, EPMP-003, EPMP-004
 Referenced By  : Seluruh Domain Specification, Module Specification, API, Database
@@ -48,11 +48,11 @@ Domain dalam EPMP dibagi menjadi tiga kategori.
 
 Core Domain adalah domain yang memberikan nilai bisnis utama dan menjadi pembeda EPMP.
 
-- Property Management
+- Property Management (termasuk Bed Templates & 3D Spatial Canvas)
 - Reservation Management
 - Contract Management
 - Occupancy Management
-- Billing & Finance
+- Billing & Finance (Multi-Currency, Auto-Settlement)
 
 Perubahan pada Core Domain harus melalui analisis arsitektur yang mendalam.
 
@@ -65,7 +65,7 @@ Supporting Domain mendukung operasional Core Domain.
 - Tenant Management
 - Asset Management
 - Maintenance Management
-- Notification
+- Communication & Messaging (WhatsApp Multi-Device Gateway, Blast, Templates)
 - Reporting
 
 Supporting Domain dapat berkembang secara independen selama tidak melanggar kontrak dengan Core Domain.
@@ -76,15 +76,13 @@ Supporting Domain dapat berkembang secara independen selama tidak melanggar kont
 
 Generic Domain adalah kemampuan umum yang dapat digunakan lintas aplikasi.
 
-- Authentication
-- Authorization
+- Authentication & RBAC
+- Organization-Scoped Isolation
 - File Storage
 - Audit Log
 - Configuration
-- Search
+- Search & Pagination
 - Logging
-- Scheduler
-- Integration
 
 Generic Domain tidak mengandung aturan bisnis khusus properti.
 
@@ -102,8 +100,8 @@ Organization
 │   ├── Building
 │   ├── Floor
 │   ├── Zone
-│   ├── Room
-│   └── Bed
+│   ├── Room (Availability: Vacant, Reserved, Occupied, Maintenance)
+│   └── Bed (Templates: Single, Queen, King, Bunk)
 │
 ├── Tenant Management
 │   ├── Tenant
@@ -113,19 +111,37 @@ Organization
 │
 ├── Reservation Management
 │
-├── Contract Management
+├── Contract Management (Whole-Room / Bed, Multi-Term)
 │
-├── Occupancy Management
+├── Occupancy Management (Check-In, Active, Check-Out)
 │
-├── Billing & Finance
+├── Billing & Finance (Multi-Currency: IDR, USD, EUR, SGD, MYR)
+│   ├── Invoice (Auto-Sync Status on Payment)
+│   ├── Payment (Manual & Gateway)
+│   ├── Deposit
+│   ├── Charge
+│   ├── Adjustment
+│   ├── Penalty
+│   └── Refund
+│
+├── Communication & Messaging
+│   ├── WhatsApp Multi-Device Gateway (whatsmeow)
+│   ├── Live QR Handshake Pairing
+│   ├── Number Verification (IsOnWhatsApp)
+│   ├── Message Templates & Variable Parser
+│   └── Blast Campaign & Audit Logs
 │
 ├── Asset Management
+│   ├── Asset
+│   ├── Asset Assignment
+│   └── Asset Inspection
 │
 ├── Maintenance Management
+│   ├── Work Order
+│   ├── Technician
+│   └── Supplier
 │
-├── Reporting
-│
-└── Notification
+└── Reporting
 ```
 
 ---

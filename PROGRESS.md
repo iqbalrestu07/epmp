@@ -141,6 +141,7 @@ All core modules now enforce organization-scoped filtering:
 | TenantContact   | ✅ DONE |
 | TenantDocument  | ✅ DONE |
 | TenantIdentity  | ✅ DONE |
+| Communication   | ✅ DONE |
 
 ### Frontend — Remaining
 
@@ -150,6 +151,13 @@ All core modules now enforce organization-scoped filtering:
 | Room form: property/floor select from API                                    | DONE   |
 | Remove organization_id from all frontend Create/Update types, schemas, forms | DONE   |
 | Remove sort/order from API query params                                      | DONE   |
+| Currency Selector (IDR, USD, EUR, SGD, MYR) for global pricing               | DONE   |
+| Room-Bed assignment & private rental hierarchy (Property/Building/Floor)     | DONE   |
+| Financial & Billing UX: Reference names, formatted dates, direct shortcuts   | DONE   |
+| Auto-sync Invoice status on payment settlement (Migration 000038 trigger)     | DONE   |
+| WhatsApp Gateway: Live QR pairing via `react-qr-code`, auto-JID detection    | DONE   |
+| WhatsApp Delivery: `IsOnWhatsApp` verification & Indonesian prefix conversion| DONE   |
+| Blast Messaging: Dynamic templates, target filters, strict real delivery     | DONE   |
 
 ## Notes
 

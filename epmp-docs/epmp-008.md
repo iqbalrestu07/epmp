@@ -5,8 +5,8 @@
 ```text
 Document ID    : EPMP-008
 Document Name  : Solution Architecture
-Version        : 1.0.0
-Status         : Draft
+Version        : 1.1.0
+Status         : Implemented & Active
 Owner          : Software Architecture Team
 Dependencies   : EPMP-001 ~ EPMP-007
 Referenced By  : Repository Structure, Backend Architecture, Frontend Architecture, API, Database
@@ -16,9 +16,9 @@ Referenced By  : Repository Structure, Backend Architecture, Frontend Architectu
 
 # 1. Purpose
 
-Dokumen ini mendefinisikan **arsitektur implementasi** Enterprise Property Management Platform (EPMP).
+Dokumen ini mendefinisikan **arsitektur implementasi nyata** Enterprise Property Management Platform (EPMP).
 
-Berbeda dengan EPMP-003 yang menjelaskan arsitektur secara konseptual, dokumen ini menjelaskan bagaimana platform akan dibangun menggunakan teknologi yang telah dipilih.
+Berbeda dengan EPMP-003 yang menjelaskan arsitektur secara konseptual, dokumen ini menjelaskan bagaimana platform dibangun dan dioperasikan menggunakan stack teknologi aktif: Go (Echo), PostgreSQL, React (Vite, Tailwind), Three.js (3D WebGL Canvas), dan native Go WhatsApp Gateway (`whatsmeow`).
 
 Dokumen ini menjadi jembatan antara desain bisnis dan implementasi perangkat lunak.
 
@@ -28,151 +28,106 @@ Dokumen ini menjadi jembatan antara desain bisnis dan implementasi perangkat lun
 
 ## Backend
 
-- Go (Golang)
+- **Language & Runtime**: Go (Golang 1.24+)
+- **HTTP Framework**: Echo v4 (REST API routing, middleware, CORS, request validation)
+- **Database Engine**: PostgreSQL 16 (Relational DB, ACID transactions, database triggers)
+- **Database Migrations**: `golang-migrate/migrate/v4`
+- **WhatsApp Gateway**: `go.mau.fi/whatsmeow` (Multi-device WhatsApp protocol, session management via SQLite3/PostgreSQL container store)
+- **Authentication**: JWT (JSON Web Tokens) dengan bcrypt password hashing dan RBAC middleware.
 
 Alasan pemilihan:
-
-- Performa tinggi.
-- Binary deployment yang sederhana.
-- Concurrency yang sangat baik.
-- Strong typing.
-- Mudah dipelihara dalam jangka panjang.
-- Sangat cocok untuk REST API dan service modular.
+- Performa tinggi dengan binary footprint kecil.
+- Concurrency goroutine yang sangat tangguh untuk menangani koneksi websocket WhatsApp dan broadcast massal.
+- Strong typing mencegah runtime bugs pada model finansial dan status ketersediaan.
 
 ---
 
 ## Frontend
 
-- React
+- **Core Library**: React 19 + TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS + Shadcn UI primitives
+- **Spatial 3D Engine**: Three.js (`@react-three/fiber` & `@react-three/drei`) untuk visualisasi 3D WebGL bangunan dan status kamar real-time.
+- **Routing**: React Router v7 (Feature-driven routing)
+- **Icons & QR**: `lucide-react`, `react-qr-code` (render QR pairing resmi WhatsApp)
+- **State & Data Fetching**: TanStack React Query / Custom Hook Service Architecture
 
 Alasan pemilihan:
-
-- Component-based.
-- Ekosistem yang matang.
-- Mudah membangun dashboard kompleks.
-- Reusable UI.
-- Cocok untuk SPA (Single Page Application).
+- SPA responsif dengan pemisahan bounded context berbasis fitur (`src/features/*`).
+- Visualisasi 3D langsung di browser tanpa plugin eksternal.
+- Dynamic theme dan multi-currency formatting yang fleksibel (IDR, USD, EUR, SGD, MYR).
 
 ---
 
-## Platform
+## Testing & Quality Assurance
 
-Versi pertama EPMP hanya mendukung:
-
-- Web Admin Portal
-- Web Management Portal
-
-Versi mobile akan menjadi proyek terpisah di masa depan dan menggunakan API yang sama.
+- **End-to-End (E2E)**: Playwright (`make test-e2e` mencakup 40+ rute dashboard dan visual 3D canvas).
+- **Backend Unit/Integration Tests**: Go standard test suite (`go test ./...`).
 
 ---
 
 # 3. Architectural Style
 
-EPMP mengadopsi kombinasi beberapa pendekatan arsitektur.
+EPMP mengadopsi kombinasi beberapa pendekatan arsitektur:
 
 ## Clean Architecture
-
 Memisahkan:
+- Business Rules (Domain Entities & Value Objects)
+- Application Logic (Use Cases & Handlers)
+- Infrastructure (Repositories, whatsmeow client, DB drivers)
+- Framework (Echo HTTP router)
 
-- Business Rules
-- Application Logic
-- Infrastructure
-- Framework
-
-Framework tidak boleh memengaruhi Domain.
-
----
-
-## Domain Driven Design
-
-Setiap module dibangun berdasarkan Domain.
-
-Contoh:
-
+## Domain Driven Design (DDD)
+Setiap modul backend dan fitur frontend dibangun berdasarkan Bounded Context domain:
+```text
+backend/internal/modules/
+├── property/          (Property, Building, Floor, Room, Bed, 3D spatial layout)
+├── tenant/            (Tenant directory & profiles)
+├── reservation/       (Booking, holding, expiration)
+├── contract/          (Lease agreement, renewal, terms)
+├── occupancy/         (Check-in, check-out, living records)
+├── billing/           (Invoice, recurring fees, multi-currency)
+├── payment/           (Payment collection, auto-settlement trigger)
+├── deposit/           (Security deposit, refund, deductions)
+├── communication/     (WhatsApp devices, pairing, blast campaigns, audit logs)
+├── asset/             (Inventory items, assignments, inspections)
+└── maintenance/       (Work orders, technician dispatch, maintenance locks)
 ```
-Property
-
-Contract
-
-Reservation
-
-Finance
-
-Asset
-
-Maintenance
-```
-
-Bukan berdasarkan tabel database.
-
----
 
 ## Modular Monolith
+Seluruh sistem berjalan sebagai satu service backend Go terpadu dengan modul internal independen yang berkomunikasi melalui Go interface dan database event triggers.
 
-Seluruh sistem berjalan sebagai satu aplikasi.
-
-Namun secara internal terdiri dari module yang independen.
-
-```
-EPMP
-
-├── Property Module
-
-├── Reservation Module
-
-├── Contract Module
-
-├── Finance Module
-
-├── Asset Module
-
-└── Maintenance Module
-```
-
-Module hanya berkomunikasi melalui interface dan event.
-
----
-
-## Event Driven Ready
-
-Walaupun MVP menggunakan pemanggilan langsung antar module melalui interface aplikasi, setiap perubahan penting harus menghasilkan **Domain Event**.
-
-Contoh:
-
-```
-ReservationConfirmed
-
-↓
-
-ContractCreated
-
-↓
-
-InvoiceIssued
-```
-
-Dengan pendekatan ini, ketika nanti dibutuhkan message broker (Kafka, NATS, RabbitMQ, dsb.), implementasi dapat ditambahkan tanpa mengubah model domain.
+## Event Driven & Triggers
+- **Database Trigger (`migration 000038`)**: Otomatisasi sinkronisasi status Invoice menjadi `Paid` ketika akumulasi pembayaran berstatus `completed` memenuhi nilai tagihan.
+- **Whatsmeow Event Handlers**: Menangkap event live login, session disconnect, dan delivery confirmation dari WhatsApp Web protocol.
 
 ---
 
 # 4. System Context
 
+```text
+       ┌─────────────────────────────────────────────────────────┐
+       │                   Web Browser (Client)                 │
+       │  React 19 SPA + Tailwind CSS + Three.js 3D WebGL Canvas │
+       └────────────────────────────┬────────────────────────────┘
+                                    │ HTTPS (REST API + JSON)
+                                    ▼
+       ┌─────────────────────────────────────────────────────────┐
+       │                    Golang Backend (Echo)                │
+       │                                                         │
+       │  ┌─────────────────┐             ┌───────────────────┐  │
+       │  │ Domain Handlers │             │ Communication Svc │  │
+       │  │ & Use Cases     │             │ (whatsmeow engine)│  │
+       │  └────────┬────────┘             └─────────┬─────────┘  │
+       └───────────┼────────────────────────────────┼────────────┘
+                   │                                │
+                   ▼                                ▼
+       ┌───────────────────────┐        ┌────────────────────────┐
+       │     PostgreSQL 16     │        │  WhatsApp Web Servers  │
+       │  - Core App Database  │        │  (Direct TLS Pairing)  │
+       │  - Auto-Paid Triggers │        └────────────────────────┘
+       └───────────────────────┘
 ```
-Browser
-     │
-     ▼
-React Web Application
-     │
- REST API (HTTPS)
-     │
-     ▼
-Golang Backend
-     │
-     ▼
-Database
-```
-
-Komunikasi dilakukan menggunakan REST API berbasis JSON pada versi pertama.
 
 ---
 
