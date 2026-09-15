@@ -4,37 +4,37 @@ import "time"
 
 // CreateChargeRequest is the DTO for creating a Charge.
 type CreateChargeRequest struct {
-	ContractId           string       `json:"contract_id"`
-	InvoiceId            string       `json:"invoice_id"`
-	ChargeType           string       `json:"charge_type"`
-	Amount               float64      `json:"amount"`
-	Status               string       `json:"status"`
-	ChargeDate           time.Time    `json:"charge_date"`
-	Notes                string       `json:"notes"`
+	ContractId string    `json:"contract_id"`
+	InvoiceId  string    `json:"invoice_id"`
+	ChargeType string    `json:"charge_type"`
+	Amount     float64   `json:"amount"`
+	Status     string    `json:"status"`
+	ChargeDate time.Time `json:"charge_date"`
+	Notes      string    `json:"notes"`
 }
 
 // UpdateChargeRequest is the DTO for updating a Charge.
 type UpdateChargeRequest struct {
-	ContractId           string       `json:"contract_id"`
-	InvoiceId            string       `json:"invoice_id"`
-	ChargeType           string       `json:"charge_type"`
-	Amount               float64      `json:"amount"`
-	Status               string       `json:"status"`
-	ChargeDate           time.Time    `json:"charge_date"`
-	Notes                string       `json:"notes"`
+	ContractId string    `json:"contract_id"`
+	InvoiceId  string    `json:"invoice_id"`
+	ChargeType string    `json:"charge_type"`
+	Amount     float64   `json:"amount"`
+	Status     string    `json:"status"`
+	ChargeDate time.Time `json:"charge_date"`
+	Notes      string    `json:"notes"`
 }
 
 // ChargeResponse is the DTO for returning a Charge.
 type ChargeResponse struct {
 	OrganizationId string    `json:"organization_id"`
 	Id             string    `json:"id"`
-	ContractId           string       `json:"contract_id"`
-	InvoiceId            string       `json:"invoice_id"`
-	ChargeType           string       `json:"charge_type"`
-	Amount               float64      `json:"amount"`
-	Status               string       `json:"status"`
-	ChargeDate           time.Time    `json:"charge_date"`
-	Notes                string       `json:"notes"`
+	ContractId     string    `json:"contract_id"`
+	InvoiceId      string    `json:"invoice_id"`
+	ChargeType     string    `json:"charge_type"`
+	Amount         float64   `json:"amount"`
+	Status         string    `json:"status"`
+	ChargeDate     time.Time `json:"charge_date"`
+	Notes          string    `json:"notes"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 }
@@ -42,8 +42,8 @@ type ChargeResponse struct {
 // ChargeListResponse is the DTO for a paginated list of Charge.
 type ChargeListResponse struct {
 	Data       []ChargeResponse `json:"data"`
-	Total      int64         `json:"total"`
-	Page       int           `json:"page"`
-	PerPage    int           `json:"per_page"`
-	TotalPages int           `json:"total_pages"`
+	Total      int64            `json:"total"`
+	Page       int              `json:"page"`
+	PerPage    int              `json:"per_page"`
+	TotalPages int              `json:"total_pages"`
 }

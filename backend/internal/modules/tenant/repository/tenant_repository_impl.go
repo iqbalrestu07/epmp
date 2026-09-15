@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"github.com/epmp/backend/internal/pkg/errs"
 
 	"github.com/epmp/backend/internal/modules/tenant/entity"
 
@@ -109,7 +110,13 @@ func (r *TenantRepositoryImpl) Count(ctx context.Context, search, orgID string) 
 }
 
 func (r *TenantRepositoryImpl) Delete(ctx context.Context, id, orgID string) error {
-	_, err := r.db.Exec(ctx, `
+	tag, err := r.db.Exec(ctx, `
 		UPDATE tenants SET deleted_at = now() WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL`, id, orgID)
-	return err
+	if err != nil {
+		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return errs.ErrNotFound
+	}
+	return nil
 }

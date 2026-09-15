@@ -119,15 +119,15 @@ func (s *DepositService) Delete(ctx context.Context, id, orgID string) error {
 func (s *DepositService) toResponse(e *entity.Deposit) *dto.DepositResponse {
 	return &dto.DepositResponse{
 		OrganizationId: e.OrganizationId,
-		Id: e.Id,
-		ContractId: e.ContractId,
-		TenantId: e.TenantId,
-		Amount: e.Amount,
-		Status: e.Status,
+		Id:             e.Id,
+		ContractId:     e.ContractId,
+		TenantId:       e.TenantId,
+		Amount:         e.Amount,
+		Status:         e.Status,
 		CollectionDate: e.CollectionDate,
-		RefundDate: e.RefundDate,
-		Notes: e.Notes,
-		CreatedAt: e.CreatedAt,
-		UpdatedAt: e.UpdatedAt,
+		RefundDate:     e.RefundDate,
+		Notes:          e.Notes,
+		CreatedAt:      e.CreatedAt,
+		UpdatedAt:      e.UpdatedAt,
 	}
 }

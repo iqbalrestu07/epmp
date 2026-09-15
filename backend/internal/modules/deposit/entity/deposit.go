@@ -6,13 +6,13 @@ import "time"
 type Deposit struct {
 	OrganizationId string     `json:"organization_id"`
 	Id             string     `json:"id"`
-	ContractId           string       `json:"contract_id"`
-	TenantId             string       `json:"tenant_id"`
-	Amount               float64      `json:"amount"`
-	Status               string       `json:"status"`
-	CollectionDate       time.Time    `json:"collection_date"`
-	RefundDate           time.Time    `json:"refund_date"`
-	Notes                string       `json:"notes"`
+	ContractId     string     `json:"contract_id"`
+	TenantId       string     `json:"tenant_id"`
+	Amount         float64    `json:"amount"`
+	Status         string     `json:"status"`
+	CollectionDate time.Time  `json:"collection_date"`
+	RefundDate     time.Time  `json:"refund_date"`
+	Notes          string     `json:"notes"`
 	DeletedAt      *time.Time `json:"deleted_at,omitempty"`
 	CreatedAt      time.Time  `json:"created_at"`
 	UpdatedAt      time.Time  `json:"updated_at"`

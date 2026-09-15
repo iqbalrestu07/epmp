@@ -16,4 +16,3 @@ func RegisterOrganizationRoutes(g *echo.Group, h *OrganizationHandler) {
 	g.PUT("/:id", h.Update)
 	g.DELETE("/:id", h.Delete)
 }
-

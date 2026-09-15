@@ -4,25 +4,25 @@ import "time"
 
 // CreateTechnicianRequest is the DTO for creating a Technician.
 type CreateTechnicianRequest struct {
-	Name                 string       `json:"name"`
-	Phone                string       `json:"phone"`
-	Specialty            string       `json:"specialty"`
+	Name      string `json:"name"`
+	Phone     string `json:"phone"`
+	Specialty string `json:"specialty"`
 }
 
 // UpdateTechnicianRequest is the DTO for updating a Technician.
 type UpdateTechnicianRequest struct {
-	Name                 string       `json:"name"`
-	Phone                string       `json:"phone"`
-	Specialty            string       `json:"specialty"`
+	Name      string `json:"name"`
+	Phone     string `json:"phone"`
+	Specialty string `json:"specialty"`
 }
 
 // TechnicianResponse is the DTO for returning a Technician.
 type TechnicianResponse struct {
 	OrganizationId string    `json:"organization_id"`
 	Id             string    `json:"id"`
-	Name                 string       `json:"name"`
-	Phone                string       `json:"phone"`
-	Specialty            string       `json:"specialty"`
+	Name           string    `json:"name"`
+	Phone          string    `json:"phone"`
+	Specialty      string    `json:"specialty"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 }
@@ -30,8 +30,8 @@ type TechnicianResponse struct {
 // TechnicianListResponse is the DTO for a paginated list of Technician.
 type TechnicianListResponse struct {
 	Data       []TechnicianResponse `json:"data"`
-	Total      int64         `json:"total"`
-	Page       int           `json:"page"`
-	PerPage    int           `json:"per_page"`
-	TotalPages int           `json:"total_pages"`
+	Total      int64                `json:"total"`
+	Page       int                  `json:"page"`
+	PerPage    int                  `json:"per_page"`
+	TotalPages int                  `json:"total_pages"`
 }

@@ -115,13 +115,13 @@ func (s *WorkOrderService) Delete(ctx context.Context, id, orgID string) error {
 func (s *WorkOrderService) toResponse(e *entity.WorkOrder) *dto.WorkOrderResponse {
 	return &dto.WorkOrderResponse{
 		OrganizationId: e.OrganizationId,
-		Id: e.Id,
-		PropertyId: e.PropertyId,
-		RoomId: e.RoomId,
-		Description: e.Description,
-		Status: e.Status,
-		Priority: e.Priority,
-		CreatedAt: e.CreatedAt,
-		UpdatedAt: e.UpdatedAt,
+		Id:             e.Id,
+		PropertyId:     e.PropertyId,
+		RoomId:         e.RoomId,
+		Description:    e.Description,
+		Status:         e.Status,
+		Priority:       e.Priority,
+		CreatedAt:      e.CreatedAt,
+		UpdatedAt:      e.UpdatedAt,
 	}
 }

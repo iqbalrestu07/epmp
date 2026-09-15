@@ -4,31 +4,31 @@ import "time"
 
 // CreatePenaltyRequest is the DTO for creating a Penalty.
 type CreatePenaltyRequest struct {
-	InvoiceId            string       `json:"invoice_id"`
-	Amount               float64      `json:"amount"`
-	Status               string       `json:"status"`
-	PenaltyDate          time.Time    `json:"penalty_date"`
-	Description          string       `json:"description"`
+	InvoiceId   string    `json:"invoice_id"`
+	Amount      float64   `json:"amount"`
+	Status      string    `json:"status"`
+	PenaltyDate time.Time `json:"penalty_date"`
+	Description string    `json:"description"`
 }
 
 // UpdatePenaltyRequest is the DTO for updating a Penalty.
 type UpdatePenaltyRequest struct {
-	InvoiceId            string       `json:"invoice_id"`
-	Amount               float64      `json:"amount"`
-	Status               string       `json:"status"`
-	PenaltyDate          time.Time    `json:"penalty_date"`
-	Description          string       `json:"description"`
+	InvoiceId   string    `json:"invoice_id"`
+	Amount      float64   `json:"amount"`
+	Status      string    `json:"status"`
+	PenaltyDate time.Time `json:"penalty_date"`
+	Description string    `json:"description"`
 }
 
 // PenaltyResponse is the DTO for returning a Penalty.
 type PenaltyResponse struct {
 	OrganizationId string    `json:"organization_id"`
 	Id             string    `json:"id"`
-	InvoiceId            string       `json:"invoice_id"`
-	Amount               float64      `json:"amount"`
-	Status               string       `json:"status"`
-	PenaltyDate          time.Time    `json:"penalty_date"`
-	Description          string       `json:"description"`
+	InvoiceId      string    `json:"invoice_id"`
+	Amount         float64   `json:"amount"`
+	Status         string    `json:"status"`
+	PenaltyDate    time.Time `json:"penalty_date"`
+	Description    string    `json:"description"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 }
@@ -36,8 +36,8 @@ type PenaltyResponse struct {
 // PenaltyListResponse is the DTO for a paginated list of Penalty.
 type PenaltyListResponse struct {
 	Data       []PenaltyResponse `json:"data"`
-	Total      int64         `json:"total"`
-	Page       int           `json:"page"`
-	PerPage    int           `json:"per_page"`
-	TotalPages int           `json:"total_pages"`
+	Total      int64             `json:"total"`
+	Page       int               `json:"page"`
+	PerPage    int               `json:"per_page"`
+	TotalPages int               `json:"total_pages"`
 }

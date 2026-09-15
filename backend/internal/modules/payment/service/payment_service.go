@@ -10,14 +10,21 @@ import (
 	"github.com/epmp/backend/internal/modules/payment/repository"
 )
 
+// OrgNotifier is the minimal contract for emitting org-wide notifications.
+// Implemented by the notification module; nil-safe.
+type OrgNotifier interface {
+	NotifyOrg(ctx context.Context, orgID, notifType, title, message, link string) error
+}
+
 // PaymentService implements the application layer for Payment.
 type PaymentService struct {
-	repo repository.PaymentRepository
+	repo     repository.PaymentRepository
+	notifier OrgNotifier
 }
 
 // NewPaymentService creates a new PaymentService.
-func NewPaymentService(repo repository.PaymentRepository) *PaymentService {
-	return &PaymentService{repo: repo}
+func NewPaymentService(repo repository.PaymentRepository, notifier OrgNotifier) *PaymentService {
+	return &PaymentService{repo: repo, notifier: notifier}
 }
 
 func (s *PaymentService) Create(ctx context.Context, orgID string, req *dto.CreatePaymentRequest) (*dto.PaymentResponse, error) {
@@ -36,6 +43,13 @@ func (s *PaymentService) Create(ctx context.Context, orgID string, req *dto.Crea
 
 	if err := s.repo.Save(ctx, e); err != nil {
 		return nil, fmt.Errorf("payment service: create: %w", err)
+	}
+
+	if s.notifier != nil {
+		_ = s.notifier.NotifyOrg(ctx, orgID, "payment",
+			"Pembayaran Diterima",
+			fmt.Sprintf("Pembayaran sebesar %.0f via %s berstatus %s.", e.Amount, e.PaymentMethod, e.Status),
+			"/payments/"+e.Id)
 	}
 
 	return s.toResponse(e), nil
@@ -118,16 +132,16 @@ func (s *PaymentService) Delete(ctx context.Context, id, orgID string) error {
 
 func (s *PaymentService) toResponse(e *entity.Payment) *dto.PaymentResponse {
 	return &dto.PaymentResponse{
-		OrganizationId: e.OrganizationId,
-		Id: e.Id,
-		InvoiceId: e.InvoiceId,
-		TenantId: e.TenantId,
-		Amount: e.Amount,
-		PaymentDate: e.PaymentDate,
-		PaymentMethod: e.PaymentMethod,
-		Status: e.Status,
+		OrganizationId:  e.OrganizationId,
+		Id:              e.Id,
+		InvoiceId:       e.InvoiceId,
+		TenantId:        e.TenantId,
+		Amount:          e.Amount,
+		PaymentDate:     e.PaymentDate,
+		PaymentMethod:   e.PaymentMethod,
+		Status:          e.Status,
 		ReferenceNumber: e.ReferenceNumber,
-		CreatedAt: e.CreatedAt,
-		UpdatedAt: e.UpdatedAt,
+		CreatedAt:       e.CreatedAt,
+		UpdatedAt:       e.UpdatedAt,
 	}
 }

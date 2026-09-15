@@ -111,11 +111,11 @@ func (s *TenantDocumentService) Delete(ctx context.Context, id, orgID string) er
 func (s *TenantDocumentService) toResponse(e *entity.TenantDocument) *dto.TenantDocumentResponse {
 	return &dto.TenantDocumentResponse{
 		OrganizationId: e.OrganizationId,
-		Id: e.Id,
-		TenantId: e.TenantId,
-		DocumentType: e.DocumentType,
-		FileUrl: e.FileUrl,
-		CreatedAt: e.CreatedAt,
-		UpdatedAt: e.UpdatedAt,
+		Id:             e.Id,
+		TenantId:       e.TenantId,
+		DocumentType:   e.DocumentType,
+		FileUrl:        e.FileUrl,
+		CreatedAt:      e.CreatedAt,
+		UpdatedAt:      e.UpdatedAt,
 	}
 }

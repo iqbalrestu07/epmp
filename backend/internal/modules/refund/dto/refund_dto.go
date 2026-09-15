@@ -4,34 +4,34 @@ import "time"
 
 // CreateRefundRequest is the DTO for creating a Refund.
 type CreateRefundRequest struct {
-	PaymentId            string       `json:"payment_id"`
-	TenantId             string       `json:"tenant_id"`
-	Amount               float64      `json:"amount"`
-	Status               string       `json:"status"`
-	RefundDate           time.Time    `json:"refund_date"`
-	Reason               string       `json:"reason"`
+	PaymentId  string    `json:"payment_id"`
+	TenantId   string    `json:"tenant_id"`
+	Amount     float64   `json:"amount"`
+	Status     string    `json:"status"`
+	RefundDate time.Time `json:"refund_date"`
+	Reason     string    `json:"reason"`
 }
 
 // UpdateRefundRequest is the DTO for updating a Refund.
 type UpdateRefundRequest struct {
-	PaymentId            string       `json:"payment_id"`
-	TenantId             string       `json:"tenant_id"`
-	Amount               float64      `json:"amount"`
-	Status               string       `json:"status"`
-	RefundDate           time.Time    `json:"refund_date"`
-	Reason               string       `json:"reason"`
+	PaymentId  string    `json:"payment_id"`
+	TenantId   string    `json:"tenant_id"`
+	Amount     float64   `json:"amount"`
+	Status     string    `json:"status"`
+	RefundDate time.Time `json:"refund_date"`
+	Reason     string    `json:"reason"`
 }
 
 // RefundResponse is the DTO for returning a Refund.
 type RefundResponse struct {
 	OrganizationId string    `json:"organization_id"`
 	Id             string    `json:"id"`
-	PaymentId            string       `json:"payment_id"`
-	TenantId             string       `json:"tenant_id"`
-	Amount               float64      `json:"amount"`
-	Status               string       `json:"status"`
-	RefundDate           time.Time    `json:"refund_date"`
-	Reason               string       `json:"reason"`
+	PaymentId      string    `json:"payment_id"`
+	TenantId       string    `json:"tenant_id"`
+	Amount         float64   `json:"amount"`
+	Status         string    `json:"status"`
+	RefundDate     time.Time `json:"refund_date"`
+	Reason         string    `json:"reason"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 }
@@ -39,8 +39,8 @@ type RefundResponse struct {
 // RefundListResponse is the DTO for a paginated list of Refund.
 type RefundListResponse struct {
 	Data       []RefundResponse `json:"data"`
-	Total      int64         `json:"total"`
-	Page       int           `json:"page"`
-	PerPage    int           `json:"per_page"`
-	TotalPages int           `json:"total_pages"`
+	Total      int64            `json:"total"`
+	Page       int              `json:"page"`
+	PerPage    int              `json:"per_page"`
+	TotalPages int              `json:"total_pages"`
 }

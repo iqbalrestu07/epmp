@@ -6,6 +6,7 @@ import (
 	"github.com/epmp/backend/internal/modules/asset"
 	"github.com/epmp/backend/internal/modules/assetassignment"
 	"github.com/epmp/backend/internal/modules/assetinspection"
+	"github.com/epmp/backend/internal/modules/audit"
 	"github.com/epmp/backend/internal/modules/bed"
 	"github.com/epmp/backend/internal/modules/building"
 	"github.com/epmp/backend/internal/modules/communication"
@@ -27,15 +28,18 @@ import (
 	"github.com/epmp/backend/internal/modules/deposit"
 	"github.com/epmp/backend/internal/modules/floor"
 	"github.com/epmp/backend/internal/modules/iam"
+	"github.com/epmp/backend/internal/modules/notification"
 	"github.com/epmp/backend/internal/modules/occupancy"
 	"github.com/epmp/backend/internal/modules/organization"
 	"github.com/epmp/backend/internal/modules/payment"
 	"github.com/epmp/backend/internal/modules/penalty"
 	"github.com/epmp/backend/internal/modules/property"
 	"github.com/epmp/backend/internal/modules/refund"
+	"github.com/epmp/backend/internal/modules/report"
 	"github.com/epmp/backend/internal/modules/reservation"
 	"github.com/epmp/backend/internal/modules/room"
 	"github.com/epmp/backend/internal/modules/tenant"
+	"github.com/epmp/backend/internal/pkg/email"
 	mw "github.com/epmp/backend/internal/pkg/middleware"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -43,8 +47,25 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// Option customizes module registration.
+type Option func(*registerOptions)
+
+type registerOptions struct {
+	emailSender email.Sender
+}
+
+// WithEmailSender enables the email notification channel.
+func WithEmailSender(s email.Sender) Option {
+	return func(o *registerOptions) { o.emailSender = s }
+}
+
 // Register registers all modules to the Echo router.
-func Register(e *echo.Echo, db *pgxpool.Pool, log zerolog.Logger, jwtSecret string, accessTTL, refreshTTL time.Duration) error {
+func Register(e *echo.Echo, db *pgxpool.Pool, log zerolog.Logger, jwtSecret string, accessTTL, refreshTTL time.Duration, opts ...Option) error {
+	var ropts registerOptions
+	for _, o := range opts {
+		o(&ropts)
+	}
+
 	v1 := e.Group("/api/v1")
 
 	// IAM module registers its own public and protected routes.
@@ -52,7 +73,7 @@ func Register(e *echo.Echo, db *pgxpool.Pool, log zerolog.Logger, jwtSecret stri
 	iamMod.RegisterRoutes(v1)
 
 	// Resource modules — all protected by JWT auth middleware.
-	protected := v1.Group("", mw.AuthRequired(jwtSecret))
+	protected := v1.Group("", mw.AuthRequired(jwtSecret), mw.AuditLog(db, log))
 	dashboard.NewModule(db, log).RegisterRoutes(protected)
 	property.NewModule(db, log).RegisterRoutes(protected)
 	tenant.NewModule(db, log).RegisterRoutes(protected)
@@ -61,8 +82,11 @@ func Register(e *echo.Echo, db *pgxpool.Pool, log zerolog.Logger, jwtSecret stri
 	contract.NewModule(db, log).RegisterRoutes(protected)
 	organization.NewModule(db, log).RegisterRoutes(protected)
 	occupancy.NewModule(db, log).RegisterRoutes(protected)
+	notifMod := notification.NewModule(db, log, jwtSecret, ropts.emailSender)
+	notifMod.RegisterWS(v1)
+
 	billing.NewModule(db, log).RegisterRoutes(protected)
-	payment.NewModule(db, log).RegisterRoutes(protected)
+	payment.NewModule(db, log, notifMod.Service).RegisterRoutes(protected)
 	deposit.NewModule(db, log).RegisterRoutes(protected)
 	charge.NewModule(db, log).RegisterRoutes(protected)
 	refund.NewModule(db, log).RegisterRoutes(protected)
@@ -86,6 +110,11 @@ func Register(e *echo.Echo, db *pgxpool.Pool, log zerolog.Logger, jwtSecret stri
 	supplier.NewModule(db, log).RegisterRoutes(protected)
 
 	communication.NewModule(db, log).RegisterRoutes(protected)
+
+	report.NewModule(db, log).RegisterRoutes(protected)
+	audit.NewModule(db, log).RegisterRoutes(protected)
+
+	notifMod.RegisterRoutes(protected)
 
 	return nil
 }

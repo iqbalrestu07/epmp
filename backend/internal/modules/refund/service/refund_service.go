@@ -117,14 +117,14 @@ func (s *RefundService) Delete(ctx context.Context, id, orgID string) error {
 func (s *RefundService) toResponse(e *entity.Refund) *dto.RefundResponse {
 	return &dto.RefundResponse{
 		OrganizationId: e.OrganizationId,
-		Id: e.Id,
-		PaymentId: e.PaymentId,
-		TenantId: e.TenantId,
-		Amount: e.Amount,
-		Status: e.Status,
-		RefundDate: e.RefundDate,
-		Reason: e.Reason,
-		CreatedAt: e.CreatedAt,
-		UpdatedAt: e.UpdatedAt,
+		Id:             e.Id,
+		PaymentId:      e.PaymentId,
+		TenantId:       e.TenantId,
+		Amount:         e.Amount,
+		Status:         e.Status,
+		RefundDate:     e.RefundDate,
+		Reason:         e.Reason,
+		CreatedAt:      e.CreatedAt,
+		UpdatedAt:      e.UpdatedAt,
 	}
 }

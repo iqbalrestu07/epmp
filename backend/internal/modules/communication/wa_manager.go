@@ -25,7 +25,7 @@ import (
 
 var (
 	ErrAlreadyConnected = errors.New("device already connected")
-	ErrDeviceNotFound    = errors.New("device not found")
+	ErrDeviceNotFound   = errors.New("device not found")
 )
 
 type cachedQRInfo struct {
@@ -42,7 +42,7 @@ type clientEntry struct {
 
 type WAManager struct {
 	mu        sync.RWMutex
-	clients   map[string]*clientEntry // deviceID -> clientEntry
+	clients   map[string]*clientEntry  // deviceID -> clientEntry
 	cachedQRs map[string]*cachedQRInfo // deviceID -> cachedQRInfo
 
 	pgxPool   *pgxpool.Pool

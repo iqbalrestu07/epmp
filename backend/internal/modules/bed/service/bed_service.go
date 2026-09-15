@@ -111,11 +111,11 @@ func (s *BedService) Delete(ctx context.Context, id, orgID string) error {
 func (s *BedService) toResponse(e *entity.Bed) *dto.BedResponse {
 	return &dto.BedResponse{
 		OrganizationId: e.OrganizationId,
-		Id: e.Id,
-		RoomId: e.RoomId,
-		Name: e.Name,
-		Status: e.Status,
-		CreatedAt: e.CreatedAt,
-		UpdatedAt: e.UpdatedAt,
+		Id:             e.Id,
+		RoomId:         e.RoomId,
+		Name:           e.Name,
+		Status:         e.Status,
+		CreatedAt:      e.CreatedAt,
+		UpdatedAt:      e.UpdatedAt,
 	}
 }

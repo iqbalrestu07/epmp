@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"github.com/epmp/backend/internal/pkg/errs"
 
 	"github.com/epmp/backend/internal/modules/technician/entity"
 
@@ -66,8 +67,8 @@ func (r *TechnicianRepositoryImpl) FindAll(ctx context.Context, limit, offset in
 	argIdx := 2
 
 	if search != "" {
-		query += fmt.Sprintf(" AND (name ILIKE $%d OR specialty ILIKE $%d)", argIdx)
-		args = append(args, "%" + search + "%")
+		query += fmt.Sprintf(" AND (name ILIKE $%d OR specialty ILIKE $%d)", argIdx, argIdx)
+		args = append(args, "%"+search+"%")
 		argIdx++
 	}
 
@@ -96,8 +97,8 @@ func (r *TechnicianRepositoryImpl) Count(ctx context.Context, search, orgID stri
 	args := []interface{}{orgID}
 
 	if search != "" {
-		query += fmt.Sprintf(" AND (name ILIKE $%d OR specialty ILIKE $%d)", 2)
-		args = append(args, "%" + search + "%")
+		query += fmt.Sprintf(" AND (name ILIKE $%d OR specialty ILIKE $%d)", 2, 2)
+		args = append(args, "%"+search+"%")
 	}
 
 	var count int64
@@ -109,7 +110,13 @@ func (r *TechnicianRepositoryImpl) Count(ctx context.Context, search, orgID stri
 }
 
 func (r *TechnicianRepositoryImpl) Delete(ctx context.Context, id, orgID string) error {
-	_, err := r.db.Exec(ctx, `
+	tag, err := r.db.Exec(ctx, `
 		UPDATE technicians SET deleted_at = now() WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL`, id, orgID)
-	return err
+	if err != nil {
+		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return errs.ErrNotFound
+	}
+	return nil
 }

@@ -7,6 +7,7 @@ import (
 
 	"github.com/epmp/backend/internal/modules/room/dto"
 	"github.com/epmp/backend/internal/modules/room/service"
+	"github.com/epmp/backend/internal/pkg/errs"
 	mw "github.com/epmp/backend/internal/pkg/middleware"
 	"github.com/epmp/backend/internal/pkg/response"
 
@@ -101,8 +102,12 @@ func (h *RoomHandler) Update(c echo.Context) error {
 
 func (h *RoomHandler) Delete(c echo.Context) error {
 	id := c.Param("id")
+	orgID := mw.GetOrgID(c)
 
-	if err := h.svc.Delete(c.Request().Context(), id); err != nil {
+	if err := h.svc.Delete(c.Request().Context(), id, orgID); err != nil {
+		if errs.IsDomainError(err, "NOT_FOUND") {
+			return response.NotFound(c, "Resource not found")
+		}
 		return response.InternalError(c, err.Error())
 	}
 

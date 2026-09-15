@@ -111,11 +111,11 @@ func (s *FacilityService) Delete(ctx context.Context, id, orgID string) error {
 func (s *FacilityService) toResponse(e *entity.Facility) *dto.FacilityResponse {
 	return &dto.FacilityResponse{
 		OrganizationId: e.OrganizationId,
-		Id: e.Id,
-		PropertyId: e.PropertyId,
-		Name: e.Name,
-		Description: e.Description,
-		CreatedAt: e.CreatedAt,
-		UpdatedAt: e.UpdatedAt,
+		Id:             e.Id,
+		PropertyId:     e.PropertyId,
+		Name:           e.Name,
+		Description:    e.Description,
+		CreatedAt:      e.CreatedAt,
+		UpdatedAt:      e.UpdatedAt,
 	}
 }

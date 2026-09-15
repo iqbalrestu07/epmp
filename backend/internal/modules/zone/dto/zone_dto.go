@@ -4,25 +4,25 @@ import "time"
 
 // CreateZoneRequest is the DTO for creating a Zone.
 type CreateZoneRequest struct {
-	BuildingId           string       `json:"building_id"`
-	Floor                int          `json:"floor"`
-	Name                 string       `json:"name"`
+	BuildingId string `json:"building_id"`
+	Floor      int    `json:"floor"`
+	Name       string `json:"name"`
 }
 
 // UpdateZoneRequest is the DTO for updating a Zone.
 type UpdateZoneRequest struct {
-	BuildingId           string       `json:"building_id"`
-	Floor                int          `json:"floor"`
-	Name                 string       `json:"name"`
+	BuildingId string `json:"building_id"`
+	Floor      int    `json:"floor"`
+	Name       string `json:"name"`
 }
 
 // ZoneResponse is the DTO for returning a Zone.
 type ZoneResponse struct {
 	OrganizationId string    `json:"organization_id"`
 	Id             string    `json:"id"`
-	BuildingId           string       `json:"building_id"`
-	Floor                int          `json:"floor"`
-	Name                 string       `json:"name"`
+	BuildingId     string    `json:"building_id"`
+	Floor          int       `json:"floor"`
+	Name           string    `json:"name"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 }
@@ -30,8 +30,8 @@ type ZoneResponse struct {
 // ZoneListResponse is the DTO for a paginated list of Zone.
 type ZoneListResponse struct {
 	Data       []ZoneResponse `json:"data"`
-	Total      int64         `json:"total"`
-	Page       int           `json:"page"`
-	PerPage    int           `json:"per_page"`
-	TotalPages int           `json:"total_pages"`
+	Total      int64          `json:"total"`
+	Page       int            `json:"page"`
+	PerPage    int            `json:"per_page"`
+	TotalPages int            `json:"total_pages"`
 }

@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"github.com/epmp/backend/internal/pkg/errs"
 	"time"
 
 	"github.com/epmp/backend/internal/modules/organization/dto"
@@ -168,9 +169,28 @@ func (r *OrganizationRepositoryImpl) Count(ctx context.Context, search string) (
 }
 
 func (r *OrganizationRepositoryImpl) Delete(ctx context.Context, id string) error {
-	_, err := r.db.Exec(ctx, `
+	tag, err := r.db.Exec(ctx, `
 		UPDATE organizations SET deleted_at = now() WHERE id = $1 AND deleted_at IS NULL`, id)
-	return err
+	if err != nil {
+		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return errs.ErrNotFound
+	}
+	return nil
+}
+
+// GetMemberRole returns the caller's role in an organization, or ErrNotFound.
+func (r *OrganizationRepositoryImpl) GetMemberRole(ctx context.Context, orgID, userID string) (string, error) {
+	var role string
+	err := r.db.QueryRow(ctx, `
+		SELECT role FROM organization_members
+		WHERE  organization_id = $1 AND user_id = $2 AND is_active = true AND deleted_at IS NULL`,
+		orgID, userID).Scan(&role)
+	if err != nil {
+		return "", errs.ErrNotFound
+	}
+	return role, nil
 }
 
 // SaveMember inserts or updates an organization_members record.
@@ -306,5 +326,3 @@ func (r *OrganizationRepositoryImpl) AddMemberByEmail(ctx context.Context, orgID
 		IsActive:       isActive,
 	}, nil
 }
-
-

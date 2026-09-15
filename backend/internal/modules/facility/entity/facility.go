@@ -6,9 +6,9 @@ import "time"
 type Facility struct {
 	OrganizationId string     `json:"organization_id"`
 	Id             string     `json:"id"`
-	PropertyId           string       `json:"property_id"`
-	Name                 string       `json:"name"`
-	Description          string       `json:"description"`
+	PropertyId     string     `json:"property_id"`
+	Name           string     `json:"name"`
+	Description    string     `json:"description"`
 	DeletedAt      *time.Time `json:"deleted_at,omitempty"`
 	CreatedAt      time.Time  `json:"created_at"`
 	UpdatedAt      time.Time  `json:"updated_at"`

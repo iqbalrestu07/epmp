@@ -6,9 +6,9 @@ import "time"
 type AssetAssignment struct {
 	OrganizationId string     `json:"organization_id"`
 	Id             string     `json:"id"`
-	AssetId              string       `json:"asset_id"`
-	RoomId               string       `json:"room_id"`
-	AssignedDate         time.Time    `json:"assigned_date"`
+	AssetId        string     `json:"asset_id"`
+	RoomId         string     `json:"room_id"`
+	AssignedDate   time.Time  `json:"assigned_date"`
 	DeletedAt      *time.Time `json:"deleted_at,omitempty"`
 	CreatedAt      time.Time  `json:"created_at"`
 	UpdatedAt      time.Time  `json:"updated_at"`

@@ -119,15 +119,15 @@ func (s *OccupancyService) Delete(ctx context.Context, id, orgID string) error {
 func (s *OccupancyService) toResponse(e *entity.Occupancy) *dto.OccupancyResponse {
 	return &dto.OccupancyResponse{
 		OrganizationId: e.OrganizationId,
-		Id: e.Id,
-		ContractId: e.ContractId,
-		RoomId: e.RoomId,
-		TenantId: e.TenantId,
-		Status: e.Status,
-		CheckInTime: e.CheckInTime,
-		CheckOutTime: e.CheckOutTime,
-		Notes: e.Notes,
-		CreatedAt: e.CreatedAt,
-		UpdatedAt: e.UpdatedAt,
+		Id:             e.Id,
+		ContractId:     e.ContractId,
+		RoomId:         e.RoomId,
+		TenantId:       e.TenantId,
+		Status:         e.Status,
+		CheckInTime:    e.CheckInTime,
+		CheckOutTime:   e.CheckOutTime,
+		Notes:          e.Notes,
+		CreatedAt:      e.CreatedAt,
+		UpdatedAt:      e.UpdatedAt,
 	}
 }

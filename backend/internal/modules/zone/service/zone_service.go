@@ -111,11 +111,11 @@ func (s *ZoneService) Delete(ctx context.Context, id, orgID string) error {
 func (s *ZoneService) toResponse(e *entity.Zone) *dto.ZoneResponse {
 	return &dto.ZoneResponse{
 		OrganizationId: e.OrganizationId,
-		Id: e.Id,
-		BuildingId: e.BuildingId,
-		Floor: e.Floor,
-		Name: e.Name,
-		CreatedAt: e.CreatedAt,
-		UpdatedAt: e.UpdatedAt,
+		Id:             e.Id,
+		BuildingId:     e.BuildingId,
+		Floor:          e.Floor,
+		Name:           e.Name,
+		CreatedAt:      e.CreatedAt,
+		UpdatedAt:      e.UpdatedAt,
 	}
 }

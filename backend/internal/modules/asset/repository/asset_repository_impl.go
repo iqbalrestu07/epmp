@@ -66,7 +66,7 @@ func (r *AssetRepositoryImpl) FindByID(ctx context.Context, id, orgID string) (*
 	if orgIDPtr != nil {
 		e.OrganizationId = *orgIDPtr
 	}
-	
+
 	if err != nil {
 		return nil, fmt.Errorf("asset repository: find by id: %w", err)
 	}

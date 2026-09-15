@@ -6,11 +6,11 @@ import "time"
 type Adjustment struct {
 	OrganizationId string     `json:"organization_id"`
 	Id             string     `json:"id"`
-	InvoiceId            string       `json:"invoice_id"`
-	AdjustmentType       string       `json:"adjustment_type"`
-	Amount               float64      `json:"amount"`
-	AdjustmentDate       time.Time    `json:"adjustment_date"`
-	Reason               string       `json:"reason"`
+	InvoiceId      string     `json:"invoice_id"`
+	AdjustmentType string     `json:"adjustment_type"`
+	Amount         float64    `json:"amount"`
+	AdjustmentDate time.Time  `json:"adjustment_date"`
+	Reason         string     `json:"reason"`
 	DeletedAt      *time.Time `json:"deleted_at,omitempty"`
 	CreatedAt      time.Time  `json:"created_at"`
 	UpdatedAt      time.Time  `json:"updated_at"`

@@ -6,16 +6,16 @@ import "time"
 type Contract struct {
 	OrganizationId string     `json:"organization_id"`
 	Id             string     `json:"id"`
-	ReservationId        string       `json:"reservation_id"`
-	TenantId             string       `json:"tenant_id"`
-	PropertyId           string       `json:"property_id"`
-	RoomId               string       `json:"room_id"`
-	Status               string       `json:"status"`
-	StartDate            time.Time    `json:"start_date"`
-	EndDate              time.Time    `json:"end_date"`
-	MonthlyRent          float64      `json:"monthly_rent"`
-	DepositAmount        float64      `json:"deposit_amount"`
-	Terms                string       `json:"terms"`
+	ReservationId  string     `json:"reservation_id"`
+	TenantId       string     `json:"tenant_id"`
+	PropertyId     string     `json:"property_id"`
+	RoomId         string     `json:"room_id"`
+	Status         string     `json:"status"`
+	StartDate      time.Time  `json:"start_date"`
+	EndDate        time.Time  `json:"end_date"`
+	MonthlyRent    float64    `json:"monthly_rent"`
+	DepositAmount  float64    `json:"deposit_amount"`
+	Terms          string     `json:"terms"`
 	DeletedAt      *time.Time `json:"deleted_at,omitempty"`
 	CreatedAt      time.Time  `json:"created_at"`
 	UpdatedAt      time.Time  `json:"updated_at"`

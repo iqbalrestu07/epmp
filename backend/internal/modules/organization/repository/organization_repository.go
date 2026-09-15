@@ -27,6 +27,9 @@ type OrganizationRepository interface {
 	// Delete soft-deletes an Organization by its primary key.
 	Delete(ctx context.Context, id string) error
 
+	// GetMemberRole returns the caller's role in an organization.
+	GetMemberRole(ctx context.Context, orgID, userID string) (string, error)
+
 	// SaveMember inserts or upserts an organization_members record.
 	SaveMember(ctx context.Context, m *entity.OrganizationMember) error
 
@@ -42,4 +45,3 @@ type OrganizationRepository interface {
 	// DeleteMember removes a member from an organization.
 	DeleteMember(ctx context.Context, orgID, userID string) error
 }
-

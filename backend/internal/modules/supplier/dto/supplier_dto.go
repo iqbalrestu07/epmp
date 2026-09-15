@@ -4,28 +4,28 @@ import "time"
 
 // CreateSupplierRequest is the DTO for creating a Supplier.
 type CreateSupplierRequest struct {
-	Name                 string       `json:"name"`
-	ContactPerson        string       `json:"contact_person"`
-	Phone                string       `json:"phone"`
-	ServiceType          string       `json:"service_type"`
+	Name          string `json:"name"`
+	ContactPerson string `json:"contact_person"`
+	Phone         string `json:"phone"`
+	ServiceType   string `json:"service_type"`
 }
 
 // UpdateSupplierRequest is the DTO for updating a Supplier.
 type UpdateSupplierRequest struct {
-	Name                 string       `json:"name"`
-	ContactPerson        string       `json:"contact_person"`
-	Phone                string       `json:"phone"`
-	ServiceType          string       `json:"service_type"`
+	Name          string `json:"name"`
+	ContactPerson string `json:"contact_person"`
+	Phone         string `json:"phone"`
+	ServiceType   string `json:"service_type"`
 }
 
 // SupplierResponse is the DTO for returning a Supplier.
 type SupplierResponse struct {
 	OrganizationId string    `json:"organization_id"`
 	Id             string    `json:"id"`
-	Name                 string       `json:"name"`
-	ContactPerson        string       `json:"contact_person"`
-	Phone                string       `json:"phone"`
-	ServiceType          string       `json:"service_type"`
+	Name           string    `json:"name"`
+	ContactPerson  string    `json:"contact_person"`
+	Phone          string    `json:"phone"`
+	ServiceType    string    `json:"service_type"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 }
@@ -33,8 +33,8 @@ type SupplierResponse struct {
 // SupplierListResponse is the DTO for a paginated list of Supplier.
 type SupplierListResponse struct {
 	Data       []SupplierResponse `json:"data"`
-	Total      int64         `json:"total"`
-	Page       int           `json:"page"`
-	PerPage    int           `json:"per_page"`
-	TotalPages int           `json:"total_pages"`
+	Total      int64              `json:"total"`
+	Page       int                `json:"page"`
+	PerPage    int                `json:"per_page"`
+	TotalPages int                `json:"total_pages"`
 }

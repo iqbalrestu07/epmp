@@ -4,25 +4,25 @@ import "time"
 
 // CreateRoomTypeRequest is the DTO for creating a RoomType.
 type CreateRoomTypeRequest struct {
-	Name                 string       `json:"name"`
-	Description          string       `json:"description"`
-	BasePrice            float64      `json:"base_price"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	BasePrice   float64 `json:"base_price"`
 }
 
 // UpdateRoomTypeRequest is the DTO for updating a RoomType.
 type UpdateRoomTypeRequest struct {
-	Name                 string       `json:"name"`
-	Description          string       `json:"description"`
-	BasePrice            float64      `json:"base_price"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	BasePrice   float64 `json:"base_price"`
 }
 
 // RoomTypeResponse is the DTO for returning a RoomType.
 type RoomTypeResponse struct {
 	OrganizationId string    `json:"organization_id"`
 	Id             string    `json:"id"`
-	Name                 string       `json:"name"`
-	Description          string       `json:"description"`
-	BasePrice            float64      `json:"base_price"`
+	Name           string    `json:"name"`
+	Description    string    `json:"description"`
+	BasePrice      float64   `json:"base_price"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 }
@@ -30,8 +30,8 @@ type RoomTypeResponse struct {
 // RoomTypeListResponse is the DTO for a paginated list of RoomType.
 type RoomTypeListResponse struct {
 	Data       []RoomTypeResponse `json:"data"`
-	Total      int64         `json:"total"`
-	Page       int           `json:"page"`
-	PerPage    int           `json:"per_page"`
-	TotalPages int           `json:"total_pages"`
+	Total      int64              `json:"total"`
+	Page       int                `json:"page"`
+	PerPage    int                `json:"per_page"`
+	TotalPages int                `json:"total_pages"`
 }

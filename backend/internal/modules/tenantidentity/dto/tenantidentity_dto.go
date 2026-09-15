@@ -4,28 +4,28 @@ import "time"
 
 // CreateTenantIdentityRequest is the DTO for creating a TenantIdentity.
 type CreateTenantIdentityRequest struct {
-	TenantId             string       `json:"tenant_id"`
-	IdentityType         string       `json:"identity_type"`
-	IdentityNumber       string       `json:"identity_number"`
-	FileUrl              string       `json:"file_url"`
+	TenantId       string `json:"tenant_id"`
+	IdentityType   string `json:"identity_type"`
+	IdentityNumber string `json:"identity_number"`
+	FileUrl        string `json:"file_url"`
 }
 
 // UpdateTenantIdentityRequest is the DTO for updating a TenantIdentity.
 type UpdateTenantIdentityRequest struct {
-	TenantId             string       `json:"tenant_id"`
-	IdentityType         string       `json:"identity_type"`
-	IdentityNumber       string       `json:"identity_number"`
-	FileUrl              string       `json:"file_url"`
+	TenantId       string `json:"tenant_id"`
+	IdentityType   string `json:"identity_type"`
+	IdentityNumber string `json:"identity_number"`
+	FileUrl        string `json:"file_url"`
 }
 
 // TenantIdentityResponse is the DTO for returning a TenantIdentity.
 type TenantIdentityResponse struct {
 	OrganizationId string    `json:"organization_id"`
 	Id             string    `json:"id"`
-	TenantId             string       `json:"tenant_id"`
-	IdentityType         string       `json:"identity_type"`
-	IdentityNumber       string       `json:"identity_number"`
-	FileUrl              string       `json:"file_url"`
+	TenantId       string    `json:"tenant_id"`
+	IdentityType   string    `json:"identity_type"`
+	IdentityNumber string    `json:"identity_number"`
+	FileUrl        string    `json:"file_url"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 }
@@ -33,8 +33,8 @@ type TenantIdentityResponse struct {
 // TenantIdentityListResponse is the DTO for a paginated list of TenantIdentity.
 type TenantIdentityListResponse struct {
 	Data       []TenantIdentityResponse `json:"data"`
-	Total      int64         `json:"total"`
-	Page       int           `json:"page"`
-	PerPage    int           `json:"per_page"`
-	TotalPages int           `json:"total_pages"`
+	Total      int64                    `json:"total"`
+	Page       int                      `json:"page"`
+	PerPage    int                      `json:"per_page"`
+	TotalPages int                      `json:"total_pages"`
 }

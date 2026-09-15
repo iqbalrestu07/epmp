@@ -3,11 +3,12 @@
 package http
 
 import (
-	"strconv"
 	"math"
+	"strconv"
 
 	"github.com/epmp/backend/internal/modules/asset/dto"
 	"github.com/epmp/backend/internal/modules/asset/service"
+	"github.com/epmp/backend/internal/pkg/errs"
 	mw "github.com/epmp/backend/internal/pkg/middleware"
 	"github.com/epmp/backend/internal/pkg/response"
 
@@ -64,7 +65,7 @@ func (h *AssetHandler) List(c echo.Context) error {
 	if perPage == 0 {
 		perPage = 20
 	}
-	
+
 	search := c.QueryParam("search")
 	propertyID := c.QueryParam("property_id")
 	orgID := mw.GetOrgID(c)
@@ -73,7 +74,7 @@ func (h *AssetHandler) List(c echo.Context) error {
 	if err != nil {
 		return response.InternalError(c, err.Error())
 	}
-	
+
 	if result.Total > 0 {
 		result.TotalPages = int(math.Ceil(float64(result.Total) / float64(perPage)))
 	}
@@ -103,6 +104,9 @@ func (h *AssetHandler) Delete(c echo.Context) error {
 	orgID := mw.GetOrgID(c)
 
 	if err := h.svc.Delete(c.Request().Context(), id, orgID); err != nil {
+		if errs.IsDomainError(err, "NOT_FOUND") {
+			return response.NotFound(c, "Resource not found")
+		}
 		return response.InternalError(c, err.Error())
 	}
 

@@ -85,7 +85,7 @@ Pengujian menguji alur berikut secara menyeluruh:
 1. **Autentikasi & Sesi Enterprise:**
    - Login menggunakan akun tester ke `/auth/signin`.
    - Inisialisasi token JWT, refresh token, dan context organisasi (`X-Organization-ID`).
-2. **Pemeriksaan 40 Halaman & Form:**
+2. **Pemeriksaan 64 Halaman & Form:**
    - **Dashboard & Core:** Overview (`/dashboard`), Spatial Explorer (`/dashboard/explorer`).
    - **Struktur Properti:** Organizations, Properties, Buildings, Floors, Rooms, Room Types, Beds, Zones, Facilities (baik halaman List maupun New Form).
    - **Operasional:** Tenants, Reservations, Contracts, Occupancies.

@@ -6,16 +6,16 @@ import "time"
 
 // CreateOrganizationRequest is the DTO for creating a Organization.
 type CreateOrganizationRequest struct {
-	Name string `json:"name"`
-	Domain string `json:"domain"`
-	IsActive bool `json:"is_active"`
+	Name     string `json:"name"`
+	Domain   string `json:"domain"`
+	IsActive bool   `json:"is_active"`
 }
 
 // UpdateOrganizationRequest is the DTO for updating a Organization.
 type UpdateOrganizationRequest struct {
-	Name string `json:"name"`
-	Domain string `json:"domain"`
-	IsActive bool `json:"is_active"`
+	Name     string `json:"name"`
+	Domain   string `json:"domain"`
+	IsActive bool   `json:"is_active"`
 }
 
 // OrganizationResponse is the DTO for returning a Organization.
@@ -32,10 +32,10 @@ type OrganizationResponse struct {
 // OrganizationListResponse is the DTO for a paginated list of Organization.
 type OrganizationListResponse struct {
 	Data       []OrganizationResponse `json:"data"`
-	Total      int64               `json:"total"`
-	Page       int                 `json:"page"`
-	PerPage    int                 `json:"per_page"`
-	TotalPages int                 `json:"total_pages"`
+	Total      int64                  `json:"total"`
+	Page       int                    `json:"page"`
+	PerPage    int                    `json:"per_page"`
+	TotalPages int                    `json:"total_pages"`
 }
 
 type OrganizationMemberResponse struct {
@@ -55,4 +55,3 @@ type AddOrganizationMemberRequest struct {
 	Password string `json:"password,omitempty"`
 	Role     string `json:"role,omitempty"`
 }
-

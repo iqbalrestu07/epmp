@@ -6,14 +6,14 @@ import "time"
 
 // Asset is the domain entity for asset.
 type Asset struct {
-	OrganizationId string `json:"organization_id"`
-	Id string `json:"id"`
-	PropertyId string `json:"property_id"`
-	Name string `json:"name"`
-	Category string `json:"category"`
-	Status string `json:"status"`
-	PurchasePrice float64 `json:"purchase_price"`
-	DeletedAt *time.Time `json:"deleted_at,omitempty"`
+	OrganizationId string     `json:"organization_id"`
+	Id             string     `json:"id"`
+	PropertyId     string     `json:"property_id"`
+	Name           string     `json:"name"`
+	Category       string     `json:"category"`
+	Status         string     `json:"status"`
+	PurchasePrice  float64    `json:"purchase_price"`
+	DeletedAt      *time.Time `json:"deleted_at,omitempty"`
 }
 
 // NewAsset creates a new Asset instance.

@@ -27,5 +27,5 @@ type FloorRepository interface {
 	CountByBuildingID(ctx context.Context, buildingID string) (int64, error)
 
 	// Delete removes a Floor by its primary key.
-	Delete(ctx context.Context, id string) error
+	Delete(ctx context.Context, id, orgID string) error
 }

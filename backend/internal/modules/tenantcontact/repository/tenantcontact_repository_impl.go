@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"github.com/epmp/backend/internal/pkg/errs"
 
 	"github.com/epmp/backend/internal/modules/tenantcontact/entity"
 
@@ -66,8 +67,8 @@ func (r *TenantContactRepositoryImpl) FindAll(ctx context.Context, limit, offset
 	argIdx := 2
 
 	if search != "" {
-		query += fmt.Sprintf(" AND (contact_type ILIKE $%d OR contact_value ILIKE $%d)", argIdx)
-		args = append(args, "%" + search + "%")
+		query += fmt.Sprintf(" AND (contact_type ILIKE $%d OR contact_value ILIKE $%d)", argIdx, argIdx)
+		args = append(args, "%"+search+"%")
 		argIdx++
 	}
 
@@ -96,8 +97,8 @@ func (r *TenantContactRepositoryImpl) Count(ctx context.Context, search, orgID s
 	args := []interface{}{orgID}
 
 	if search != "" {
-		query += fmt.Sprintf(" AND (contact_type ILIKE $%d OR contact_value ILIKE $%d)", 2)
-		args = append(args, "%" + search + "%")
+		query += fmt.Sprintf(" AND (contact_type ILIKE $%d OR contact_value ILIKE $%d)", 2, 2)
+		args = append(args, "%"+search+"%")
 	}
 
 	var count int64
@@ -109,7 +110,13 @@ func (r *TenantContactRepositoryImpl) Count(ctx context.Context, search, orgID s
 }
 
 func (r *TenantContactRepositoryImpl) Delete(ctx context.Context, id, orgID string) error {
-	_, err := r.db.Exec(ctx, `
+	tag, err := r.db.Exec(ctx, `
 		UPDATE tenant_contacts SET deleted_at = now() WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL`, id, orgID)
-	return err
+	if err != nil {
+		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return errs.ErrNotFound
+	}
+	return nil
 }

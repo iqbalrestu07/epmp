@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"github.com/epmp/backend/internal/pkg/errs"
 
 	"github.com/epmp/backend/internal/modules/building/entity"
 
@@ -147,8 +148,14 @@ func (r *BuildingRepositoryImpl) Count(ctx context.Context, search string, prope
 	return count, nil
 }
 
-func (r *BuildingRepositoryImpl) Delete(ctx context.Context, id string) error {
-	_, err := r.db.Exec(ctx, `
-		UPDATE buildings SET deleted_at = now() WHERE id = $1 AND deleted_at IS NULL`, id)
-	return err
+func (r *BuildingRepositoryImpl) Delete(ctx context.Context, id, orgID string) error {
+	tag, err := r.db.Exec(ctx, `
+		UPDATE buildings SET deleted_at = now() WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL`, id, orgID)
+	if err != nil {
+		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return errs.ErrNotFound
+	}
+	return nil
 }

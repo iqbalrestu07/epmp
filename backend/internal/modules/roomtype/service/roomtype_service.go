@@ -111,11 +111,11 @@ func (s *RoomTypeService) Delete(ctx context.Context, id, orgID string) error {
 func (s *RoomTypeService) toResponse(e *entity.RoomType) *dto.RoomTypeResponse {
 	return &dto.RoomTypeResponse{
 		OrganizationId: e.OrganizationId,
-		Id: e.Id,
-		Name: e.Name,
-		Description: e.Description,
-		BasePrice: e.BasePrice,
-		CreatedAt: e.CreatedAt,
-		UpdatedAt: e.UpdatedAt,
+		Id:             e.Id,
+		Name:           e.Name,
+		Description:    e.Description,
+		BasePrice:      e.BasePrice,
+		CreatedAt:      e.CreatedAt,
+		UpdatedAt:      e.UpdatedAt,
 	}
 }

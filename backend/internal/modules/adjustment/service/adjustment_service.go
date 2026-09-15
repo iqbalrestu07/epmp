@@ -115,13 +115,13 @@ func (s *AdjustmentService) Delete(ctx context.Context, id, orgID string) error 
 func (s *AdjustmentService) toResponse(e *entity.Adjustment) *dto.AdjustmentResponse {
 	return &dto.AdjustmentResponse{
 		OrganizationId: e.OrganizationId,
-		Id: e.Id,
-		InvoiceId: e.InvoiceId,
+		Id:             e.Id,
+		InvoiceId:      e.InvoiceId,
 		AdjustmentType: e.AdjustmentType,
-		Amount: e.Amount,
+		Amount:         e.Amount,
 		AdjustmentDate: e.AdjustmentDate,
-		Reason: e.Reason,
-		CreatedAt: e.CreatedAt,
-		UpdatedAt: e.UpdatedAt,
+		Reason:         e.Reason,
+		CreatedAt:      e.CreatedAt,
+		UpdatedAt:      e.UpdatedAt,
 	}
 }

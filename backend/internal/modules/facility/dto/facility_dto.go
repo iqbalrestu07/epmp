@@ -4,25 +4,25 @@ import "time"
 
 // CreateFacilityRequest is the DTO for creating a Facility.
 type CreateFacilityRequest struct {
-	PropertyId           string       `json:"property_id"`
-	Name                 string       `json:"name"`
-	Description          string       `json:"description"`
+	PropertyId  string `json:"property_id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 // UpdateFacilityRequest is the DTO for updating a Facility.
 type UpdateFacilityRequest struct {
-	PropertyId           string       `json:"property_id"`
-	Name                 string       `json:"name"`
-	Description          string       `json:"description"`
+	PropertyId  string `json:"property_id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 // FacilityResponse is the DTO for returning a Facility.
 type FacilityResponse struct {
 	OrganizationId string    `json:"organization_id"`
 	Id             string    `json:"id"`
-	PropertyId           string       `json:"property_id"`
-	Name                 string       `json:"name"`
-	Description          string       `json:"description"`
+	PropertyId     string    `json:"property_id"`
+	Name           string    `json:"name"`
+	Description    string    `json:"description"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 }
@@ -30,8 +30,8 @@ type FacilityResponse struct {
 // FacilityListResponse is the DTO for a paginated list of Facility.
 type FacilityListResponse struct {
 	Data       []FacilityResponse `json:"data"`
-	Total      int64         `json:"total"`
-	Page       int           `json:"page"`
-	PerPage    int           `json:"per_page"`
-	TotalPages int           `json:"total_pages"`
+	Total      int64              `json:"total"`
+	Page       int                `json:"page"`
+	PerPage    int                `json:"per_page"`
+	TotalPages int                `json:"total_pages"`
 }

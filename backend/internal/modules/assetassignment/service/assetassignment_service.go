@@ -111,11 +111,11 @@ func (s *AssetAssignmentService) Delete(ctx context.Context, id, orgID string) e
 func (s *AssetAssignmentService) toResponse(e *entity.AssetAssignment) *dto.AssetAssignmentResponse {
 	return &dto.AssetAssignmentResponse{
 		OrganizationId: e.OrganizationId,
-		Id: e.Id,
-		AssetId: e.AssetId,
-		RoomId: e.RoomId,
-		AssignedDate: e.AssignedDate,
-		CreatedAt: e.CreatedAt,
-		UpdatedAt: e.UpdatedAt,
+		Id:             e.Id,
+		AssetId:        e.AssetId,
+		RoomId:         e.RoomId,
+		AssignedDate:   e.AssignedDate,
+		CreatedAt:      e.CreatedAt,
+		UpdatedAt:      e.UpdatedAt,
 	}
 }

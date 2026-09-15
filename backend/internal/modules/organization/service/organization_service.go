@@ -7,6 +7,7 @@ import (
 	"github.com/epmp/backend/internal/modules/organization/dto"
 	"github.com/epmp/backend/internal/modules/organization/entity"
 	"github.com/epmp/backend/internal/modules/organization/repository"
+	"github.com/epmp/backend/internal/pkg/errs"
 	"github.com/epmp/backend/internal/pkg/uid"
 )
 
@@ -126,7 +127,15 @@ func (s *OrganizationService) Update(ctx context.Context, id string, req *dto.Up
 	return s.toResponse(updated), nil
 }
 
-func (s *OrganizationService) Delete(ctx context.Context, id string) error {
+func (s *OrganizationService) Delete(ctx context.Context, id, userID string) error {
+	// Only an owner member may delete the organization.
+	role, err := s.repo.GetMemberRole(ctx, id, userID)
+	if err != nil {
+		return fmt.Errorf("organization service: delete: %w", err)
+	}
+	if role != "owner" {
+		return errs.NewDomainError("FORBIDDEN", "only the organization owner can delete it")
+	}
 	if err := s.repo.Delete(ctx, id); err != nil {
 		return fmt.Errorf("organization service: delete: %w", err)
 	}
@@ -147,7 +156,6 @@ func (s *OrganizationService) AddMember(ctx context.Context, orgID string, req *
 func (s *OrganizationService) RemoveMember(ctx context.Context, orgID, userID string) error {
 	return s.repo.DeleteMember(ctx, orgID, userID)
 }
-
 
 func (s *OrganizationService) toResponse(e *entity.Organization) *dto.OrganizationResponse {
 	return &dto.OrganizationResponse{

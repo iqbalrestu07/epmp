@@ -6,40 +6,40 @@ import "time"
 
 // CreateAssetRequest is the DTO for creating a Asset.
 type CreateAssetRequest struct {
-	PropertyId string `json:"property_id"`
-	Name string `json:"name"`
-	Category string `json:"category"`
-	Status string `json:"status"`
+	PropertyId    string  `json:"property_id"`
+	Name          string  `json:"name"`
+	Category      string  `json:"category"`
+	Status        string  `json:"status"`
 	PurchasePrice float64 `json:"purchase_price"`
 }
 
 // UpdateAssetRequest is the DTO for updating a Asset.
 type UpdateAssetRequest struct {
-	PropertyId string `json:"property_id"`
-	Name string `json:"name"`
-	Category string `json:"category"`
-	Status string `json:"status"`
+	PropertyId    string  `json:"property_id"`
+	Name          string  `json:"name"`
+	Category      string  `json:"category"`
+	Status        string  `json:"status"`
 	PurchasePrice float64 `json:"purchase_price"`
 }
 
 // AssetResponse is the DTO for returning a Asset.
 type AssetResponse struct {
-	OrganizationId string `json:"organization_id"`
-	Id string `json:"id"`
-	PropertyId string `json:"property_id"`
-	Name string `json:"name"`
-	Category string `json:"category"`
-	Status string `json:"status"`
-	PurchasePrice float64 `json:"purchase_price"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	OrganizationId string    `json:"organization_id"`
+	Id             string    `json:"id"`
+	PropertyId     string    `json:"property_id"`
+	Name           string    `json:"name"`
+	Category       string    `json:"category"`
+	Status         string    `json:"status"`
+	PurchasePrice  float64   `json:"purchase_price"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
 }
 
 // AssetListResponse is the DTO for a paginated list of Asset.
 type AssetListResponse struct {
 	Data       []AssetResponse `json:"data"`
-	Total      int64               `json:"total"`
-	Page       int                 `json:"page"`
-	PerPage    int                 `json:"per_page"`
-	TotalPages int                 `json:"total_pages"`
+	Total      int64           `json:"total"`
+	Page       int             `json:"page"`
+	PerPage    int             `json:"per_page"`
+	TotalPages int             `json:"total_pages"`
 }

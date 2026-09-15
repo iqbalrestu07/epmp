@@ -104,8 +104,8 @@ func (s *PropertyService) Update(ctx context.Context, id, orgID string, req *dto
 	return s.toResponse(updated), nil
 }
 
-func (s *PropertyService) Delete(ctx context.Context, id string) error {
-	if err := s.repo.Delete(ctx, id); err != nil {
+func (s *PropertyService) Delete(ctx context.Context, id, orgID string) error {
+	if err := s.repo.Delete(ctx, id, orgID); err != nil {
 		return fmt.Errorf("property service: delete: %w", err)
 	}
 	return nil
@@ -125,7 +125,6 @@ func (s *PropertyService) AssignStaff(ctx context.Context, orgID, propertyID, us
 func (s *PropertyService) RemoveStaff(ctx context.Context, propertyID, userID, roleID, orgID string) error {
 	return s.repo.RemoveStaff(ctx, propertyID, userID, roleID, orgID)
 }
-
 
 func (s *PropertyService) toResponse(e *entity.Property) *dto.PropertyResponse {
 	return &dto.PropertyResponse{

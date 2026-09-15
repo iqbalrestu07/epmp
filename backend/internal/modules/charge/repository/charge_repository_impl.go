@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"github.com/epmp/backend/internal/pkg/errs"
 
 	"github.com/epmp/backend/internal/modules/charge/entity"
 
@@ -66,8 +67,8 @@ func (r *ChargeRepositoryImpl) FindAll(ctx context.Context, limit, offset int, s
 	argIdx := 2
 
 	if search != "" {
-		query += fmt.Sprintf(" AND (charge_type ILIKE $%d OR status ILIKE $%d)", argIdx)
-		args = append(args, "%" + search + "%")
+		query += fmt.Sprintf(" AND (charge_type ILIKE $%d OR status ILIKE $%d)", argIdx, argIdx)
+		args = append(args, "%"+search+"%")
 		argIdx++
 	}
 
@@ -96,8 +97,8 @@ func (r *ChargeRepositoryImpl) Count(ctx context.Context, search, orgID string) 
 	args := []interface{}{orgID}
 
 	if search != "" {
-		query += fmt.Sprintf(" AND (charge_type ILIKE $%d OR status ILIKE $%d)", 2)
-		args = append(args, "%" + search + "%")
+		query += fmt.Sprintf(" AND (charge_type ILIKE $%d OR status ILIKE $%d)", 2, 2)
+		args = append(args, "%"+search+"%")
 	}
 
 	var count int64
@@ -109,7 +110,13 @@ func (r *ChargeRepositoryImpl) Count(ctx context.Context, search, orgID string) 
 }
 
 func (r *ChargeRepositoryImpl) Delete(ctx context.Context, id, orgID string) error {
-	_, err := r.db.Exec(ctx, `
+	tag, err := r.db.Exec(ctx, `
 		UPDATE charges SET deleted_at = now() WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL`, id, orgID)
-	return err
+	if err != nil {
+		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return errs.ErrNotFound
+	}
+	return nil
 }

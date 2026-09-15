@@ -118,8 +118,8 @@ func (s *FloorService) Update(ctx context.Context, id, orgID string, req *dto.Up
 	return s.toResponse(updated), nil
 }
 
-func (s *FloorService) Delete(ctx context.Context, id string) error {
-	if err := s.repo.Delete(ctx, id); err != nil {
+func (s *FloorService) Delete(ctx context.Context, id, orgID string) error {
+	if err := s.repo.Delete(ctx, id, orgID); err != nil {
 		return fmt.Errorf("floor service: delete: %w", err)
 	}
 	return nil

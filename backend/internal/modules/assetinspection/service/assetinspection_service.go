@@ -113,12 +113,12 @@ func (s *AssetInspectionService) Delete(ctx context.Context, id, orgID string) e
 func (s *AssetInspectionService) toResponse(e *entity.AssetInspection) *dto.AssetInspectionResponse {
 	return &dto.AssetInspectionResponse{
 		OrganizationId: e.OrganizationId,
-		Id: e.Id,
-		AssetId: e.AssetId,
+		Id:             e.Id,
+		AssetId:        e.AssetId,
 		InspectionDate: e.InspectionDate,
-		Condition: e.Condition,
-		Notes: e.Notes,
-		CreatedAt: e.CreatedAt,
-		UpdatedAt: e.UpdatedAt,
+		Condition:      e.Condition,
+		Notes:          e.Notes,
+		CreatedAt:      e.CreatedAt,
+		UpdatedAt:      e.UpdatedAt,
 	}
 }

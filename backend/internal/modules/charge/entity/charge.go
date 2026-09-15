@@ -6,13 +6,13 @@ import "time"
 type Charge struct {
 	OrganizationId string     `json:"organization_id"`
 	Id             string     `json:"id"`
-	ContractId           string       `json:"contract_id"`
-	InvoiceId            string       `json:"invoice_id"`
-	ChargeType           string       `json:"charge_type"`
-	Amount               float64      `json:"amount"`
-	Status               string       `json:"status"`
-	ChargeDate           time.Time    `json:"charge_date"`
-	Notes                string       `json:"notes"`
+	ContractId     string     `json:"contract_id"`
+	InvoiceId      string     `json:"invoice_id"`
+	ChargeType     string     `json:"charge_type"`
+	Amount         float64    `json:"amount"`
+	Status         string     `json:"status"`
+	ChargeDate     time.Time  `json:"charge_date"`
+	Notes          string     `json:"notes"`
 	DeletedAt      *time.Time `json:"deleted_at,omitempty"`
 	CreatedAt      time.Time  `json:"created_at"`
 	UpdatedAt      time.Time  `json:"updated_at"`

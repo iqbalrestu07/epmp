@@ -4,25 +4,25 @@ import "time"
 
 // CreateTenantDocumentRequest is the DTO for creating a TenantDocument.
 type CreateTenantDocumentRequest struct {
-	TenantId             string       `json:"tenant_id"`
-	DocumentType         string       `json:"document_type"`
-	FileUrl              string       `json:"file_url"`
+	TenantId     string `json:"tenant_id"`
+	DocumentType string `json:"document_type"`
+	FileUrl      string `json:"file_url"`
 }
 
 // UpdateTenantDocumentRequest is the DTO for updating a TenantDocument.
 type UpdateTenantDocumentRequest struct {
-	TenantId             string       `json:"tenant_id"`
-	DocumentType         string       `json:"document_type"`
-	FileUrl              string       `json:"file_url"`
+	TenantId     string `json:"tenant_id"`
+	DocumentType string `json:"document_type"`
+	FileUrl      string `json:"file_url"`
 }
 
 // TenantDocumentResponse is the DTO for returning a TenantDocument.
 type TenantDocumentResponse struct {
 	OrganizationId string    `json:"organization_id"`
 	Id             string    `json:"id"`
-	TenantId             string       `json:"tenant_id"`
-	DocumentType         string       `json:"document_type"`
-	FileUrl              string       `json:"file_url"`
+	TenantId       string    `json:"tenant_id"`
+	DocumentType   string    `json:"document_type"`
+	FileUrl        string    `json:"file_url"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 }
@@ -30,8 +30,8 @@ type TenantDocumentResponse struct {
 // TenantDocumentListResponse is the DTO for a paginated list of TenantDocument.
 type TenantDocumentListResponse struct {
 	Data       []TenantDocumentResponse `json:"data"`
-	Total      int64         `json:"total"`
-	Page       int           `json:"page"`
-	PerPage    int           `json:"per_page"`
-	TotalPages int           `json:"total_pages"`
+	Total      int64                    `json:"total"`
+	Page       int                      `json:"page"`
+	PerPage    int                      `json:"per_page"`
+	TotalPages int                      `json:"total_pages"`
 }

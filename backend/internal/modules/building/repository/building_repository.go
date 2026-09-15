@@ -24,5 +24,5 @@ type BuildingRepository interface {
 	Count(ctx context.Context, search, propertyId, orgID string) (int64, error)
 
 	// Delete removes a Building by its primary key.
-	Delete(ctx context.Context, id string) error
+	Delete(ctx context.Context, id, orgID string) error
 }

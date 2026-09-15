@@ -113,12 +113,12 @@ func (s *TenantContactService) Delete(ctx context.Context, id, orgID string) err
 func (s *TenantContactService) toResponse(e *entity.TenantContact) *dto.TenantContactResponse {
 	return &dto.TenantContactResponse{
 		OrganizationId: e.OrganizationId,
-		Id: e.Id,
-		TenantId: e.TenantId,
-		ContactType: e.ContactType,
-		ContactValue: e.ContactValue,
-		IsPrimary: e.IsPrimary,
-		CreatedAt: e.CreatedAt,
-		UpdatedAt: e.UpdatedAt,
+		Id:             e.Id,
+		TenantId:       e.TenantId,
+		ContactType:    e.ContactType,
+		ContactValue:   e.ContactValue,
+		IsPrimary:      e.IsPrimary,
+		CreatedAt:      e.CreatedAt,
+		UpdatedAt:      e.UpdatedAt,
 	}
 }

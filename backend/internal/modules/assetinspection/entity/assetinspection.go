@@ -6,10 +6,10 @@ import "time"
 type AssetInspection struct {
 	OrganizationId string     `json:"organization_id"`
 	Id             string     `json:"id"`
-	AssetId              string       `json:"asset_id"`
-	InspectionDate       time.Time    `json:"inspection_date"`
-	Condition            string       `json:"condition"`
-	Notes                string       `json:"notes"`
+	AssetId        string     `json:"asset_id"`
+	InspectionDate time.Time  `json:"inspection_date"`
+	Condition      string     `json:"condition"`
+	Notes          string     `json:"notes"`
 	DeletedAt      *time.Time `json:"deleted_at,omitempty"`
 	CreatedAt      time.Time  `json:"created_at"`
 	UpdatedAt      time.Time  `json:"updated_at"`

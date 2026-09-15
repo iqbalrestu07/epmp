@@ -11,11 +11,18 @@ Organization → Property → Building → Floor → Room
 | #   | Module       | Backend Tests    | Backend Fixes                                  | Frontend Integration              | Status |
 | --- | ------------ | ---------------- | ---------------------------------------------- | --------------------------------- | ------ |
 | 1   | Property     | ✅ 8 tests pass  | ✅ timestamps, search, pagination, org-scoped  | ✅ real API, 3D view              | DONE   |
-| 2   | Organization | ✅ 8 tests pass  | ✅ timestamps, search, pagination, org_members | ✅ real API, routes, UI, switcher | DONE   |
-| 3   | Building     | ✅ 10 tests pass | ✅ timestamps, search, pagination, org-scoped  | ✅ real API, routes, UI           | DONE   |
-| 4   | Floor        | ✅ 10 tests pass | ✅ timestamps, search, pagination, org-scoped  | ✅ real API, routes, UI           | DONE   |
-| 5   | Room         | ✅ 10 tests pass | ✅ timestamps, search, pagination, org-scoped  | ✅ real API, routes, UI           | DONE   |
-| 6   | Tenant       | ✅ 10 tests pass | ✅ timestamps, search, pagination, org-scoped  | TODO                              | DONE   |
+| 2   | Organization | ✅ 8 tests pass  | ✅ timestamps, search, pagination, org_members, owner-only delete | ✅ real API, routes, UI, switcher | DONE   |
+| 3   | Building     | ✅ 9 tests pass  | ✅ timestamps, search, pagination, org-scoped delete | ✅ real API, routes, UI           | DONE   |
+| 4   | Floor        | ✅ 11 tests pass | ✅ timestamps, search, pagination, org-scoped delete | ✅ real API, routes, UI           | DONE   |
+| 5   | Room         | ✅ 10 tests pass | ✅ timestamps, search, pagination, org-scoped delete | ✅ real API, routes, UI           | DONE   |
+| 6   | Tenant       | ✅ 10 tests pass | ✅ timestamps, search, pagination, org-scoped  | ✅ real API                       | DONE   |
+| 7   | Billing/Invoice | ✅ 12 tests pass | ✅ org-scoped, currency, timestamps         | ✅ real API                       | DONE   |
+| 8   | Report       | ✅ 7 tests pass  | ✅ occupancy, revenue, AR aging, org-scoped | ✅ real API, routes, UI           | DONE   |
+| 9   | Audit Trail  | ✅ 4 tests pass  | ✅ mutation middleware, org-scoped list     | ✅ real API, routes, UI           | DONE   |
+| 10  | Notification | ✅ 5 tests pass  | ✅ WebSocket hub, persistence, payment hooks, SMTP email | ✅ notification center UI | DONE   |
+| 11  | Communication| ✅ 4 tests pass  | ✅ org-scoped devices/templates/blasts (security fix) | ✅ WA gateway UI | DONE   |
+| 12  | IAM          | ✅ 4 tests pass  | ✅ register/login/refresh/logout/me, RBAC   | ✅ auth pages                     | DONE   |
+| 13  | Dashboard    | ✅ 3 tests pass  | ✅ org-scoped summary metrics               | ✅ dashboard UI                   | DONE   |
 
 ## Org-Scoped Filtering Architecture
 
@@ -168,7 +175,7 @@ All core modules now enforce organization-scoped filtering:
 - JWT test secret: "test-jwt-secret-for-integration-tests"
 - DB: postgres://postgres:postgres@localhost:5432/epmp?sslmode=disable
 - All IDs are ULID (TEXT), not UUID
-- 56 backend tests total (Property: 8, Organization: 8, Building: 10, Floor: 10, Room: 10, Tenant: 10)
+- 137 backend tests total across 33 module packages (all CRUD modules have API integration tests covering create/get/list/update/delete, cross-org isolation, and unauthorized access)
 - Soft deletes via `deleted_at` column
 - `organization_id` always from context (X-Organization-ID header), never from request body
 
@@ -177,6 +184,6 @@ All core modules now enforce organization-scoped filtering:
 - **Testing Engine**: Playwright 1.63+ utilizing native system Google Chrome (`channel: 'chrome'`)
 - **Specification Document**: [`E2E_TESTING.md`](E2E_TESTING.md)
 - **Suite Command**: `make test-e2e` (or `npm run test:e2e` in `frontend/`)
-- **Coverage**: 40 dashboard routes, interactive spatial views (Building Drop 3D, Property 3D Map, Explorer), and auth flows.
+- **Coverage**: 64 dashboard routes (all list pages + create forms, including overview, roster, management/users, management/rbac, reports, audit-logs), a 26-step end-to-end business flow (property→building→floor→zone→roomtype→room→bed→facility→technician→supplier→asset→assignment→inspection→work order→tenant→reservation→contract→occupancy→deposit→charge→invoice→adjustment→penalty→payment→refund), interactive spatial views (Building Drop 3D, Property 3D Map, Explorer), and auth flows.
 - **Current Status**: ✅ 100% Passed (0 Errors).
 - **Mandatory Policy**: Every future feature, form, or route addition must be included in the E2E test suite and pass before merge/completion.

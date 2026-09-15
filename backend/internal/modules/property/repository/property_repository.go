@@ -25,7 +25,7 @@ type PropertyRepository interface {
 	Count(ctx context.Context, search, orgID string) (int64, error)
 
 	// Delete removes a Property by its primary key.
-	Delete(ctx context.Context, id string) error
+	Delete(ctx context.Context, id, orgID string) error
 
 	// FindStaffByPropertyID returns all assigned staff for a property.
 	FindStaffByPropertyID(ctx context.Context, propertyID, orgID string) ([]*dto.PropertyStaffResponse, error)
@@ -36,4 +36,3 @@ type PropertyRepository interface {
 	// RemoveStaff removes a staff assignment.
 	RemoveStaff(ctx context.Context, propertyID, userID, roleID, orgID string) error
 }
-

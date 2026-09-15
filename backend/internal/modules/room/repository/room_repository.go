@@ -26,5 +26,5 @@ type RoomRepository interface {
 	Count(ctx context.Context, search, floorId, propertyId, buildingId, orgID string) (int64, error)
 
 	// Delete removes a Room by its primary key.
-	Delete(ctx context.Context, id string) error
+	Delete(ctx context.Context, id, orgID string) error
 }

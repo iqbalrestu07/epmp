@@ -5,8 +5,9 @@ import (
 
 	"github.com/epmp/backend/internal/modules/organization/dto"
 	"github.com/epmp/backend/internal/modules/organization/service"
-	"github.com/epmp/backend/internal/pkg/response"
+	"github.com/epmp/backend/internal/pkg/errs"
 	mw "github.com/epmp/backend/internal/pkg/middleware"
+	"github.com/epmp/backend/internal/pkg/response"
 
 	"github.com/labstack/echo/v4"
 )
@@ -107,8 +108,15 @@ func (h *OrganizationHandler) Update(c echo.Context) error {
 
 func (h *OrganizationHandler) Delete(c echo.Context) error {
 	id := c.Param("id")
+	userID := mw.GetUserID(c)
 
-	if err := h.svc.Delete(c.Request().Context(), id); err != nil {
+	if err := h.svc.Delete(c.Request().Context(), id, userID); err != nil {
+		if errs.IsDomainError(err, "NOT_FOUND") {
+			return response.NotFound(c, "Resource not found")
+		}
+		if errs.IsDomainError(err, "FORBIDDEN") {
+			return response.Forbidden(c, "only the organization owner can delete it")
+		}
 		return response.InternalError(c, err.Error())
 	}
 
@@ -165,4 +173,3 @@ func (h *OrganizationHandler) RemoveMember(c echo.Context) error {
 
 	return response.NoContent(c)
 }
-

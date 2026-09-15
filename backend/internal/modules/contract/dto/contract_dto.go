@@ -4,46 +4,46 @@ import "time"
 
 // CreateContractRequest is the DTO for creating a Contract.
 type CreateContractRequest struct {
-	ReservationId        string       `json:"reservation_id"`
-	TenantId             string       `json:"tenant_id"`
-	PropertyId           string       `json:"property_id"`
-	RoomId               string       `json:"room_id"`
-	Status               string       `json:"status"`
-	StartDate            time.Time    `json:"start_date"`
-	EndDate              time.Time    `json:"end_date"`
-	MonthlyRent          float64      `json:"monthly_rent"`
-	DepositAmount        float64      `json:"deposit_amount"`
-	Terms                string       `json:"terms"`
+	ReservationId string    `json:"reservation_id"`
+	TenantId      string    `json:"tenant_id"`
+	PropertyId    string    `json:"property_id"`
+	RoomId        string    `json:"room_id"`
+	Status        string    `json:"status"`
+	StartDate     time.Time `json:"start_date"`
+	EndDate       time.Time `json:"end_date"`
+	MonthlyRent   float64   `json:"monthly_rent"`
+	DepositAmount float64   `json:"deposit_amount"`
+	Terms         string    `json:"terms"`
 }
 
 // UpdateContractRequest is the DTO for updating a Contract.
 type UpdateContractRequest struct {
-	ReservationId        string       `json:"reservation_id"`
-	TenantId             string       `json:"tenant_id"`
-	PropertyId           string       `json:"property_id"`
-	RoomId               string       `json:"room_id"`
-	Status               string       `json:"status"`
-	StartDate            time.Time    `json:"start_date"`
-	EndDate              time.Time    `json:"end_date"`
-	MonthlyRent          float64      `json:"monthly_rent"`
-	DepositAmount        float64      `json:"deposit_amount"`
-	Terms                string       `json:"terms"`
+	ReservationId string    `json:"reservation_id"`
+	TenantId      string    `json:"tenant_id"`
+	PropertyId    string    `json:"property_id"`
+	RoomId        string    `json:"room_id"`
+	Status        string    `json:"status"`
+	StartDate     time.Time `json:"start_date"`
+	EndDate       time.Time `json:"end_date"`
+	MonthlyRent   float64   `json:"monthly_rent"`
+	DepositAmount float64   `json:"deposit_amount"`
+	Terms         string    `json:"terms"`
 }
 
 // ContractResponse is the DTO for returning a Contract.
 type ContractResponse struct {
 	OrganizationId string    `json:"organization_id"`
 	Id             string    `json:"id"`
-	ReservationId        string       `json:"reservation_id"`
-	TenantId             string       `json:"tenant_id"`
-	PropertyId           string       `json:"property_id"`
-	RoomId               string       `json:"room_id"`
-	Status               string       `json:"status"`
-	StartDate            time.Time    `json:"start_date"`
-	EndDate              time.Time    `json:"end_date"`
-	MonthlyRent          float64      `json:"monthly_rent"`
-	DepositAmount        float64      `json:"deposit_amount"`
-	Terms                string       `json:"terms"`
+	ReservationId  string    `json:"reservation_id"`
+	TenantId       string    `json:"tenant_id"`
+	PropertyId     string    `json:"property_id"`
+	RoomId         string    `json:"room_id"`
+	Status         string    `json:"status"`
+	StartDate      time.Time `json:"start_date"`
+	EndDate        time.Time `json:"end_date"`
+	MonthlyRent    float64   `json:"monthly_rent"`
+	DepositAmount  float64   `json:"deposit_amount"`
+	Terms          string    `json:"terms"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 }
@@ -51,8 +51,8 @@ type ContractResponse struct {
 // ContractListResponse is the DTO for a paginated list of Contract.
 type ContractListResponse struct {
 	Data       []ContractResponse `json:"data"`
-	Total      int64         `json:"total"`
-	Page       int           `json:"page"`
-	PerPage    int           `json:"per_page"`
-	TotalPages int           `json:"total_pages"`
+	Total      int64              `json:"total"`
+	Page       int                `json:"page"`
+	PerPage    int                `json:"per_page"`
+	TotalPages int                `json:"total_pages"`
 }

@@ -113,12 +113,12 @@ func (s *SupplierService) Delete(ctx context.Context, id, orgID string) error {
 func (s *SupplierService) toResponse(e *entity.Supplier) *dto.SupplierResponse {
 	return &dto.SupplierResponse{
 		OrganizationId: e.OrganizationId,
-		Id: e.Id,
-		Name: e.Name,
-		ContactPerson: e.ContactPerson,
-		Phone: e.Phone,
-		ServiceType: e.ServiceType,
-		CreatedAt: e.CreatedAt,
-		UpdatedAt: e.UpdatedAt,
+		Id:             e.Id,
+		Name:           e.Name,
+		ContactPerson:  e.ContactPerson,
+		Phone:          e.Phone,
+		ServiceType:    e.ServiceType,
+		CreatedAt:      e.CreatedAt,
+		UpdatedAt:      e.UpdatedAt,
 	}
 }

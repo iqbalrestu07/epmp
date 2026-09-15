@@ -121,16 +121,16 @@ func (s *ReservationService) Delete(ctx context.Context, id, orgID string) error
 func (s *ReservationService) toResponse(e *entity.Reservation) *dto.ReservationResponse {
 	return &dto.ReservationResponse{
 		OrganizationId: e.OrganizationId,
-		Id: e.Id,
-		TenantId: e.TenantId,
-		PropertyId: e.PropertyId,
-		RoomId: e.RoomId,
-		Status: e.Status,
-		CheckInDate: e.CheckInDate,
-		CheckOutDate: e.CheckOutDate,
-		BookingFee: e.BookingFee,
-		Notes: e.Notes,
-		CreatedAt: e.CreatedAt,
-		UpdatedAt: e.UpdatedAt,
+		Id:             e.Id,
+		TenantId:       e.TenantId,
+		PropertyId:     e.PropertyId,
+		RoomId:         e.RoomId,
+		Status:         e.Status,
+		CheckInDate:    e.CheckInDate,
+		CheckOutDate:   e.CheckOutDate,
+		BookingFee:     e.BookingFee,
+		Notes:          e.Notes,
+		CreatedAt:      e.CreatedAt,
+		UpdatedAt:      e.UpdatedAt,
 	}
 }

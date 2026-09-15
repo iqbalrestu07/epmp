@@ -111,11 +111,11 @@ func (s *TechnicianService) Delete(ctx context.Context, id, orgID string) error 
 func (s *TechnicianService) toResponse(e *entity.Technician) *dto.TechnicianResponse {
 	return &dto.TechnicianResponse{
 		OrganizationId: e.OrganizationId,
-		Id: e.Id,
-		Name: e.Name,
-		Phone: e.Phone,
-		Specialty: e.Specialty,
-		CreatedAt: e.CreatedAt,
-		UpdatedAt: e.UpdatedAt,
+		Id:             e.Id,
+		Name:           e.Name,
+		Phone:          e.Phone,
+		Specialty:      e.Specialty,
+		CreatedAt:      e.CreatedAt,
+		UpdatedAt:      e.UpdatedAt,
 	}
 }

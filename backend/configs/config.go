@@ -16,6 +16,14 @@ type Config struct {
 	JWTSecret       string
 	AccessTokenTTL  time.Duration
 	RefreshTokenTTL time.Duration
+
+	// SMTP settings for the email notification channel (all optional;
+	// when SMTPHost is empty the email channel is disabled).
+	SMTPHost     string
+	SMTPPort     string
+	SMTPUser     string
+	SMTPPassword string
+	SMTPFrom     string
 }
 
 // Load reads the .env file (if available) and builds the Config struct from environment variables.
@@ -52,6 +60,13 @@ func Load() (*Config, error) {
 		refreshDays = 30 // 30 days
 	}
 	cfg.RefreshTokenTTL = time.Duration(refreshDays) * 24 * time.Hour
+
+	// Email notification channel (optional).
+	cfg.SMTPHost = os.Getenv("SMTP_HOST")
+	cfg.SMTPPort = os.Getenv("SMTP_PORT")
+	cfg.SMTPUser = os.Getenv("SMTP_USER")
+	cfg.SMTPPassword = os.Getenv("SMTP_PASSWORD")
+	cfg.SMTPFrom = os.Getenv("SMTP_FROM")
 
 	return cfg, nil
 }

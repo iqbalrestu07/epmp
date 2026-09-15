@@ -7,43 +7,43 @@ import "time"
 // CreatePropertyRequest is the DTO for creating a Property.
 type CreatePropertyRequest struct {
 	OrganizationId string `json:"organization_id"`
-	Name string `json:"name"`
-	Description string `json:"description"`
-	Address string `json:"address"`
-	PropertyType string `json:"property_type"`
-	IsActive bool `json:"is_active"`
+	Name           string `json:"name"`
+	Description    string `json:"description"`
+	Address        string `json:"address"`
+	PropertyType   string `json:"property_type"`
+	IsActive       bool   `json:"is_active"`
 }
 
 // UpdatePropertyRequest is the DTO for updating a Property.
 type UpdatePropertyRequest struct {
 	OrganizationId string `json:"organization_id"`
-	Name string `json:"name"`
-	Description string `json:"description"`
-	Address string `json:"address"`
-	PropertyType string `json:"property_type"`
-	IsActive bool `json:"is_active"`
+	Name           string `json:"name"`
+	Description    string `json:"description"`
+	Address        string `json:"address"`
+	PropertyType   string `json:"property_type"`
+	IsActive       bool   `json:"is_active"`
 }
 
 // PropertyResponse is the DTO for returning a Property.
 type PropertyResponse struct {
-	OrganizationId string `json:"organization_id"`
-	Id string `json:"id"`
-	Name string `json:"name"`
-	Description string `json:"description"`
-	Address string `json:"address"`
-	PropertyType string `json:"property_type"`
-	IsActive bool `json:"is_active"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	OrganizationId string    `json:"organization_id"`
+	Id             string    `json:"id"`
+	Name           string    `json:"name"`
+	Description    string    `json:"description"`
+	Address        string    `json:"address"`
+	PropertyType   string    `json:"property_type"`
+	IsActive       bool      `json:"is_active"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
 }
 
 // PropertyListResponse is the DTO for a paginated list of Property.
 type PropertyListResponse struct {
 	Data       []PropertyResponse `json:"data"`
-	Total      int64               `json:"total"`
-	Page       int                 `json:"page"`
-	PerPage    int                 `json:"per_page"`
-	TotalPages int                 `json:"total_pages"`
+	Total      int64              `json:"total"`
+	Page       int                `json:"page"`
+	PerPage    int                `json:"per_page"`
+	TotalPages int                `json:"total_pages"`
 }
 
 type PropertyStaffResponse struct {
@@ -62,4 +62,3 @@ type AssignPropertyStaffRequest struct {
 	UserId string `json:"user_id"`
 	RoleId string `json:"role_id"`
 }
-

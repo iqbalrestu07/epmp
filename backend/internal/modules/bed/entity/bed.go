@@ -6,9 +6,9 @@ import "time"
 type Bed struct {
 	OrganizationId string     `json:"organization_id"`
 	Id             string     `json:"id"`
-	RoomId               string       `json:"room_id"`
-	Name                 string       `json:"name"`
-	Status               string       `json:"status"`
+	RoomId         string     `json:"room_id"`
+	Name           string     `json:"name"`
+	Status         string     `json:"status"`
 	DeletedAt      *time.Time `json:"deleted_at,omitempty"`
 	CreatedAt      time.Time  `json:"created_at"`
 	UpdatedAt      time.Time  `json:"updated_at"`

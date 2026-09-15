@@ -5,6 +5,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"github.com/epmp/backend/internal/pkg/errs"
 	"time"
 
 	"github.com/epmp/backend/internal/modules/property/dto"
@@ -153,10 +154,16 @@ func (r *PropertyRepositoryImpl) Count(ctx context.Context, search, orgID string
 	return count, nil
 }
 
-func (r *PropertyRepositoryImpl) Delete(ctx context.Context, id string) error {
-	_, err := r.db.Exec(ctx, `
-		UPDATE properties SET deleted_at = now() WHERE id = $1 AND deleted_at IS NULL`, id)
-	return err
+func (r *PropertyRepositoryImpl) Delete(ctx context.Context, id, orgID string) error {
+	tag, err := r.db.Exec(ctx, `
+		UPDATE properties SET deleted_at = now() WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL`, id, orgID)
+	if err != nil {
+		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return errs.ErrNotFound
+	}
+	return nil
 }
 
 func (r *PropertyRepositoryImpl) FindStaffByPropertyID(ctx context.Context, propertyID, orgID string) ([]*dto.PropertyStaffResponse, error) {
@@ -227,4 +234,3 @@ func (r *PropertyRepositoryImpl) RemoveStaff(ctx context.Context, propertyID, us
 	)
 	return err
 }
-

@@ -14,19 +14,21 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog"
+
+	mw "github.com/epmp/backend/internal/pkg/middleware"
 )
 
 // ─── Domain Types ─────────────────────────────────────────────────────────────
 
 type WADevice struct {
-	ID          string     `json:"id"`
-	OrgID       string     `json:"org_id"`
-	Label       string     `json:"label"`
-	Phone       string     `json:"phone"`
-	Status      string     `json:"status"` // connected | disconnected | qr_pending
-	LastSeen    *time.Time `json:"last_seen"`
-	CreatedAt   time.Time  `json:"created_at"`
-	UpdatedAt   time.Time  `json:"updated_at"`
+	ID        string     `json:"id"`
+	OrgID     string     `json:"org_id"`
+	Label     string     `json:"label"`
+	Phone     string     `json:"phone"`
+	Status    string     `json:"status"` // connected | disconnected | qr_pending
+	LastSeen  *time.Time `json:"last_seen"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
 }
 
 type MessageTemplate struct {
@@ -42,22 +44,22 @@ type MessageTemplate struct {
 }
 
 type BlastMessage struct {
-	ID               string      `json:"id"`
-	OrgID            string      `json:"org_id"`
-	DeviceID         *string     `json:"device_id"`
-	Title            string      `json:"title"`
-	Template         string      `json:"template"`
-	TargetType       string      `json:"target_type"`
-	TargetFilter     interface{} `json:"target_filter"`
-	Status           string      `json:"status"`
-	TotalRecipients  int         `json:"total_recipients"`
-	SentCount        int         `json:"sent_count"`
-	FailedCount      int         `json:"failed_count"`
-	ScheduledAt      *time.Time  `json:"scheduled_at"`
-	StartedAt        *time.Time  `json:"started_at"`
-	CompletedAt      *time.Time  `json:"completed_at"`
-	CreatedAt        time.Time   `json:"created_at"`
-	UpdatedAt        time.Time   `json:"updated_at"`
+	ID              string      `json:"id"`
+	OrgID           string      `json:"org_id"`
+	DeviceID        *string     `json:"device_id"`
+	Title           string      `json:"title"`
+	Template        string      `json:"template"`
+	TargetType      string      `json:"target_type"`
+	TargetFilter    interface{} `json:"target_filter"`
+	Status          string      `json:"status"`
+	TotalRecipients int         `json:"total_recipients"`
+	SentCount       int         `json:"sent_count"`
+	FailedCount     int         `json:"failed_count"`
+	ScheduledAt     *time.Time  `json:"scheduled_at"`
+	StartedAt       *time.Time  `json:"started_at"`
+	CompletedAt     *time.Time  `json:"completed_at"`
+	CreatedAt       time.Time   `json:"created_at"`
+	UpdatedAt       time.Time   `json:"updated_at"`
 }
 
 type BlastMessageLog struct {
@@ -138,9 +140,13 @@ func (m *Module) RegisterRoutes(router *echo.Group) {
 // ─── Devices ──────────────────────────────────────────────────────────────────
 
 func (m *Module) listDevices(c echo.Context) error {
+	orgID := mw.GetOrgID(c)
+	if orgID == "" {
+		return fail(c, 400, "X-Organization-ID header is required")
+	}
 	rows, err := m.db.Query(context.Background(),
 		`SELECT id, org_id, label, COALESCE(phone,''), status, last_seen, created_at, updated_at
-		 FROM wa_devices ORDER BY created_at DESC`)
+		 FROM wa_devices WHERE org_id=$1 ORDER BY created_at DESC`, orgID)
 	if err != nil {
 		m.log.Error().Err(err).Msg("listDevices")
 		return fail(c, 500, "internal error")
@@ -168,13 +174,17 @@ func (m *Module) createDevice(c echo.Context) error {
 	if strings.TrimSpace(req.Label) == "" {
 		return fail(c, 400, "label harus diisi")
 	}
+	orgID := mw.GetOrgID(c)
+	if orgID == "" {
+		return fail(c, 400, "X-Organization-ID header is required")
+	}
 
 	var d WADevice
 	err := m.db.QueryRow(context.Background(),
 		`INSERT INTO wa_devices (org_id, label, phone, status)
 		 VALUES ($1, $2, '', 'disconnected')
 		 RETURNING id, org_id, label, COALESCE(phone,''), status, last_seen, created_at, updated_at`,
-		"00000000-0000-0000-0000-000000000000", req.Label,
+		orgID, req.Label,
 	).Scan(&d.ID, &d.OrgID, &d.Label, &d.Phone, &d.Status, &d.LastSeen, &d.CreatedAt, &d.UpdatedAt)
 	if err != nil {
 		m.log.Error().Err(err).Msg("createDevice")
@@ -185,14 +195,21 @@ func (m *Module) createDevice(c echo.Context) error {
 
 func (m *Module) getDeviceQR(c echo.Context) error {
 	id := c.Param("id")
+	orgID := mw.GetOrgID(c)
+	if orgID == "" {
+		return fail(c, 400, "X-Organization-ID header is required")
+	}
 
 	if m.waMgr == nil {
 		return fail(c, 500, "WhatsApp manager tidak dapat diinisialisasi")
 	}
 
-	// Mark device as qr_pending in DB
-	_, _ = m.db.Exec(context.Background(),
-		`UPDATE wa_devices SET status='qr_pending', updated_at=now() WHERE id=$1`, id)
+	// Mark device as qr_pending in DB (org-scoped)
+	tag, err := m.db.Exec(context.Background(),
+		`UPDATE wa_devices SET status='qr_pending', updated_at=now() WHERE id=$1 AND org_id=$2`, id, orgID)
+	if err != nil || tag.RowsAffected() == 0 {
+		return fail(c, 404, "device not found")
+	}
 
 	qrCode, expiresIn, err := m.waMgr.GetQR(c.Request().Context(), id)
 	if err != nil {
@@ -216,6 +233,10 @@ func (m *Module) getDeviceQR(c echo.Context) error {
 
 func (m *Module) updateDeviceStatus(c echo.Context) error {
 	id := c.Param("id")
+	orgID := mw.GetOrgID(c)
+	if orgID == "" {
+		return fail(c, 400, "X-Organization-ID header is required")
+	}
 	var req struct {
 		Status string `json:"status"`
 		Phone  string `json:"phone"`
@@ -235,15 +256,15 @@ func (m *Module) updateDeviceStatus(c echo.Context) error {
 	}
 
 	_, err := m.db.Exec(context.Background(),
-		`UPDATE wa_devices SET status=$1, phone=COALESCE(NULLIF($2,''), phone), last_seen=COALESCE($3, last_seen), updated_at=now() WHERE id=$4`,
-		req.Status, req.Phone, lastSeen, id)
+		`UPDATE wa_devices SET status=$1, phone=COALESCE(NULLIF($2,''), phone), last_seen=COALESCE($3, last_seen), updated_at=now() WHERE id=$4 AND org_id=$5`,
+		req.Status, req.Phone, lastSeen, id, orgID)
 	if err != nil {
 		return fail(c, 500, "failed to update status")
 	}
 
 	var d WADevice
 	err = m.db.QueryRow(context.Background(),
-		`SELECT id, org_id, label, COALESCE(phone,''), status, last_seen, created_at, updated_at FROM wa_devices WHERE id=$1`, id,
+		`SELECT id, org_id, label, COALESCE(phone,''), status, last_seen, created_at, updated_at FROM wa_devices WHERE id=$1 AND org_id=$2`, id, orgID,
 	).Scan(&d.ID, &d.OrgID, &d.Label, &d.Phone, &d.Status, &d.LastSeen, &d.CreatedAt, &d.UpdatedAt)
 	if err != nil {
 		return fail(c, 404, "device not found")
@@ -253,12 +274,19 @@ func (m *Module) updateDeviceStatus(c echo.Context) error {
 
 func (m *Module) deleteDevice(c echo.Context) error {
 	id := c.Param("id")
+	orgID := mw.GetOrgID(c)
+	if orgID == "" {
+		return fail(c, 400, "X-Organization-ID header is required")
+	}
 	if m.waMgr != nil {
 		_ = m.waMgr.Delete(c.Request().Context(), id)
 	}
-	_, err := m.db.Exec(context.Background(), `DELETE FROM wa_devices WHERE id=$1`, id)
+	tag, err := m.db.Exec(context.Background(), `DELETE FROM wa_devices WHERE id=$1 AND org_id=$2`, id, orgID)
 	if err != nil {
 		return fail(c, 500, "failed to delete")
+	}
+	if tag.RowsAffected() == 0 {
+		return fail(c, 404, "device not found")
 	}
 	return success(c, map[string]string{"message": "device berhasil dihapus"})
 }
@@ -266,9 +294,13 @@ func (m *Module) deleteDevice(c echo.Context) error {
 // ─── Templates ────────────────────────────────────────────────────────────────
 
 func (m *Module) listTemplates(c echo.Context) error {
+	orgID := mw.GetOrgID(c)
+	if orgID == "" {
+		return fail(c, 400, "X-Organization-ID header is required")
+	}
 	rows, err := m.db.Query(context.Background(),
 		`SELECT id, org_id, name, content, COALESCE(variables, '{}'), category, is_active, created_at, updated_at
-		 FROM message_templates WHERE is_active=true ORDER BY category, name`)
+		 FROM message_templates WHERE is_active=true AND org_id=$1 ORDER BY category, name`, orgID)
 	if err != nil {
 		return fail(c, 500, "internal error")
 	}
@@ -287,9 +319,9 @@ func (m *Module) listTemplates(c echo.Context) error {
 
 func (m *Module) createTemplate(c echo.Context) error {
 	var req struct {
-		Name     string   `json:"name"`
-		Content  string   `json:"content"`
-		Category string   `json:"category"`
+		Name      string   `json:"name"`
+		Content   string   `json:"content"`
+		Category  string   `json:"category"`
 		Variables []string `json:"variables"`
 	}
 	if err := c.Bind(&req); err != nil {
@@ -301,13 +333,17 @@ func (m *Module) createTemplate(c echo.Context) error {
 	if req.Category == "" {
 		req.Category = "general"
 	}
+	orgID := mw.GetOrgID(c)
+	if orgID == "" {
+		return fail(c, 400, "X-Organization-ID header is required")
+	}
 
 	var t MessageTemplate
 	err := m.db.QueryRow(context.Background(),
 		`INSERT INTO message_templates (org_id, name, content, variables, category)
 		 VALUES ($1, $2, $3, $4, $5)
 		 RETURNING id, org_id, name, content, COALESCE(variables,'{}'), category, is_active, created_at, updated_at`,
-		"00000000-0000-0000-0000-000000000000", req.Name, req.Content, req.Variables, req.Category,
+		orgID, req.Name, req.Content, req.Variables, req.Category,
 	).Scan(&t.ID, &t.OrgID, &t.Name, &t.Content, &t.Variables, &t.Category, &t.IsActive, &t.CreatedAt, &t.UpdatedAt)
 	if err != nil {
 		m.log.Error().Err(err).Msg("createTemplate")
@@ -318,6 +354,10 @@ func (m *Module) createTemplate(c echo.Context) error {
 
 func (m *Module) updateTemplate(c echo.Context) error {
 	id := c.Param("id")
+	orgID := mw.GetOrgID(c)
+	if orgID == "" {
+		return fail(c, 400, "X-Organization-ID header is required")
+	}
 	var req struct {
 		Name      string   `json:"name"`
 		Content   string   `json:"content"`
@@ -332,9 +372,9 @@ func (m *Module) updateTemplate(c echo.Context) error {
 	var t MessageTemplate
 	err := m.db.QueryRow(context.Background(),
 		`UPDATE message_templates SET name=$1, content=$2, category=$3, variables=$4, is_active=$5, updated_at=now()
-		 WHERE id=$6
+		 WHERE id=$6 AND org_id=$7
 		 RETURNING id, org_id, name, content, COALESCE(variables,'{}'), category, is_active, created_at, updated_at`,
-		req.Name, req.Content, req.Category, req.Variables, req.IsActive, id,
+		req.Name, req.Content, req.Category, req.Variables, req.IsActive, id, orgID,
 	).Scan(&t.ID, &t.OrgID, &t.Name, &t.Content, &t.Variables, &t.Category, &t.IsActive, &t.CreatedAt, &t.UpdatedAt)
 	if err != nil {
 		if err == pgx.ErrNoRows {
@@ -347,8 +387,12 @@ func (m *Module) updateTemplate(c echo.Context) error {
 
 func (m *Module) deleteTemplate(c echo.Context) error {
 	id := c.Param("id")
+	orgID := mw.GetOrgID(c)
+	if orgID == "" {
+		return fail(c, 400, "X-Organization-ID header is required")
+	}
 	_, err := m.db.Exec(context.Background(),
-		`UPDATE message_templates SET is_active=false, updated_at=now() WHERE id=$1`, id)
+		`UPDATE message_templates SET is_active=false, updated_at=now() WHERE id=$1 AND org_id=$2`, id, orgID)
 	if err != nil {
 		return fail(c, 500, "gagal menghapus template")
 	}
@@ -358,11 +402,15 @@ func (m *Module) deleteTemplate(c echo.Context) error {
 // ─── Blast Messages ───────────────────────────────────────────────────────────
 
 func (m *Module) listBlasts(c echo.Context) error {
+	orgID := mw.GetOrgID(c)
+	if orgID == "" {
+		return fail(c, 400, "X-Organization-ID header is required")
+	}
 	rows, err := m.db.Query(context.Background(),
 		`SELECT b.id, b.org_id, b.device_id, b.title, b.template, b.target_type,
 		        b.status, b.total_recipients, b.sent_count, b.failed_count,
 		        b.scheduled_at, b.started_at, b.completed_at, b.created_at, b.updated_at
-		 FROM blast_messages b ORDER BY b.created_at DESC LIMIT 100`)
+		 FROM blast_messages b WHERE b.org_id=$1 ORDER BY b.created_at DESC LIMIT 100`, orgID)
 	if err != nil {
 		return fail(c, 500, "internal error")
 	}
@@ -406,6 +454,10 @@ func (m *Module) createBlast(c echo.Context) error {
 	if req.TargetFilter != nil {
 		filterJSON, _ = json.Marshal(req.TargetFilter)
 	}
+	orgID := mw.GetOrgID(c)
+	if orgID == "" {
+		return fail(c, 400, "X-Organization-ID header is required")
+	}
 
 	var b BlastMessage
 	err := m.db.QueryRow(context.Background(),
@@ -414,7 +466,7 @@ func (m *Module) createBlast(c echo.Context) error {
 		 RETURNING id, org_id, device_id, title, template, target_type,
 		           status, total_recipients, sent_count, failed_count,
 		           scheduled_at, started_at, completed_at, created_at, updated_at`,
-		"00000000-0000-0000-0000-000000000000",
+		orgID,
 		req.DeviceID, req.Title, req.Template, req.TargetType,
 		filterJSON, req.ScheduledAt,
 	).Scan(
@@ -431,12 +483,16 @@ func (m *Module) createBlast(c echo.Context) error {
 
 func (m *Module) getBlast(c echo.Context) error {
 	id := c.Param("id")
+	orgID := mw.GetOrgID(c)
+	if orgID == "" {
+		return fail(c, 400, "X-Organization-ID header is required")
+	}
 	var b BlastMessage
 	err := m.db.QueryRow(context.Background(),
 		`SELECT id, org_id, device_id, title, template, target_type,
 		        status, total_recipients, sent_count, failed_count,
 		        scheduled_at, started_at, completed_at, created_at, updated_at
-		 FROM blast_messages WHERE id=$1`, id,
+		 FROM blast_messages WHERE id=$1 AND org_id=$2`, id, orgID,
 	).Scan(
 		&b.ID, &b.OrgID, &b.DeviceID, &b.Title, &b.Template, &b.TargetType,
 		&b.Status, &b.TotalRecipients, &b.SentCount, &b.FailedCount,
@@ -453,9 +509,15 @@ func (m *Module) getBlast(c echo.Context) error {
 
 func (m *Module) getBlastLogs(c echo.Context) error {
 	id := c.Param("id")
+	orgID := mw.GetOrgID(c)
+	if orgID == "" {
+		return fail(c, 400, "X-Organization-ID header is required")
+	}
 	rows, err := m.db.Query(context.Background(),
-		`SELECT id, blast_id, tenant_id, phone, recipient_name, message, status, error_message, sent_at, read_at, created_at
-		 FROM blast_message_logs WHERE blast_id=$1 ORDER BY created_at DESC`, id)
+		`SELECT l.id, l.blast_id, l.tenant_id, l.phone, l.recipient_name, l.message, l.status, l.error_message, l.sent_at, l.read_at, l.created_at
+		 FROM blast_message_logs l
+		 JOIN blast_messages b ON b.id = l.blast_id
+		 WHERE l.blast_id=$1 AND b.org_id=$2 ORDER BY l.created_at DESC`, id, orgID)
 	if err != nil {
 		return fail(c, 500, "internal error")
 	}
@@ -478,6 +540,10 @@ func (m *Module) getBlastLogs(c echo.Context) error {
 // sendBlast: load recipients based on target_type, create logs, and send
 func (m *Module) sendBlast(c echo.Context) error {
 	id := c.Param("id")
+	orgID := mw.GetOrgID(c)
+	if orgID == "" {
+		return fail(c, 400, "X-Organization-ID header is required")
+	}
 
 	// Load blast
 	var b BlastMessage
@@ -485,20 +551,30 @@ func (m *Module) sendBlast(c echo.Context) error {
 	var targetType string
 	var deviceID *string
 	err := m.db.QueryRow(context.Background(),
-		`SELECT id, template, target_type, device_id FROM blast_messages WHERE id=$1`, id,
+		`SELECT id, template, target_type, device_id FROM blast_messages WHERE id=$1 AND org_id=$2`, id, orgID,
 	).Scan(&b.ID, &templateContent, &targetType, &deviceID)
 	if err != nil {
 		return fail(c, 404, "blast tidak ditemukan")
 	}
 
-	// If no device specified, auto-detect any connected device
+	// If no device specified, auto-detect any connected device in this org
 	if deviceID == nil || *deviceID == "" {
 		var activeDevID string
 		err := m.db.QueryRow(context.Background(),
-			`SELECT id FROM wa_devices WHERE status='connected' ORDER BY updated_at DESC LIMIT 1`).Scan(&activeDevID)
+			`SELECT id FROM wa_devices WHERE status='connected' AND org_id=$1 ORDER BY updated_at DESC LIMIT 1`, orgID).Scan(&activeDevID)
 		if err == nil && activeDevID != "" {
 			deviceID = &activeDevID
 			m.db.Exec(context.Background(), `UPDATE blast_messages SET device_id=$1 WHERE id=$2`, activeDevID, id)
+		}
+	}
+
+	// Verify an explicitly-specified device belongs to this org.
+	if deviceID != nil && *deviceID != "" {
+		var devOrg string
+		err := m.db.QueryRow(context.Background(),
+			`SELECT org_id FROM wa_devices WHERE id=$1`, *deviceID).Scan(&devOrg)
+		if err != nil || devOrg != orgID {
+			return fail(c, 404, "device tidak ditemukan pada organisasi ini")
 		}
 	}
 
@@ -512,15 +588,16 @@ func (m *Module) sendBlast(c echo.Context) error {
 	m.db.Exec(context.Background(),
 		`UPDATE blast_messages SET status='sending', started_at=$1, updated_at=now() WHERE id=$2`, now, id)
 
-	// Load tenants with room info based on target_type
+	// Load tenants with room info based on target_type (org-scoped)
 	query := `
 		SELECT t.id, t.full_name, COALESCE(t.phone,'') as phone,
 		       COALESCE(r.name,'') as room_name,
 		       COALESCE(c.monthly_rent::text, '0') as rent_amount
 		FROM tenants t
-		LEFT JOIN contracts c ON c.tenant_id = t.id AND c.status='active'
-		LEFT JOIN rooms r ON r.id = c.room_id
-		WHERE t.is_active = true AND COALESCE(t.phone,'') != ''`
+		LEFT JOIN contracts c ON c.tenant_id = t.id AND lower(c.status)='active' AND c.deleted_at IS NULL
+		LEFT JOIN rooms r ON r.id = c.room_id AND r.deleted_at IS NULL
+		WHERE t.is_active = true AND COALESCE(t.phone,'') != ''
+		  AND t.organization_id = $1 AND t.deleted_at IS NULL`
 
 	if targetType == "overdue" {
 		query = `
@@ -528,13 +605,14 @@ func (m *Module) sendBlast(c echo.Context) error {
 		       COALESCE(r.name,'') as room_name,
 		       COALESCE(c.monthly_rent::text, '0') as rent_amount
 		FROM tenants t
-		JOIN invoices i ON i.tenant_id = t.id AND i.status NOT IN ('Paid','paid')
-		LEFT JOIN contracts c ON c.tenant_id = t.id AND c.status='active'
-		LEFT JOIN rooms r ON r.id = c.room_id
-		WHERE t.is_active = true AND COALESCE(t.phone,'') != ''`
+		JOIN invoices i ON i.tenant_id = t.id AND lower(i.status) != 'paid' AND i.deleted_at IS NULL
+		LEFT JOIN contracts c ON c.tenant_id = t.id AND lower(c.status)='active' AND c.deleted_at IS NULL
+		LEFT JOIN rooms r ON r.id = c.room_id AND r.deleted_at IS NULL
+		WHERE t.is_active = true AND COALESCE(t.phone,'') != ''
+		  AND t.organization_id = $1 AND t.deleted_at IS NULL`
 	}
 
-	rows, err := m.db.Query(context.Background(), query)
+	rows, err := m.db.Query(context.Background(), query, orgID)
 	if err != nil {
 		m.log.Error().Err(err).Msg("sendBlast: query tenants")
 		m.db.Exec(context.Background(),
@@ -628,25 +706,29 @@ func (m *Module) sendBlast(c echo.Context) error {
 
 func (m *Module) previewRecipients(c echo.Context) error {
 	targetType := c.QueryParam("target_type")
+	orgID := mw.GetOrgID(c)
+	if orgID == "" {
+		return fail(c, 400, "X-Organization-ID header is required")
+	}
 
 	query := `
 		SELECT t.id, t.full_name, COALESCE(t.phone,'') as phone, COALESCE(r.name,'') as room_name
 		FROM tenants t
-		LEFT JOIN contracts c ON c.tenant_id = t.id AND c.status='active'
-		LEFT JOIN rooms r ON r.id = c.room_id
-		WHERE t.is_active = true`
+		LEFT JOIN contracts c ON c.tenant_id = t.id AND lower(c.status)='active' AND c.deleted_at IS NULL
+		LEFT JOIN rooms r ON r.id = c.room_id AND r.deleted_at IS NULL
+		WHERE t.is_active = true AND t.organization_id = $1 AND t.deleted_at IS NULL`
 
 	if targetType == "overdue" {
 		query = `
 		SELECT DISTINCT t.id, t.full_name, COALESCE(t.phone,'') as phone, COALESCE(r.name,'') as room_name
 		FROM tenants t
-		JOIN invoices i ON i.tenant_id = t.id AND i.status NOT IN ('Paid','paid')
-		LEFT JOIN contracts c ON c.tenant_id = t.id AND c.status='active'
-		LEFT JOIN rooms r ON r.id = c.room_id
-		WHERE t.is_active = true`
+		JOIN invoices i ON i.tenant_id = t.id AND lower(i.status) != 'paid' AND i.deleted_at IS NULL
+		LEFT JOIN contracts c ON c.tenant_id = t.id AND lower(c.status)='active' AND c.deleted_at IS NULL
+		LEFT JOIN rooms r ON r.id = c.room_id AND r.deleted_at IS NULL
+		WHERE t.is_active = true AND t.organization_id = $1 AND t.deleted_at IS NULL`
 	}
 
-	rows, err := m.db.Query(context.Background(), query)
+	rows, err := m.db.Query(context.Background(), query, orgID)
 	if err != nil {
 		return fail(c, 500, "internal error")
 	}

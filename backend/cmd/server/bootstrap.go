@@ -7,6 +7,7 @@ import (
 	"github.com/epmp/backend/configs"
 	"github.com/epmp/backend/internal/database/postgres"
 	"github.com/epmp/backend/internal/modules"
+	"github.com/epmp/backend/internal/pkg/email"
 	"github.com/epmp/backend/internal/pkg/logger"
 	mw "github.com/epmp/backend/internal/pkg/middleware"
 
@@ -47,8 +48,16 @@ func bootstrap(ctx context.Context, cfg *configs.Config) (*App, func(), error) {
 		return c.JSON(http.StatusOK, map[string]string{"status": "ok"})
 	})
 
+	// Email notification channel — enabled only when SMTP_HOST is configured.
+	var regOpts []modules.Option
+	if cfg.SMTPHost != "" {
+		regOpts = append(regOpts, modules.WithEmailSender(
+			email.NewSMTPSender(cfg.SMTPHost, cfg.SMTPPort, cfg.SMTPUser, cfg.SMTPPassword, cfg.SMTPFrom)))
+		log.Info().Str("smtp_host", cfg.SMTPHost).Msg("email notification channel enabled")
+	}
+
 	// Init modules
-	if err := modules.Register(e, db, log, cfg.JWTSecret, cfg.AccessTokenTTL, cfg.RefreshTokenTTL); err != nil {
+	if err := modules.Register(e, db, log, cfg.JWTSecret, cfg.AccessTokenTTL, cfg.RefreshTokenTTL, regOpts...); err != nil {
 		log.Error().Err(err).Msg("failed to register modules")
 		return nil, nil, err
 	}

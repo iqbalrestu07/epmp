@@ -410,7 +410,7 @@ To guarantee enterprise-grade stability and eliminate UI regressions, **every ne
 ### Testing Commands (via root Makefile)
 
 ```bash
-# Run automated E2E tests against all 40 routes & 3D canvas
+# Run automated E2E tests against all 64 routes, 26-step business flow & 3D canvas
 make test-e2e
 
 # Run backend unit & integration tests

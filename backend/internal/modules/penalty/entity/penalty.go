@@ -6,11 +6,11 @@ import "time"
 type Penalty struct {
 	OrganizationId string     `json:"organization_id"`
 	Id             string     `json:"id"`
-	InvoiceId            string       `json:"invoice_id"`
-	Amount               float64      `json:"amount"`
-	Status               string       `json:"status"`
-	PenaltyDate          time.Time    `json:"penalty_date"`
-	Description          string       `json:"description"`
+	InvoiceId      string     `json:"invoice_id"`
+	Amount         float64    `json:"amount"`
+	Status         string     `json:"status"`
+	PenaltyDate    time.Time  `json:"penalty_date"`
+	Description    string     `json:"description"`
 	DeletedAt      *time.Time `json:"deleted_at,omitempty"`
 	CreatedAt      time.Time  `json:"created_at"`
 	UpdatedAt      time.Time  `json:"updated_at"`

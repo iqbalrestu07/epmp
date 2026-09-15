@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Building2, DoorOpen, Users, ShieldCheck,
-  UserCog, Settings, Menu, X, Bell, LogOut, ChevronDown, ChevronRight,
+  UserCog, Settings, Menu, X, LogOut, ChevronDown, ChevronRight,
   CalendarCheck, FileText, Bed, Receipt, CreditCard, Wrench, Package,
-  Globe2, MessageCircle, Megaphone, Layers, Check, Box
+  Globe2, MessageCircle, Megaphone, Layers, Check, Box, BarChart3
 } from 'lucide-react';
 import { useAuth } from '../features/iam/context/AuthContext';
 import { useOrg } from '../features/organization/context/OrgContext';
+import { NotificationCenter } from '../features/notification/components/NotificationCenter';
 
 // ─── Menu Groups Configuration ──────────────────────────────────────────────
 interface MenuItem {
@@ -91,12 +92,20 @@ const MENU_GROUPS: MenuGroup[] = [
     ],
   },
   {
+    id: 'reports',
+    label: 'Laporan',
+    items: [
+      { label: 'Laporan & Analitik', path: '/reports', icon: BarChart3 },
+    ],
+  },
+  {
     id: 'system',
     label: 'Sistem & Pengaturan',
     items: [
       { label: 'Organisasi', path: '/organizations', icon: Globe2 },
       { label: 'Role & Akses (RBAC)', path: '/management/rbac', icon: ShieldCheck, requiredPermission: 'role:read' },
       { label: 'Akun Pengguna', path: '/management/users', icon: UserCog, requiredPermission: 'user:read' },
+      { label: 'Audit Log', path: '/audit-logs', icon: FileText },
       { label: 'Pengaturan Sistem', path: '/settings', icon: Settings },
     ],
   },
@@ -351,10 +360,7 @@ export default function MainLayout() {
               )}
             </div>
 
-            <button className="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center relative transition-colors">
-              <Bell size={18} className="text-slate-600" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-orange rounded-full border border-white" />
-            </button>
+            <NotificationCenter />
           </div>
         </header>
 

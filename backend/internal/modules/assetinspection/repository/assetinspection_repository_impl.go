@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"github.com/epmp/backend/internal/pkg/errs"
 
 	"github.com/epmp/backend/internal/modules/assetinspection/entity"
 
@@ -67,7 +68,7 @@ func (r *AssetInspectionRepositoryImpl) FindAll(ctx context.Context, limit, offs
 
 	if search != "" {
 		query += fmt.Sprintf(" AND condition ILIKE $%d", argIdx)
-		args = append(args, "%" + search + "%")
+		args = append(args, "%"+search+"%")
 		argIdx++
 	}
 
@@ -97,7 +98,7 @@ func (r *AssetInspectionRepositoryImpl) Count(ctx context.Context, search, orgID
 
 	if search != "" {
 		query += fmt.Sprintf(" AND condition ILIKE $%d", 2)
-		args = append(args, "%" + search + "%")
+		args = append(args, "%"+search+"%")
 	}
 
 	var count int64
@@ -109,7 +110,13 @@ func (r *AssetInspectionRepositoryImpl) Count(ctx context.Context, search, orgID
 }
 
 func (r *AssetInspectionRepositoryImpl) Delete(ctx context.Context, id, orgID string) error {
-	_, err := r.db.Exec(ctx, `
+	tag, err := r.db.Exec(ctx, `
 		UPDATE asset_inspections SET deleted_at = now() WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL`, id, orgID)
-	return err
+	if err != nil {
+		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return errs.ErrNotFound
+	}
+	return nil
 }

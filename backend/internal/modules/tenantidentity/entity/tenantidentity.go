@@ -6,10 +6,10 @@ import "time"
 type TenantIdentity struct {
 	OrganizationId string     `json:"organization_id"`
 	Id             string     `json:"id"`
-	TenantId             string       `json:"tenant_id"`
-	IdentityType         string       `json:"identity_type"`
-	IdentityNumber       string       `json:"identity_number"`
-	FileUrl              string       `json:"file_url"`
+	TenantId       string     `json:"tenant_id"`
+	IdentityType   string     `json:"identity_type"`
+	IdentityNumber string     `json:"identity_number"`
+	FileUrl        string     `json:"file_url"`
 	DeletedAt      *time.Time `json:"deleted_at,omitempty"`
 	CreatedAt      time.Time  `json:"created_at"`
 	UpdatedAt      time.Time  `json:"updated_at"`

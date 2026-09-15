@@ -4,28 +4,28 @@ import "time"
 
 // CreateAssetInspectionRequest is the DTO for creating a AssetInspection.
 type CreateAssetInspectionRequest struct {
-	AssetId              string       `json:"asset_id"`
-	InspectionDate       time.Time    `json:"inspection_date"`
-	Condition            string       `json:"condition"`
-	Notes                string       `json:"notes"`
+	AssetId        string    `json:"asset_id"`
+	InspectionDate time.Time `json:"inspection_date"`
+	Condition      string    `json:"condition"`
+	Notes          string    `json:"notes"`
 }
 
 // UpdateAssetInspectionRequest is the DTO for updating a AssetInspection.
 type UpdateAssetInspectionRequest struct {
-	AssetId              string       `json:"asset_id"`
-	InspectionDate       time.Time    `json:"inspection_date"`
-	Condition            string       `json:"condition"`
-	Notes                string       `json:"notes"`
+	AssetId        string    `json:"asset_id"`
+	InspectionDate time.Time `json:"inspection_date"`
+	Condition      string    `json:"condition"`
+	Notes          string    `json:"notes"`
 }
 
 // AssetInspectionResponse is the DTO for returning a AssetInspection.
 type AssetInspectionResponse struct {
 	OrganizationId string    `json:"organization_id"`
 	Id             string    `json:"id"`
-	AssetId              string       `json:"asset_id"`
-	InspectionDate       time.Time    `json:"inspection_date"`
-	Condition            string       `json:"condition"`
-	Notes                string       `json:"notes"`
+	AssetId        string    `json:"asset_id"`
+	InspectionDate time.Time `json:"inspection_date"`
+	Condition      string    `json:"condition"`
+	Notes          string    `json:"notes"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 }
@@ -33,8 +33,8 @@ type AssetInspectionResponse struct {
 // AssetInspectionListResponse is the DTO for a paginated list of AssetInspection.
 type AssetInspectionListResponse struct {
 	Data       []AssetInspectionResponse `json:"data"`
-	Total      int64         `json:"total"`
-	Page       int           `json:"page"`
-	PerPage    int           `json:"per_page"`
-	TotalPages int           `json:"total_pages"`
+	Total      int64                     `json:"total"`
+	Page       int                       `json:"page"`
+	PerPage    int                       `json:"per_page"`
+	TotalPages int                       `json:"total_pages"`
 }

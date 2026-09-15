@@ -4,25 +4,25 @@ import "time"
 
 // CreateBedRequest is the DTO for creating a Bed.
 type CreateBedRequest struct {
-	RoomId               string       `json:"room_id"`
-	Name                 string       `json:"name"`
-	Status               string       `json:"status"`
+	RoomId string `json:"room_id"`
+	Name   string `json:"name"`
+	Status string `json:"status"`
 }
 
 // UpdateBedRequest is the DTO for updating a Bed.
 type UpdateBedRequest struct {
-	RoomId               string       `json:"room_id"`
-	Name                 string       `json:"name"`
-	Status               string       `json:"status"`
+	RoomId string `json:"room_id"`
+	Name   string `json:"name"`
+	Status string `json:"status"`
 }
 
 // BedResponse is the DTO for returning a Bed.
 type BedResponse struct {
 	OrganizationId string    `json:"organization_id"`
 	Id             string    `json:"id"`
-	RoomId               string       `json:"room_id"`
-	Name                 string       `json:"name"`
-	Status               string       `json:"status"`
+	RoomId         string    `json:"room_id"`
+	Name           string    `json:"name"`
+	Status         string    `json:"status"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 }

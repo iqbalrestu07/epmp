@@ -119,15 +119,15 @@ func (s *ChargeService) Delete(ctx context.Context, id, orgID string) error {
 func (s *ChargeService) toResponse(e *entity.Charge) *dto.ChargeResponse {
 	return &dto.ChargeResponse{
 		OrganizationId: e.OrganizationId,
-		Id: e.Id,
-		ContractId: e.ContractId,
-		InvoiceId: e.InvoiceId,
-		ChargeType: e.ChargeType,
-		Amount: e.Amount,
-		Status: e.Status,
-		ChargeDate: e.ChargeDate,
-		Notes: e.Notes,
-		CreatedAt: e.CreatedAt,
-		UpdatedAt: e.UpdatedAt,
+		Id:             e.Id,
+		ContractId:     e.ContractId,
+		InvoiceId:      e.InvoiceId,
+		ChargeType:     e.ChargeType,
+		Amount:         e.Amount,
+		Status:         e.Status,
+		ChargeDate:     e.ChargeDate,
+		Notes:          e.Notes,
+		CreatedAt:      e.CreatedAt,
+		UpdatedAt:      e.UpdatedAt,
 	}
 }

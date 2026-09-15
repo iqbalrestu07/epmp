@@ -147,6 +147,8 @@ import UserListPage from "./features/iam/pages/UserListPage";
 
 // Settings
 import { SettingsPage } from "./features/settings/pages/SettingsPage";
+import { ReportsPage } from "./features/report/pages/ReportsPage";
+import { AuditLogPage } from "./features/audit/pages/AuditLogPage";
 
 function getModuleRoutes() {
   return (
@@ -321,6 +323,8 @@ function getModuleRoutes() {
         }
       />
 
+      <Route path="reports" element={<ReportsPage />} />
+      <Route path="audit-logs" element={<AuditLogPage />} />
       <Route path="settings" element={<SettingsPage />} />
     </>
   );

@@ -115,13 +115,13 @@ func (s *PenaltyService) Delete(ctx context.Context, id, orgID string) error {
 func (s *PenaltyService) toResponse(e *entity.Penalty) *dto.PenaltyResponse {
 	return &dto.PenaltyResponse{
 		OrganizationId: e.OrganizationId,
-		Id: e.Id,
-		InvoiceId: e.InvoiceId,
-		Amount: e.Amount,
-		Status: e.Status,
-		PenaltyDate: e.PenaltyDate,
-		Description: e.Description,
-		CreatedAt: e.CreatedAt,
-		UpdatedAt: e.UpdatedAt,
+		Id:             e.Id,
+		InvoiceId:      e.InvoiceId,
+		Amount:         e.Amount,
+		Status:         e.Status,
+		PenaltyDate:    e.PenaltyDate,
+		Description:    e.Description,
+		CreatedAt:      e.CreatedAt,
+		UpdatedAt:      e.UpdatedAt,
 	}
 }

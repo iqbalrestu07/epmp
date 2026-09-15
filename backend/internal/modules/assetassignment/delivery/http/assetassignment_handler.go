@@ -5,6 +5,7 @@ import (
 
 	"github.com/epmp/backend/internal/modules/assetassignment/dto"
 	"github.com/epmp/backend/internal/modules/assetassignment/service"
+	"github.com/epmp/backend/internal/pkg/errs"
 	mw "github.com/epmp/backend/internal/pkg/middleware"
 	"github.com/epmp/backend/internal/pkg/response"
 
@@ -94,6 +95,9 @@ func (h *AssetAssignmentHandler) Delete(c echo.Context) error {
 	orgID := mw.GetOrgID(c)
 
 	if err := h.svc.Delete(c.Request().Context(), id, orgID); err != nil {
+		if errs.IsDomainError(err, "NOT_FOUND") {
+			return response.NotFound(c, "Resource not found")
+		}
 		return response.InternalError(c, err.Error())
 	}
 

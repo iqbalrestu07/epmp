@@ -6,6 +6,7 @@ export interface Invoice {
   contract_id: string;
   tenant_id: string;
   amount: number;
+  currency: string;
   status: string;
   due_date: string;
   paid_date?: string;
@@ -28,6 +29,7 @@ export interface CreateInvoiceRequest {
   contract_id: string;
   tenant_id: string;
   amount: number;
+  currency?: string;
   status: string;
   due_date: string;
   paid_date?: string;
@@ -39,6 +41,7 @@ export interface UpdateInvoiceRequest {
   contract_id: string;
   tenant_id: string;
   amount: number;
+  currency?: string;
   status: string;
   due_date: string;
   paid_date?: string;

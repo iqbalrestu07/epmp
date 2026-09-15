@@ -6,10 +6,10 @@ import "time"
 type Supplier struct {
 	OrganizationId string     `json:"organization_id"`
 	Id             string     `json:"id"`
-	Name                 string       `json:"name"`
-	ContactPerson        string       `json:"contact_person"`
-	Phone                string       `json:"phone"`
-	ServiceType          string       `json:"service_type"`
+	Name           string     `json:"name"`
+	ContactPerson  string     `json:"contact_person"`
+	Phone          string     `json:"phone"`
+	ServiceType    string     `json:"service_type"`
 	DeletedAt      *time.Time `json:"deleted_at,omitempty"`
 	CreatedAt      time.Time  `json:"created_at"`
 	UpdatedAt      time.Time  `json:"updated_at"`

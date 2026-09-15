@@ -4,37 +4,37 @@ import "time"
 
 // CreateDepositRequest is the DTO for creating a Deposit.
 type CreateDepositRequest struct {
-	ContractId           string       `json:"contract_id"`
-	TenantId             string       `json:"tenant_id"`
-	Amount               float64      `json:"amount"`
-	Status               string       `json:"status"`
-	CollectionDate       time.Time    `json:"collection_date"`
-	RefundDate           time.Time    `json:"refund_date"`
-	Notes                string       `json:"notes"`
+	ContractId     string    `json:"contract_id"`
+	TenantId       string    `json:"tenant_id"`
+	Amount         float64   `json:"amount"`
+	Status         string    `json:"status"`
+	CollectionDate time.Time `json:"collection_date"`
+	RefundDate     time.Time `json:"refund_date"`
+	Notes          string    `json:"notes"`
 }
 
 // UpdateDepositRequest is the DTO for updating a Deposit.
 type UpdateDepositRequest struct {
-	ContractId           string       `json:"contract_id"`
-	TenantId             string       `json:"tenant_id"`
-	Amount               float64      `json:"amount"`
-	Status               string       `json:"status"`
-	CollectionDate       time.Time    `json:"collection_date"`
-	RefundDate           time.Time    `json:"refund_date"`
-	Notes                string       `json:"notes"`
+	ContractId     string    `json:"contract_id"`
+	TenantId       string    `json:"tenant_id"`
+	Amount         float64   `json:"amount"`
+	Status         string    `json:"status"`
+	CollectionDate time.Time `json:"collection_date"`
+	RefundDate     time.Time `json:"refund_date"`
+	Notes          string    `json:"notes"`
 }
 
 // DepositResponse is the DTO for returning a Deposit.
 type DepositResponse struct {
 	OrganizationId string    `json:"organization_id"`
 	Id             string    `json:"id"`
-	ContractId           string       `json:"contract_id"`
-	TenantId             string       `json:"tenant_id"`
-	Amount               float64      `json:"amount"`
-	Status               string       `json:"status"`
-	CollectionDate       time.Time    `json:"collection_date"`
-	RefundDate           time.Time    `json:"refund_date"`
-	Notes                string       `json:"notes"`
+	ContractId     string    `json:"contract_id"`
+	TenantId       string    `json:"tenant_id"`
+	Amount         float64   `json:"amount"`
+	Status         string    `json:"status"`
+	CollectionDate time.Time `json:"collection_date"`
+	RefundDate     time.Time `json:"refund_date"`
+	Notes          string    `json:"notes"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 }
@@ -42,8 +42,8 @@ type DepositResponse struct {
 // DepositListResponse is the DTO for a paginated list of Deposit.
 type DepositListResponse struct {
 	Data       []DepositResponse `json:"data"`
-	Total      int64         `json:"total"`
-	Page       int           `json:"page"`
-	PerPage    int           `json:"per_page"`
-	TotalPages int           `json:"total_pages"`
+	Total      int64             `json:"total"`
+	Page       int               `json:"page"`
+	PerPage    int               `json:"per_page"`
+	TotalPages int               `json:"total_pages"`
 }

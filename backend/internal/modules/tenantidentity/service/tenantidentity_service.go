@@ -113,12 +113,12 @@ func (s *TenantIdentityService) Delete(ctx context.Context, id, orgID string) er
 func (s *TenantIdentityService) toResponse(e *entity.TenantIdentity) *dto.TenantIdentityResponse {
 	return &dto.TenantIdentityResponse{
 		OrganizationId: e.OrganizationId,
-		Id: e.Id,
-		TenantId: e.TenantId,
-		IdentityType: e.IdentityType,
+		Id:             e.Id,
+		TenantId:       e.TenantId,
+		IdentityType:   e.IdentityType,
 		IdentityNumber: e.IdentityNumber,
-		FileUrl: e.FileUrl,
-		CreatedAt: e.CreatedAt,
-		UpdatedAt: e.UpdatedAt,
+		FileUrl:        e.FileUrl,
+		CreatedAt:      e.CreatedAt,
+		UpdatedAt:      e.UpdatedAt,
 	}
 }

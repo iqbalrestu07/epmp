@@ -99,8 +99,8 @@ func (s *BuildingService) Update(ctx context.Context, id, orgID string, req *dto
 	return s.toResponse(updated), nil
 }
 
-func (s *BuildingService) Delete(ctx context.Context, id string) error {
-	if err := s.repo.Delete(ctx, id); err != nil {
+func (s *BuildingService) Delete(ctx context.Context, id, orgID string) error {
+	if err := s.repo.Delete(ctx, id, orgID); err != nil {
 		return fmt.Errorf("building service: delete: %w", err)
 	}
 	return nil
