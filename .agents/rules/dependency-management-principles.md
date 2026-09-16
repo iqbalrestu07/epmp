@@ -9,41 +9,36 @@ description: When managing project dependencies, configuring package files, or o
 
 **Production:** Pin exact versions (1.2.3, not ^1.2.0)
 
-- Prevents supply chain attacks  
-- Prevents unexpected breakage from patch updates  
+- Prevents supply chain attacks
+- Prevents unexpected breakage from patch updates
 - Ensures reproducible builds
 
 **Use lock files:**
 
-- `package-lock.json` (Node.js / npm)  
-- `pnpm-lock.yaml` (Node.js / pnpm)  
-- `yarn.lock` (Node.js / yarn)  
-- `Cargo.lock` (Rust)  
-- `go.sum` (Go)  
-- `pubspec.lock` (Flutter / Dart)  
-- `requirements.txt` / `poetry.lock` (Python)
+- `package-lock.json` (Node.js / npm)
+- `go.sum` (Go)
 
 ### Minimize Dependencies
 
 **Every dependency is a liability:**
 
-- Potential security vulnerability  
-- Increased build time and artifact size  
+- Potential security vulnerability
+- Increased build time and artifact size
 - Maintenance burden (updates, compatibility)
 
 **Ask before adding dependency:**
 
-- "Can I implement this in 50 lines?"  
-- "Is this functionality critical?"  
-- "Is this dependency actively maintained?"  
+- "Can I implement this in 50 lines?"
+- "Is this functionality critical?"
+- "Is this dependency actively maintained?"
 - "Is this the latest stable version?"
 
 ### Organize Imports
 
 **Grouping:**
 
-1. Standard library  
-2. External dependencies  
+1. Standard library
+2. External dependencies
 3. Internal modules
 
 **Sorting:** Alphabetical within groups
@@ -60,5 +55,6 @@ description: When managing project dependencies, configuring package files, or o
 - [ ] Are unused imports removed?
 
 ### Related Principles
+
 - Security Mandate @security-mandate.md
 - Security Principles @security-principles.md

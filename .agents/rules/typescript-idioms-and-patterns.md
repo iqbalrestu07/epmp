@@ -9,7 +9,9 @@ description: When writing TypeScript code, reviewing TypeScript idioms, or worki
 
 TypeScript's type system is your documentation, your test, and your specification — all at once. Make the type system encode the invariants of your domain so that invalid states are unrepresentable. Lean into the compiler.
 
-> **Scope:** This file covers TypeScript-specific *type system and language idioms*. For quality commands, see `code-completion-mandate.md`. For logging, see `logging-and-observability-principles.md`.
+> **Scope:** This file covers TypeScript-specific _type system and language idioms_. For quality commands, see `code-completion-mandate.md`. For logging, see `logging-and-observability-principles.md`. For EPMP feature layout (api/hooks/types/schema/pages), TanStack Query, and the `@/services/api` wrapper, see `epmp-module-patterns.md`.
+>
+> **This project:** `frontend/` is React 18 + Vite + TypeScript 5 with `npm`. Path alias `@/` → `src/`. Typecheck is `tsc -b` (run by `npm run build`).
 
 ---
 
@@ -34,18 +36,22 @@ These flags catch the majority of runtime errors at compile time. Never disable 
 ### Type System Idioms
 
 1. **`unknown` over `any` — always**
+
    ```typescript
    // ✅ Forces narrowing before use
    function parse(data: unknown): User {
-       if (!isUser(data)) throw new Error('Invalid user shape');
-       return data;
+     if (!isUser(data)) throw new Error("Invalid user shape");
+     return data;
    }
 
    // ❌ Disables the type checker entirely
-   function parse(data: any): User { return data; }
+   function parse(data: any): User {
+     return data;
+   }
    ```
 
 2. **Use `readonly` to enforce immutability at compile time**
+
    ```typescript
    interface TaskState {
        readonly id: string;
@@ -57,35 +63,42 @@ These flags catch the majority of runtime errors at compile time. Never disable 
    ```
 
 3. **Discriminated unions for type-safe state machines**
+
    ```typescript
    type AsyncState<T> =
-       | { status: 'idle' }
-       | { status: 'loading' }
-       | { status: 'success'; data: T }
-       | { status: 'error'; error: Error };
+     | { status: "idle" }
+     | { status: "loading" }
+     | { status: "success"; data: T }
+     | { status: "error"; error: Error };
 
    // Exhaustive handling — compiler catches missing cases
    function render(state: AsyncState<User>): string {
-       switch (state.status) {
-           case 'idle':    return 'Waiting...';
-           case 'loading': return 'Loading...';
-           case 'success': return state.data.name; // data is typed
-           case 'error':   return state.error.message;
-       }
+     switch (state.status) {
+       case "idle":
+         return "Waiting...";
+       case "loading":
+         return "Loading...";
+       case "success":
+         return state.data.name; // data is typed
+       case "error":
+         return state.error.message;
+     }
    }
    ```
 
 4. **Const assertions for literal types**
+
    ```typescript
-   const ROLES = ['admin', 'editor', 'viewer'] as const;
-   type Role = typeof ROLES[number]; // 'admin' | 'editor' | 'viewer'
+   const ROLES = ["admin", "editor", "viewer"] as const;
+   type Role = (typeof ROLES)[number]; // 'admin' | 'editor' | 'viewer'
    ```
 
 5. **Type narrowing — use type guards instead of `as` casts**
+
    ```typescript
    // ✅ Type guard — safe narrowing
    function isError(value: unknown): value is Error {
-       return value instanceof Error;
+     return value instanceof Error;
    }
 
    // ❌ Type assertion — bypasses type checker
@@ -93,20 +106,21 @@ These flags catch the majority of runtime errors at compile time. Never disable 
    ```
 
 6. **Never use non-null assertion `!` in production code**
+
    ```typescript
    // ❌ Hides a potential null/undefined bug
    const name = user!.profile!.name;
 
    // ✅ Explicit handling
-   const name = user?.profile?.name ?? 'Anonymous';
+   const name = user?.profile?.name ?? "Anonymous";
    ```
 
 7. **`satisfies` operator for type-checked object literals (TS 4.9+)**
    ```typescript
    // ✅ satisfies: compile-checked against interface, type stays as literal
    const config = {
-       endpoint: '/api/tasks',
-       retries: 3,
+     endpoint: "/api/tasks",
+     retries: 3,
    } satisfies ApiConfig;
    // config.retries is typed as `3` (literal), not `number` — narrower and safer
    ```
@@ -116,6 +130,7 @@ These flags catch the majority of runtime errors at compile time. Never disable 
 ### Null Safety
 
 1. **Prefer `??` (nullish coalescing) over `||` for default values**
+
    ```typescript
    // ✅ Only falls back for null/undefined
    const count = input.count ?? 0;
@@ -125,6 +140,7 @@ These flags catch the majority of runtime errors at compile time. Never disable 
    ```
 
 2. **Use optional chaining `?.` for safe navigation**
+
    ```typescript
    const city = user?.address?.city;
    ```
@@ -140,6 +156,7 @@ These flags catch the majority of runtime errors at compile time. Never disable 
 > This section covers TypeScript-specific async idioms.
 
 1. **Always `await` or handle returned Promises — no floating promises**
+
    ```typescript
    // ❌ Fire-and-forget — errors are silently swallowed
    sendEmail(user);
@@ -152,6 +169,7 @@ These flags catch the majority of runtime errors at compile time. Never disable 
    ```
 
 2. **Use `Promise.all` for concurrent independent operations**
+
    ```typescript
    // ✅ Concurrent — total time = max(individual times)
    const [user, tasks] = await Promise.all([getUser(id), getTasks(id)]);
@@ -162,9 +180,10 @@ These flags catch the majority of runtime errors at compile time. Never disable 
    ```
 
 3. **Use `Promise.allSettled` when partial failure is acceptable**
+
    ```typescript
    const results = await Promise.allSettled(notifications.map(send));
-   const failed = results.filter(r => r.status === 'rejected');
+   const failed = results.filter((r) => r.status === "rejected");
    ```
 
 4. **Never mix `async/await` with raw `.then()/.catch()` chains in the same function**
@@ -176,13 +195,13 @@ These flags catch the majority of runtime errors at compile time. Never disable 
 **All data crossing a system boundary must be validated at runtime**, not just typed.
 
 ```typescript
-import { z } from 'zod';
+import { z } from "zod";
 
 // Define schema as the single source of truth
 const CreateTaskSchema = z.object({
-    title: z.string().min(1).max(200),
-    priority: z.enum(['low', 'medium', 'high']),
-    dueDate: z.string().datetime().optional(),
+  title: z.string().min(1).max(200),
+  priority: z.enum(["low", "medium", "high"]),
+  dueDate: z.string().datetime().optional(),
 });
 
 // Infer the TypeScript type from the schema — no duplication
@@ -190,7 +209,7 @@ type CreateTaskRequest = z.infer<typeof CreateTaskSchema>;
 
 // Validate at the API boundary
 function parseCreateTask(body: unknown): CreateTaskRequest {
-    return CreateTaskSchema.parse(body); // throws ZodError on invalid input
+  return CreateTaskSchema.parse(body); // throws ZodError on invalid input
 }
 ```
 
@@ -202,34 +221,14 @@ function parseCreateTask(body: unknown): CreateTaskRequest {
 
 ### Centralized HTTP Client
 
-**All outbound HTTP calls MUST go through the project's single, shared API client utility.**
-
-Do not call `fetch()` or `axios()` directly in feature code. Route every request through the centralized client (e.g., `apiFetch`, `apiClient`, or equivalent).
-
-**Why this matters:**
-- Consistent auth header injection (token is attached in one place)
-- Correlation-ID propagation — every request carries a traceable ID
-- Centralized error normalization — uniform error shapes for all API failures
-- Single place to add retries, timeouts, and request logging
-
-```typescript
-// ❌ Anti-pattern — bypass: no auth header, no correlation-ID, no logging
-const res = await fetch('/api/tasks');
-
-// ✅ Correct — use the shared client
-import { apiFetch } from '@/infrastructure/apiFetch';
-const res = await apiFetch('/api/tasks');
-```
-
-**Exception:** The centralized client itself may use raw `fetch` or `axios` internally — that is its implementation detail, not a bypass.
-
-> The audit's Integration Contracts dimension (Phase 1.5, Dimension A) checks compliance with this rule. Any direct `fetch`/`axios` call outside the shared client is a `[INT]` finding.
+All requests go through `frontend/src/services/api.ts` (`BASE_URL=/api/v1`, JWT + `X-Organization-ID` headers, refresh-token handling). Never call `fetch`/`axios` directly from a component, hook, or feature `api/` file — import the wrapper. See `epmp-module-patterns.md` for the feature `api/` → `hooks/` layering.
 
 ---
 
 ### Module and Export Patterns
 
 1. **Prefer named exports over default exports**
+
    ```typescript
    // ✅ Named — explicit, refactor-safe, IDE-friendly
    export function createTask() { ... }
@@ -244,7 +243,7 @@ const res = await apiFetch('/api/tasks');
 
 3. **Import type separately to avoid bundling runtime artifacts**
    ```typescript
-   import type { Task } from './types';
+   import type { Task } from "./types";
    ```
 
 ---
@@ -253,18 +252,19 @@ const res = await apiFetch('/api/tasks');
 
 > Test naming, file conventions, and pyramid proportions are defined in `testing-strategy.md`. This section covers TypeScript-specific tooling.
 
-1. **Type your mocks with Vitest types** — never use `as any` in test doubles
-   ```typescript
-   import { vi } from 'vitest';
-   import type { MockedObject } from 'vitest';
+1. **Type your test doubles against the real interface** — never use `as any` in test doubles
 
-   const mockStore: MockedObject<TaskStore> = {
-       create: vi.fn(),
-       getById: vi.fn(),
+   > `frontend/` has no unit-test runner configured today (only Playwright E2E). Adding one is an architectural decision — record an ADR first. Until then, keep logic in pure functions and write hand-written fakes that satisfy the interface:
+
+   ```typescript
+   const fakeApi: ReservationApi = {
+     create: async (input) => ({ id: "r-1", ...input }),
+     getById: async () => null,
    };
    ```
 
 2. **Assert on error types, not just error messages**
+
    ```typescript
    await expect(service.create(invalid)).rejects.toThrow(ZodError);
    ```
@@ -272,7 +272,8 @@ const res = await apiFetch('/api/tasks');
 3. **Use `satisfies` operator in tests for type-checked fixtures**
    ```typescript
    const fixture = {
-       id: 'abc', title: 'Test task'
+     id: "abc",
+     title: "Test task",
    } satisfies Task;
    ```
 
@@ -280,18 +281,19 @@ const res = await apiFetch('/api/tasks');
 
 ### Formatting and Static Analysis
 
-| Tool                       | Purpose                                 | Notes                                                             |
-| -------------------------- | --------------------------------------- | ----------------------------------------------------------------- |
-| `vue-tsc --noEmit`         | Full type checking (incl. `.vue` files) | Must pass zero errors; use `tsc --noEmit` for non-Vue TS projects |
-| `eslint`                   | Lint rules + style                      | Use `@typescript-eslint/recommended-type-checked`                 |
-| `prettier`                 | Canonical formatting                    | Non-negotiable                                                    |
-| `npm audit` / `pnpm audit` | Dependency CVE scanning                 | Run in CI; fail on high severity                                  |
+| Tool                           | Purpose                                  | Notes                                                                                                                  |
+| ------------------------------ | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `tsc -b`                       | Full type checking (via `npm run build`) | Must pass zero errors                                                                                                  |
+| `eslint .`                     | Lint rules + style (`npm run lint`)      | No config committed yet — adding one needs `@typescript-eslint/recommended-type-checked` + `eslint-plugin-react-hooks` |
+| `prettier`                     | Canonical formatting                     | Not configured yet; match existing file style (2 spaces, double quotes, semicolons)                                    |
+| `npm audit --audit-level=high` | Dependency CVE scanning                  | Run in CI; fail on high severity                                                                                       |
 
 See `code-completion-mandate.md` for the exact commands to run before committing.
 
 ---
 
 ### Related Principles
+
 - Code Idioms and Conventions @code-idioms-and-conventions.md
 - Testing Strategy @testing-strategy.md
 - Error Handling Principles @error-handling-principles.md

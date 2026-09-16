@@ -24,19 +24,23 @@ Every code generation task follows this workflow:
 
 ### Quality Commands for This Project
 
-This project uses **plain ESM JavaScript** (no TypeScript, no build step).
+Run the set that matches the code you touched. Paths are relative to the repo root.
 
-| Check                | Command                                                        | Notes                                         |
-| -------------------- | -------------------------------------------------------------- | --------------------------------------------- |
-| **Syntax check**     | `node --check extensions/survey-forms/index.js`               | Ekstensi API utama |
-| **Syntax check**     | `node --check scripts/seed-samples.js`                        | Seeder data |
-| **Syntax check**     | `node --check scripts/run-migrations.js`                      | Migration runner |
-| **Dependency audit** | `pnpm audit` or `npm audit`                                    | Check for known CVEs |
-| **Docker build**     | `docker compose build`                                         | Verifies Dockerfile and dependency resolution |
-| **Manual smoke test**| Start Docker, call endpoints, verify JSON                      | Primary validation for endpoint extensions |
-
-> Since this project has no ESLint/Prettier configured, syntax checking via `node --check` is the minimum automated validation.
-> For more thorough validation, manually test endpoints against a running Directus instance.
+| Scope                               | Check              | Command                                                                                           | Notes                                                                                                                        |
+| ----------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Backend (`backend/`)                | Format             | `cd backend && gofmt -l .`                                                                        | Must print nothing                                                                                                           |
+|                                     | Vet                | `cd backend && go vet ./...`                                                                      |                                                                                                                              |
+|                                     | Lint               | `cd backend && staticcheck ./... && gosec -quiet ./...`                                           | Both installed in `~/go/bin`; `golangci-lint` optional                                                                       |
+|                                     | Build              | `cd backend && go build ./...`                                                                    |                                                                                                                              |
+|                                     | Tests              | `make test-backend` (= `go test ./... -v -count=1`)                                               | Integration tests need Postgres up + migrated; they `SKIP` otherwise — a skip is **not** a pass for adapter changes          |
+|                                     | Race (before ship) | `cd backend && go test -race ./...`                                                               |                                                                                                                              |
+| Frontend (`frontend/`)              | Typecheck + build  | `make test-frontend` (= `npm run build` → `tsc -b && vite build`)                                 | Zero TS errors                                                                                                               |
+|                                     | Lint               | `cd frontend && npm run lint`                                                                     | `eslint .` — **no ESLint config is committed yet**; if it errors on missing config, report it, do not fabricate one silently |
+|                                     | Dependency audit   | `cd frontend && npm audit --audit-level=high`                                                     |                                                                                                                              |
+|                                     | E2E (UI touched)   | `make test-e2e`                                                                                   | Requires backend `:8080` + frontend `:3000` running; must end with 0 errors                                                  |
+| Tools (`tools/epmp-sdk/*/codegen`)  | Tests              | `cd tools/epmp-sdk/be/codegen && go test ./...` (same for `fe/codegen`)                           | Run when templates or config change                                                                                          |
+| Migrations                          | Round-trip         | `cd backend && go run ./cmd/migrate up && go run ./cmd/migrate down 1 && go run ./cmd/migrate up` | Local DB only                                                                                                                |
+| Docker (compose/Dockerfile touched) | Build              | `docker compose build`                                                                            |                                                                                                                              |
 
 ### Failure Protocol
 
@@ -47,9 +51,12 @@ This project uses **plain ESM JavaScript** (no TypeScript, no build step).
 3. Re-run the failing command
 4. Do not proceed until all checks pass
 
-> Never disable a lint rule or suppress a warning to make checks pass. Fix the root cause.
+> Never disable a lint rule, add `//nolint`, `// eslint-disable`, `@ts-ignore`, or `t.Skip` to make checks pass. Fix the root cause. Never delete a failing test.
 
 ### Related Principles
+
 - Rugged Software Constitution @rugged-software-constitution.md
 - Code Idioms and Conventions @code-idioms-and-conventions.md
-- Directus Extension Patterns @directus-extension-patterns.md
+- Go Idioms and Patterns @go-idioms-and-patterns.md
+- TypeScript Idioms and Patterns @typescript-idioms-and-patterns.md
+- EPMP Module Patterns @epmp-module-patterns.md

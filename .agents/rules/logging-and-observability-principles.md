@@ -7,7 +7,6 @@ description: When implementing logging, working with loggers, or setting up obse
 
 > **⚠️ Prerequisite:** All operations MUST be logged per Logging and Observability Mandate @logging-and-observability-mandate.md. This guide provides implementation patterns only.
 
-
 ### Logging Standards
 
 #### Log Levels (Standard Priority)
@@ -26,6 +25,7 @@ Use consistent log levels across all services:
 #### Logging Rules
 
 **1. Every request/operation must log:**
+
 ```
 
 // Start of operation
@@ -52,13 +52,14 @@ log.Error("failed to create task",
 ```
 
 **2. Always include context:**
+
 - `correlationId`: Trace requests across services (UUID)
 - `userId`: Who triggered the action
 - `duration`: Operation timing (milliseconds)
 - `error`: Error details (if failed)
 
-
 **3. Structured logging only** (no string formatting):
+
 ```
 
 // ✅ Structured
@@ -70,6 +71,7 @@ log.Info(fmt.Sprintf("User %s logged in from %s", userID, clientIP))
 ```
 
 **4. Security - Never log:**
+
 - Passwords or password hashes
 - API keys or tokens
 - Credit card numbers
@@ -77,85 +79,45 @@ log.Info(fmt.Sprintf("User %s logged in from %s", userID, clientIP))
 - Full request/response bodies (unless DEBUG level in non-prod)
 
 **5. Performance - Never log in hot paths:**
+
 - Inside tight loops
 - Per-item processing in batch operations (use summary instead)
 - Synchronous logging in latency-critical paths
 
-**Best Practice:** "Use logger middleware redaction (e.g., pino-redact, zap masking) rather than manual string manipulation."
+**Best Practice:** "Use logger middleware redaction rather than manual string manipulation."
 
 #### Language-Specific Implementations
 
-##### Go (using slog standard library)
+##### Go (zerolog — `backend/internal/pkg/logger`)
+
+```go
+// Logger is created once in cmd/server/bootstrap.go via logger.New() and injected
+// into modules through module.go — never create a new zerolog.Logger inside a module.
+log := logger.New() // APP_ENV=production → JSON; otherwise coloured console with caller
+
+log.Info().
+    Str("request_id", reqID).
+    Str("org_id", orgID).
+    Str("module", "reservation").
+    Msg("reservation created")
+
+log.Error().
+    Err(err).
+    Str("request_id", reqID).
+    Str("org_id", orgID).
+    Msg("failed to create reservation")
 ```
 
-import "log/slog"
+Field names are `snake_case`. Never log JWTs, passwords, NIK/identity numbers, or phone numbers (WhatsApp).
 
-// Configure logger
-logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-  Level: slog.LevelInfo, // Production default
-}))
+##### Frontend (React)
 
-// Usage
-logger.Info("operation started",
-  "correlationId", correlationID,
-  "userId", userID,
-)
-
-logger.Error("operation failed",
-  "correlationId", correlationID,
-  "error", err,
-  "retryCount", retries,
-)
-
-```
-
-##### TypeScript/Node.js (using pino)
-```
-
-import pino from 'pino';
-
-const logger = pino({
-  level: process.env.LOG_LEVEL || 'info',
-});
-
-logger.info({
-  correlationId,
-  userId,
-  duration: Date.now() - startTime,
-}, 'task created successfully');
-
-logger.error({
-  correlationId,
-  error: err.message,
-  stack: err.stack,
-}, 'failed to create task');
-
-```
-
-##### Python (using structlog)
-```python
-
-import structlog
-
-logger = structlog.get_logger()
-
-logger.info("task_created",
-correlation_id=correlation_id,
-user_id=user_id,
-task_id=task.id,
-)
-
-logger.error("task_creation_failed",
-correlation_id=correlation_id,
-error=str(err),
-user_id=user_id,
-)
-
-```
+There is no logging library in `frontend/`. `console.error` is allowed only inside `components/ErrorBoundary.tsx` and the error path of `services/api.ts`; components and hooks must not log — surface errors through React Query state / UI instead.
 
 ##### Log Patterns by Operation Type
 
 ##### API Request/Response
+
 ```
 
 // Request received
@@ -176,6 +138,7 @@ log.Info("request completed",
 ```
 
 ##### Database Operations
+
 ```
 
 // Query start (DEBUG level)
@@ -201,6 +164,7 @@ log.Error("query failed",
 ```
 
 ##### External API Calls
+
 ```
 
 // Call start
@@ -227,33 +191,8 @@ log.Warn("circuit breaker opened",
 
 ```
 
-##### Background Jobs
-```
-
-// Job start
-log.Info("job started",
-  "jobId", jobID,
-  "jobType", "email-digest",
-)
-
-// Progress (INFO level - periodic, not per-item)
-log.Info("job progress",
-  "jobId", jobID,
-  "processed", 1000,
-  "total", 5000,
-  "percentComplete", 20,
-)
-
-// Job complete
-log.Info("job completed",
-  "jobId", jobID,
-  "duration", duration,
-  "itemsProcessed", count,
-)
-
-```
-
 ##### Error Scenarios
+
 ```
 
 // Recoverable error (ERROR level)
@@ -275,71 +214,11 @@ log.Fatal("critical dependency unavailable",
 
 #### Environment-Specific Configuration
 
-| Environment     | Level | Format           | Destination             |
-| --------------- | ----- | ---------------- | ----------------------- |
-| **Development** | DEBUG | Pretty (colored) | Console                 |
-| **Staging**     | INFO  | JSON             | Stdout → CloudWatch/GCP |
-| **Production**  | INFO  | JSON             | Stdout → CloudWatch/GCP |
-
-**Configuration (Go example):**
-```
-
-func configureLogger() *slog.Logger {
-var handler slog.Handler
-
-    level := slog.LevelInfo
-    if os.Getenv("ENV") == "development" {
-        level = slog.LevelDebug
-        handler = slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-            Level: level,
-        })
-    } else {
-        handler = slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-            Level: level,
-        })
-    }
-    
-    return slog.New(handler)
-    }
-
-```
+Controlled by `APP_ENV` (see `backend/internal/pkg/logger/logger.go`): `production` emits JSON to stdout; anything else emits human-readable console output with caller info. Do not add per-environment log configuration elsewhere.
 
 #### Testing Logs
 
-**Unit tests:** Capture and assert on log output
-```
-
-// Go example
-func TestUserLogin(t *testing.T) {
-var buf bytes.Buffer
-logger := slog.New(slog.NewJSONHandler(&buf, nil))
-
-    // Test operation
-    service := NewUserService(logger, mockStore)
-    err := service.Login(ctx, email, password)
-    
-    // Assert logs
-    require.NoError(t, err)
-    logs := buf.String()
-    assert.Contains(t, logs, "user login successful")
-    assert.Contains(t, logs, email)
-    }
-
-```
-
-#### Monitoring Integration
-
-**Correlation IDs:**
-- Generate at ingress (API gateway, first handler)
-- Propagate through all services
-- Include in all logs, errors, and traces
-- Format: UUID v4
-
-**Log aggregation:**
-- Ship to centralized system (CloudWatch, GCP Logs, Datadog)
-- Index by: correlationId, userId, level, timestamp
-- Alert on ERROR/FATAL patterns
-- Dashboard: request rates, error rates, latency
+**Unit tests:** Capture and assert on log output.
 
 #### Checklist for Every Feature
 
@@ -353,6 +232,7 @@ logger := slog.New(slog.NewJSONHandler(&buf, nil))
 - [ ] Performance-critical paths use DEBUG level
 
 ### Related Principles
+
 - Logging and Observability Mandate @logging-and-observability-mandate.md
 - Error Handling Principles @error-handling-principles.md
 - Security Mandate @security-mandate.md

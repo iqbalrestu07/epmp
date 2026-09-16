@@ -1,78 +1,87 @@
+---
+trigger: always_on
+---
+
 ## Schema Documentation Mandate
 
 > **This rule has the same enforcement weight as `code-completion-mandate.md`.**
-> Delivering a migration or schema change without updating `docs/schema.md` is INCOMPLETE work.
+> Delivering a migration or schema change without updating its documentation is INCOMPLETE work.
 
 ### Core Requirement
 
-**Every change to a Directus collection or field MUST be documented in `docs/schema.md` in the same commit.**
+**Every change to a PostgreSQL table or column MUST be delivered in the same commit as:**
 
-This applies to ALL operations:
-- ✅ Creating a new collection
-- ✅ Adding a field to an existing collection
-- ✅ Renaming or removing a field
-- ✅ Changing a field's type, interface, or relationship
-- ✅ Adding or changing display templates, conditions, or metadata
+1. A `backend/migrations/NNNNNN_<name>.up.sql` **and** matching `.down.sql`
+2. An updated row in the migration table of `backend/migrations/README.md`
+3. The affected module's `MODULE.md` (Fields / Behaviors tables)
+4. The module's schema YAML in `tools/epmp-sdk/schemas/<name>.yaml` (when the module is generator-managed)
+5. The frontend `types/` + `schema/` (Zod) of the corresponding feature, when the column is exposed through the API
 
-No exceptions. Not "will document later." Not "minor field."
+This applies to ALL operations: new table, new column, rename/drop column, type change, new index/constraint, new enum value.
+
+No exceptions. Not "will document later." Not "minor column."
 
 ---
 
 ### When This Rule Applies
 
 This rule activates whenever you:
-1. Write or modify a file in `scripts/migrations/`
-2. Call any Directus REST API that touches `/collections` or `/fields`
-3. Apply any schema change via `run-migrations.js`
-4. Discover an undocumented field during development
+
+1. Create or modify a file in `backend/migrations/`
+2. Change a repository SQL statement to read/write a column that did not exist before
+3. Change a field in `tools/epmp-sdk/schemas/*.yaml`
+4. Discover an undocumented column during development
+
+---
+
+### Migration Standards
+
+```bash
+cd backend && go run ./cmd/migrate create add_currency_to_properties
+# → migrations/0000NN_add_currency_to_properties.up.sql / .down.sql
+```
+
+- Sequence is a zero-padded 6-digit integer; one logical change per migration.
+- `.up.sql` and `.down.sql` are both mandatory; `.down.sql` must fully reverse `.up.sql`.
+- Tenant-owned tables MUST have: `id UUID PRIMARY KEY`, `organization_id UUID NOT NULL` (+ index), `created_at`, `updated_at`, `deleted_at TIMESTAMPTZ NULL`.
+- Use `IF NOT EXISTS` / `IF EXISTS` so re-runs are safe.
+- Never edit a migration that may already be applied in any environment — add a new one.
 
 ---
 
 ### Documentation Format
 
-Each collection in `docs/schema.md` must have a table with these columns:
+**`backend/migrations/README.md`** — one row per migration:
 
 ```markdown
-| Field Name | Type & Interface | Keterangan / Kegunaan |
-| :--- | :--- | :--- |
-| `field_name` | Type (Interface) | Clear, human-readable purpose |
+| Seq | Name | Domain | Table | Depends On |
+| 0000NN | add_currency_to_properties | property | properties | 000001 |
 ```
 
-**Every single field that exists in the live Directus instance must appear in this table.**
-This includes:
-- Custom fields you added
-- Standard/system fields (`id`, `date_created`, `date_updated`, `user_created`, `user_updated`, `sort`, `status`)
-- Alias and relational fields (O2M, M2O markers)
+**`MODULE.md`** — keep the `Fields` table a 1-to-1 mirror of the live table (name, type, PK, nullable, searchable).
 
-**For new fields, add to the correct collection section**, and add a **Changelog entry**:
-
-```markdown
-### [X.Y.Z] — YYYY-MM-DD
-#### Added
-- `collection_name.field_name` — brief description of why it was added
-```
+**Behaviour changes** (new business rule, new state) — also update the relevant `epmp-docs/epmp-0xx.md` module spec.
 
 ---
 
-### Strict 1-to-1 Field Synchronization Rule
+### Strict 1-to-1 Synchronization Rule
 
-`docs/schema.md` must be a **mirror** of the live database schema. If a field exists in Directus but not in `docs/schema.md`, the schema documentation is **out of sync** and must be fixed immediately.
+`MODULE.md` and `tools/epmp-sdk/schemas/<name>.yaml` must mirror the live schema. If a column exists in Postgres but not in these files, documentation is **out of sync** and must be fixed immediately.
 
 **Enforcement:**
-- Before writing any migration: read the relevant collection section in `docs/schema.md`
-- After writing any migration: update `docs/schema.md` to reflect all changes
-- If you discover an undocumented field during any task: document it immediately before continuing
+
+- Before writing a migration: read the module's `MODULE.md` and the latest `*.up.sql` touching that table
+- After writing a migration: update all artefacts listed under _Core Requirement_
+- If you discover an undocumented column during any task: document it before continuing
 
 ---
 
-### Discovery Protocol for Undocumented Fields
-
-If you encounter a field in Directus that is missing from `docs/schema.md`:
+### Discovery Protocol for Undocumented Columns
 
 1. **Stop current task**
-2. Investigate: check `scripts/migrations/` for when the field was added
-3. Document the field in `docs/schema.md` under the correct collection
-4. Add a Changelog entry with an estimated date and note: `[Retroactive documentation]`
+2. Investigate: `grep -rn "<column>" backend/migrations/` to find when it was added
+3. Document it in `MODULE.md` (and schema YAML if applicable)
+4. Note in the commit body: `[Retroactive documentation] <table>.<column>`
 5. Resume current task
 
 ---
@@ -80,31 +89,37 @@ If you encounter a field in Directus that is missing from `docs/schema.md`:
 ### AI Agent Checklist (Pre-flight for Any Migration Task)
 
 Before writing any migration file, verify:
-- [ ] Have I read the relevant collection section in `docs/schema.md`?
-- [ ] Does `docs/schema.md` accurately reflect the current live schema?
-- [ ] Is there any undocumented field I need to backfill documentation for first?
+
+- [ ] Have I read the module's `MODULE.md` and existing migrations for this table?
+- [ ] Does the documentation reflect the current live schema?
+- [ ] Is there an undocumented column I need to backfill first?
 
 After writing any migration file, verify:
-- [ ] Have I added all new fields to the correct collection table in `docs/schema.md`?
-- [ ] Have I added a Changelog entry at the bottom of `docs/schema.md`?
-- [ ] Do I bump the version number in the `docs/schema.md` header?
+
+- [ ] `.up.sql` and `.down.sql` both exist and `go run ./cmd/migrate up` then `down` succeed locally
+- [ ] `backend/migrations/README.md` row added
+- [ ] `MODULE.md` Fields table updated
+- [ ] `tools/epmp-sdk/schemas/<name>.yaml` updated (if generator-managed) and module regenerated or hand-edit header removed
+- [ ] Frontend `types/` + `schema/` updated when the column is API-visible
 
 ---
 
 ### Violation Examples
 
-❌ **Wrong:** Add a migration that adds `questions.is_zscore` but only update the JS file.
+❌ **Wrong:** Add `properties.currency` in a migration and only update the repository SQL.
 
-✅ **Correct:** Add migration + add `is_zscore` row to the `questions` table in `docs/schema.md` + add Changelog entry.
+✅ **Correct:** Migration pair + README row + `MODULE.md` field + `schemas/property.yaml` + frontend `propertySchema` (`currency: z.string()`).
 
-❌ **Wrong:** Discover `questions.is_zscore` is undocumented and ignore it to finish the current task faster.
+❌ **Wrong:** Notice `rooms.price` is missing from `MODULE.md` and ignore it to finish faster.
 
-✅ **Correct:** Immediately document `questions.is_zscore` in `docs/schema.md` before continuing.
+✅ **Correct:** Document `rooms.price` immediately, then continue.
 
 ---
 
 ### Related Principles
-- Database Design Principles @/Users/panjiadhiemusthofa/project/kesprimkom/kes-ssi/data-reference-module/kes-ref-screening-directus/.agents/rules/database-design-principles.md
-- Directus Extension Patterns @/Users/panjiadhiemusthofa/project/kesprimkom/kes-ssi/data-reference-module/kes-ref-screening-directus/.agents/rules/directus-extension-patterns.md
-- Code Completion Mandate @/Users/panjiadhiemusthofa/project/kesprimkom/kes-ssi/data-reference-module/kes-ref-screening-directus/.agents/rules/code-completion-mandate.md
-- Project Structure @/Users/panjiadhiemusthofa/project/kesprimkom/kes-ssi/data-reference-module/kes-ref-screening-directus/.agents/rules/project-structure.md
+
+- Database Design Principles @database-design-principles.md
+- EPMP Module Patterns @epmp-module-patterns.md
+- Code Completion Mandate @code-completion-mandate.md
+- Project Structure @project-structure.md
+- Deployment and Data Safety Mandate @deployment-and-data-safety-mandate.md

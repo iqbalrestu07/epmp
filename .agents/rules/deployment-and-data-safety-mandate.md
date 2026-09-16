@@ -1,52 +1,69 @@
+---
+trigger: always_on
+---
+
 # Deployment and Data Safety Mandate
 
 ### Core Principle: Zero Data-Loss Architecture
-Deployments and migrations between environments (`dev` ➔ `stg` ➔ `prod`) MUST NEVER destroy, drop, or truncate collections, fields, or existing database records unless explicitly requested with destructive flags and interactive confirmation.
+
+Deployments and migrations between environments (`dev` ➔ `staging` ➔ `production`) MUST NEVER drop tables, drop columns, truncate, or bulk-delete existing records unless explicitly requested by a human with an interactive confirmation for that specific action.
 
 ---
 
-### 1. Schema Migration Safety (`/schema/diff` & `/schema/apply`)
+### 1. Schema Migration Safety (golang-migrate)
 
-#### The Directus Partial Snapshot Trap
-Directus native schema engine (`/schema/diff`) treats the incoming snapshot as the *absolute desired state*. If a snapshot only contains a subset of collections (e.g. during partial deployment with `--collection=ref_tl_*`), Directus will automatically generate `DROP` actions (`kind: "D"`) for every single collection and field absent from the snapshot.
+Migrations live in `backend/migrations/` and run via `cd backend && go run ./cmd/migrate <up|down|version|force|create>` or the one-shot `migrate` service in `docker-compose.yml`.
 
-#### Mandatory Safeguards:
-1. **Never Apply Raw Diffs**:
-   All diff payloads from Directus `/schema/diff` MUST be sanitized before being sent to `/schema/apply`:
-   - Filter out all collections, fields, and relations whose change consists entirely of deletions (`kind: "D"`), unless `--allow-delete` or `--destructive` is explicitly provided.
-   - For partial deployments (`--collection=...`), strictly discard any diff entries belonging to collections outside the target scope.
-2. **Logged & Blocked Drops**:
-   Any blocked drop instruction must be logged to stderr/stdout with `🛡️ KEAMANAN: X instruksi DROP/DELETE skema diblokir otomatis`.
-3. **No Direct Admin GUI Schema Alterations**:
-   Schema definitions must be codified in `scripts/migrations/` and deployed via `scripts/deploy-collection.js` or `scripts/run-migrations.js`.
+#### Mandatory Safeguards
 
----
-
-### 2. Data Synchronization Safety
-
-1. **Additive & Idempotent by Default**:
-   - The default data mode for all transfer scripts MUST be `skip-existing` (insert only records whose primary key does not yet exist on the target).
-   - Deletion of target data (`--replace`) is strictly opt-in and requires explicit confirmation in production.
-2. **Virtual Relational Alias Sanitization**:
-   - Virtual M2M/O2M alias fields (fields with `type: "alias"` or `schema: null`, such as `age_groups`, `topic_code`, `layanan_code`) MUST be stripped from insert payloads.
-   - Junction tables (e.g., `ref_cluster_age_groups`, `ref_topic_ref_service`) are distinct collections and must be seeded independently in strict dependency order.
-3. **Dynamic Primary Key Resolution**:
-   - Do not assume `id` is the primary key for all tables. Collections like `ref_topic` use `code` as their primary key. Scripts must inspect or fallback between `id` and `code`.
-4. **Token Expiry Resilience**:
-   - Batch insert operations for large collections (e.g. `ref_zscore_reference` > 10,000 rows) must proactively refresh admin session tokens and implement automatic re-login on HTTP 401 (`TOKEN_EXPIRED`).
+1. **Additive by default** — new tables/columns/indexes are the norm. Destructive DDL (`DROP TABLE`, `DROP COLUMN`, `ALTER ... TYPE` with data loss, `TRUNCATE`) in an `.up.sql` requires:
+   - explicit user request in the current task, and
+   - a preceding data-preservation step (backfill / copy to new column) in an earlier migration, and
+   - a note in the commit body: `DESTRUCTIVE: <what and why>`.
+2. **Down migrations are for local rollback only.** Never run `migrate down` against staging/production data without a verified backup. `.down.sql` still MUST exist and reverse the `.up.sql`.
+3. **Never use `migrate force`** to paper over a failed migration in shared environments without first inspecting the partial state and documenting it.
+4. **Never edit an applied migration.** Add a new sequence number.
+5. **Column removal is two-phase**: (a) stop reading/writing the column in code and ship, (b) drop it in a later release once no running version depends on it.
 
 ---
 
-### 3. Environment Roles & Truth Hierarchy
+### 2. Data Safety
 
-- **DEV**: Active development and prototyping space (CMS UI experiments, form testing). Data may undergo temporary mutations.
-- **STG**: Pre-production staging environment. Skema and reference data must mirror production stability.
-- **PROD**: Golden source of truth for business and reference data.
-- **Safe Partial Deployment**: When shipping new feature collections (e.g. Tatalaksana V3 `ref_tl_*`) from DEV to STG, only the target feature collections are allowed to be transferred. STG baseline master data (collections 1–29) must remain 100% untouched.
+1. **No manual production data edits by AI** (`tools/epmp-ai/RULES.md` §8). Data fixes are migrations or reviewed scripts, run by a human.
+2. **Soft delete only** — application code uses `deleted_at = now()`; physical `DELETE` on tenant data is prohibited outside purge jobs explicitly designed for it.
+3. **Seed/fixture scripts must be idempotent** and target only `APP_ENV=development`. Guard with an environment check before any write.
+4. **Backfills** are separate migrations with `WHERE <col> IS NULL` guards and, for large tables, batched updates.
+
+---
+
+### 3. Docker & Local Environment
+
+- `docker compose down -v` **destroys the `postgres_data` volume**. Never run it (or suggest it) as a routine "restart"; use `docker compose down` / `docker compose restart postgres`.
+- `docker compose up -d` runs the `migrate` service automatically before `backend` starts; failed migrations block the backend by design — fix the migration, do not bypass the dependency.
+- Local DB URL default: `postgres://postgres:postgres@localhost:5432/epmp?sslmode=disable` (also the default in `internal/testutil`). Integration tests write to this DB — never point `DATABASE_URL` for tests at a shared environment.
+
+---
+
+### 4. Environment Roles & Truth Hierarchy
+
+- **DEV**: local Docker Postgres; disposable, may be reset by the developer (not by AI without asking).
+- **STAGING**: mirrors production schema; data may be anonymised copies. Migrations are rehearsed here first.
+- **PRODUCTION**: golden source of truth for business data. Only additive migrations by default; backups verified before any release containing schema changes.
+
+---
 
 ### Enforcement Checklist
-Before executing any cross-environment script:
-- [ ] Are schema drops (`kind: "D"`) blocked by default?
-- [ ] Is data transfer using `skip-existing` without destructive truncates?
-- [ ] Are virtual relational alias fields stripped prior to row insertion?
-- [ ] Is token refresh handling active for long-running batches?
+
+Before proposing or running anything that touches a database:
+
+- [ ] Is every DDL statement additive? If not, was destruction explicitly requested and documented?
+- [ ] Do `.up.sql` and `.down.sql` both exist and reverse each other?
+- [ ] Am I targeting the local dev database (`localhost:5432/epmp`) and not a shared one?
+- [ ] Have I avoided `docker compose down -v`, `migrate force`, and `migrate down` on shared data?
+- [ ] For column/table removal: is this the second phase, after code stopped using it?
+
+### Related Principles
+
+- Schema Documentation Mandate @schema-documentation-mandate.md
+- Database Design Principles @database-design-principles.md
+- Security Mandate @security-mandate.md

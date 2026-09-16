@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Exec(go build)",
+      "Exec(go vet)",
+      "Exec(go test)",
+      "Exec(gofmt)",
+      "Exec(go run ./cmd/migrate)",
+      "Exec(npm run lint)",
+      "Exec(npm run build)",
+      "Exec(make test-backend)",
+      "Exec(make test-frontend)",
+      "Exec(make test-e2e)",
+      "Exec(docker compose ps)",
+      "Exec(docker compose up -d postgres)"
+    ]
+  }
+}

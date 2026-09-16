@@ -16,18 +16,18 @@ Document significant architectural decisions so institutional knowledge persists
 - When changing existing architecture
 
 ## ADR Storage
-ADRs are stored in `docs/decisions/` as numbered files:
+ADRs are stored in `epmp-docs/adr/` as numbered files:
 ```
-docs/decisions/
+epmp-docs/adr/
 ├── 0001-use-postgresql-for-storage.md
 ├── 0002-adopt-feature-based-structure.md
-├── 0003-use-testcontainers-for-integration.md
+├── 0003-use-testutil-harness-for-integration.md
 └── NNNN-short-title.md
 ```
 
 ## ADR Template
 
-Create the ADR file at `docs/decisions/NNNN-short-title.md`:
+Create the ADR file at `epmp-docs/adr/NNNN-short-title.md`:
 
 ```markdown
 # NNNN. Short Title
@@ -78,7 +78,7 @@ We chose **Option X** because...
 
 ## Process Guidelines
 
-1. **Number sequentially** — check existing ADRs in `docs/decisions/` for the next number
+1. **Number sequentially** — check existing ADRs in `epmp-docs/adr/` for the next number
 2. **Keep titles short** — descriptive enough to identify the decision at a glance
 3. **Status lifecycle:** `Proposed` → `Accepted` (after approval) → optionally `Deprecated` or `Superseded`
 4. **Never delete ADRs** — if a decision is reversed, mark as `Superseded by NNNN` and create a new ADR

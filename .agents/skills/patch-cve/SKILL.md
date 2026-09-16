@@ -1,304 +1,190 @@
 ---
 name: patch-cve
-description: Triage CVE findings dari audit.sh, review audit-log, dan patch package.json overrides untuk memperbaiki vulnerable dependencies. Gunakan setelah audit.sh gagal atau setelah /audit menemukan dependency vulnerabilities.
+description: Triage dan patch vulnerable dependencies EPMP — Go modules (govulncheck), npm (npm audit), dan Docker base image. Gunakan setelah /audit menemukan HIGH/CRITICAL CVE atau saat ada advisory baru pada library yang dipakai backend/frontend.
 ---
 
 # Patch CVE Skill
 
 ## Purpose
-Menjalankan security audit, membaca hasil `audit-log`, dan secara otomatis memperbaiki
-vulnerable dependencies melalui `package.json` overrides — tanpa memerlukan upgrade Directus.
+
+Menjalankan dependency audit, membaca hasilnya, dan memperbaiki vulnerable dependencies
+di tiga permukaan EPMP:
+
+| Surface        | Manifest                                              | Scanner                                                |
+| -------------- | ----------------------------------------------------- | ------------------------------------------------------ |
+| Go backend     | `backend/go.mod`, `backend/go.sum`                    | `govulncheck`                                          |
+| React frontend | `frontend/package.json`, `frontend/package-lock.json` | `npm audit`                                            |
+| Docker images  | `backend/Dockerfile`, `frontend/Dockerfile`           | base image tag review (+ `docker scout` bila tersedia) |
 
 ## When to Invoke
-- Setelah `./audit.sh` gagal dengan exit code 1
+
 - Setelah `/audit` workflow menemukan HIGH/CRITICAL CVE pada dependency
-- Saat ada CVE baru dilaporkan pada library yang digunakan Directus
+- Saat ada advisory baru pada library yang dipakai (Echo, pgx, jwt, whatsmeow, React, Vite, dll)
+- Sebelum release / merge ke `main` jika audit belum dijalankan > 30 hari
 
 ## When NOT to Use
-- Ketika masalah bukan dependency (gunakan `/quick-fix` atau `/refactor`)
-- Ketika CVE hanya ada di dev tooling lokal (bukan di Docker image)
+
+- Masalah bukan dependency (gunakan `/quick-fix` atau `/refactor`)
+- CVE hanya ada di dev tooling lokal yang tidak masuk image produksi (dokumentasikan, tidak perlu patch)
 
 ---
 
 ## Steps
 
-### Step 1: Jalankan audit.sh (atau baca audit-log yang ada)
-
-Jika `audit-log` sudah ada dan fresh (dibuat < 30 menit), skip ke Step 2.
-Jika tidak, jalankan:
+### Step 1: Scan
 
 ```bash
-./audit.sh
+# Go — hanya melaporkan vuln yang benar-benar reachable dari kode kita
+cd backend && go run golang.org/x/vuln/cmd/govulncheck@latest ./...
+
+# npm — production deps saja (dev deps tidak masuk nginx runtime image)
+cd frontend && npm audit --omit=dev --json > /tmp/npm-audit.json; npm audit --omit=dev
 ```
 
-> Audit akan memakan waktu 5-15 menit karena melakukan `docker compose build`.
-> Jika ingin skip build dan hanya scan image yang sudah ada, jalankan langsung:
-> ```bash
-> docker compose --profile audit run --rm trivy image \
->   --exit-code 0 --severity CRITICAL,HIGH,MEDIUM,LOW \
->   --scanners vuln --pkg-types library \
->   --format json --skip-version-check \
->   directus:latest 2>/dev/null | node -e "..." gate
-> ```
+Cek base image:
 
-### Step 2: Baca dan parse audit-log
-
-Baca file `audit-log` di root project. Format yang diharapkan:
-
-```
-PACKAGE                       VERSION        SEVERITY    CVE                         FIX
------------------------------------------------------------------------------------------------
-basic-ftp                     5.2.2          HIGH        GHSA-rp42-5vxx-qpwr         5.3.0
-liquidjs                      10.25.3        HIGH        CVE-2026-41311              10.25.7
-...
-```
-
-Untuk setiap baris, ekstrak:
-- `PACKAGE` — nama npm package
-- `VERSION` — versi yang terinstall
-- `SEVERITY` — CRITICAL / HIGH / MEDIUM / LOW
-- `CVE` — ID CVE atau GHSA
-- `FIX` — versi yang sudah di-patch (`no fix` jika belum ada)
-
-### Step 3: Triage findings
-
-Klasifikasikan setiap CVE:
-
-| Kondisi | Aksi |
-|---|---|
-| Package adalah **build tool / dev dependency** | **HAPUS DARI DOCKERFILE** (Step 3.5) |
-| `FIX` tersedia + SEVERITY CRITICAL/HIGH | **CEK DIRECTUS** dulu (Step 3.6), lalu PATCH jika perlu |
-| `FIX = "no fix"` + SEVERITY CRITICAL/HIGH | **IGNORE** — tambah ke `.trivyignore` dengan justifikasi |
-| `FIX` tersedia tapi **tidak bisa di-apply** + SEVERITY CRITICAL/HIGH | **IGNORE** — tambah ke `.trivyignore` dengan justifikasi (lihat catatan di bawah) |
-| SEVERITY MEDIUM | **SKIP** — hanya dokumentasikan di findings, tidak ada aksi |
-| SEVERITY LOW | **SKIP** — hanya dokumentasikan di findings, tidak ada aksi |
-
-> **Alasan:** Security gate di `audit.sh` hanya memblokir HIGH/CRITICAL.
-> MEDIUM dan LOW bersifat informatif dan tidak memblokir commit.
-
-> **Kapan CVE dengan fix "tidak bisa di-apply"?**
-> - **OS-level package** (Alpine apk) — Dockerfile sudah punya `apk upgrade --no-cache`
->   tapi base image belum publish versi terbaru. Ini di luar kontrol kita; tunggu
->   Alpine update dan re-build. Sementara itu, boleh di-ignore di `.trivyignore`.
-> - **Major version jump tanpa safe path** — Fix mengharuskan upgrade major (misal
->   `tar@6→7`) dan override menyebabkan runtime error karena breaking API change
->   yang tidak kompatibel dengan consumer. Dokumentasikan alasan di `.trivyignore`.
-> - **Package hanya ada di build-time** — Vulnerability hanya exists di dependency
->   yang digunakan saat build (dev dependency), bukan runtime. Attack vector tidak
->   applicable di production image.
-
-### Step 3.5: Evaluasi Hapus Build Tool dari Runtime Image (Paling Direkomendasikan)
-
-Sebelum melakukan override, cek apakah package yang terkena CVE hanyalah **build tool** atau **dev dependency** (misalnya `vite`, `esbuild`, `npm`, `npx`) yang tidak sengaja terbawa ke dalam *runtime image* produksi.
-
-Jika package tersebut tidak dipanggil sama sekali saat aplikasi berjalan (*runtime*), maka **cara terbaik dan terbersih** adalah menghapusnya langsung dari `Dockerfile` di *stage* akhir (*runtime stage*).
-
-**Cara eksekusi:**
-Tambahkan baris berikut di `Dockerfile` pada *stage* runtime:
-```dockerfile
-# Hapus <nama-package> dari runtime (hanya dibutuhkan saat build-time, memicu CVE)
-RUN find /directus/node_modules -name "<nama-package>" -type d -exec rm -rf {} + 2>/dev/null || true
-```
-Setelah itu, jalankan rebuild, commit dengan pesan `fix(security): remove <package> from runtime image to fix CVE...`. Jika berhasil, Anda bisa skip langkah selanjutnya.
-
----
-
-### Step 3.6: Cek apakah Directus minor terbaru sudah memfix CVE
-
-Sebelum menulis override, cek apakah upgrade `DIRECTUS_VERSION` di Dockerfile
-sudah cukup untuk menghilangkan CVE tersebut.
-
-**Cara cek:**
-
-1. Baca versi Directus yang sedang dipakai dari `Dockerfile`:
-   ```bash
-   grep DIRECTUS_VERSION Dockerfile
-   # Contoh: ENV DIRECTUS_VERSION=v11.17.0
-   ```
-
-2. Cari versi minor terbaru di GitHub releases (same major, latest minor):
-   ```
-   https://github.com/directus/directus/releases
-   ```
-   Atau via API:
-   ```bash
-   curl -s https://api.github.com/repos/directus/directus/releases/latest | grep '"tag_name"'
-   ```
-
-3. Untuk setiap package CRITICAL/HIGH yang ditemukan, cek apakah sudah di-bump
-   di versi Directus terbaru dengan melihat `pnpm-lock.yaml` di branch tersebut:
-   ```
-   https://raw.githubusercontent.com/directus/directus/<latest-tag>/pnpm-lock.yaml
-   ```
-   Cari nama package dan bandingkan versi yang terpasang.
-
-**Keputusan:**
-
-| Hasil cek | Aksi |
-|---|---|
-| Directus terbaru sudah bump package ke versi ≥ fix version | **UPGRADE** `DIRECTUS_VERSION` di Dockerfile (lebih bersih dari override) |
-| Directus terbaru belum fix (masih pakai versi vulnerable) | **OVERRIDE** — lanjut ke Step 4 |
-| Versi terbaru adalah major baru (misal v11 → v12) | **SKIP upgrade** — jangan upgrade major; lanjut ke Step 4 |
-
-> **Preferensi:** Upgrade Directus > override package.
-> Override hanya sebagai fallback jika Directus upstream belum fix.
-> Semakin sedikit override, semakin mudah maintenance jangka panjang.
-
-**Jika upgrade Directus dipilih:**
 ```bash
-# Update Dockerfile
-# ENV DIRECTUS_VERSION=v11.17.0  →  ENV DIRECTUS_VERSION=v11.XX.0
-
-# Commit terpisah dari override agar mudah di-revert
-git add Dockerfile
-git commit -m "chore(docker): upgrade Directus to vXX.XX.XX (fixes CVE-XXXX)"
+grep -n '^FROM' backend/Dockerfile frontend/Dockerfile
 ```
-Setelah itu jalankan `./audit.sh` untuk konfirmasi CVE hilang.
-Jika masih ada CVE lain yang belum terfix, lanjut ke Step 4 untuk sisanya.
 
-### Step 3.7: Audit override yang sudah tidak relevan (wajib setelah upgrade Directus)
+> `npm audit` tanpa `--omit=dev` boleh dijalankan sebagai informasi, tetapi hanya
+> production findings yang memblokir.
 
-Setiap kali `DIRECTUS_VERSION` di-bump, beberapa override di `package.json` mungkin
-sudah **tidak diperlukan** karena Directus versi baru sudah menyertakan versi aman
-secara native. Override yang tidak perlu harus dihapus — membiarkannya berisiko
-memaksa Directus menggunakan versi yang tidak diuji upstream-nya.
+### Step 2: Triage
 
-**Cara cek setiap override:**
+Klasifikasikan setiap temuan:
 
-1. Baca semua entry di `pnpm.overrides` pada `package.json`
-2. Untuk setiap override, cek versi yang dipakai Directus versi baru di `pnpm-lock.yaml`:
-   ```
-   https://raw.githubusercontent.com/directus/directus/<new-tag>/pnpm-lock.yaml
-   ```
-   Cari nama package dan catat versi resolusinya.
+| Kondisi                                                                       | Aksi                                                                                                              |
+| ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Go vuln **reachable** (govulncheck melaporkan call stack) + fix tersedia      | **PATCH** — `go get <module>@<fixed>` (Step 3a)                                                                   |
+| Go vuln di module yang di-import tapi symbol tidak dipanggil                  | **DOKUMENTASIKAN** — govulncheck sudah memfilternya; catat di audit log saja                                      |
+| npm prod dep, CRITICAL/HIGH, fix tersedia tanpa major bump                    | **PATCH** — `npm audit fix` atau bump versi (Step 3b)                                                             |
+| npm prod dep, fix hanya lewat major bump                                      | **OVERRIDE** transitive via `overrides` di `package.json` jika aman; kalau tidak, ADR + ignore dengan justifikasi |
+| npm dev-only dep (eslint, vite plugin, playwright, dll)                       | **SKIP** — tidak ada di runtime image; catat                                                                      |
+| `FIX = none` + CRITICAL/HIGH                                                  | **IGNORE dengan justifikasi** — catat di `epmp-docs/audits/` (Step 4)                                             |
+| SEVERITY MEDIUM/LOW                                                           | **SKIP** — dokumentasikan saja                                                                                    |
+| Base image (`golang:`, `alpine:`, `node:`, `nginx:`) tertinggal patch release | **BUMP** tag ke patch terbaru dalam minor yang sama                                                               |
 
-3. Bandingkan:
+### Step 3a: Patch Go module
 
-| Kondisi | Aksi |
-|---|---|
-| Directus baru sudah pakai versi ≥ override version | **HAPUS** override (sudah tidak diperlukan) |
-| Directus baru masih pakai versi < override version | **PERTAHANKAN** override (masih melindungi) |
-| Override terkait workaround build (bukan CVE, misal `rollup`, `tsconfig`) | **PERTAHANKAN** selalu — ini bukan CVE override |
-
-> **Contoh:**
-> Override `"basic-ftp": "5.3.0"` ditambahkan karena CVE-XXXX.
-> Directus v11.18.0 sudah memakai `basic-ftp@5.3.1` secara native.
-> → Hapus override `basic-ftp` dari `package.json`.
-
-**Setelah cleanup:**
 ```bash
-# Validasi JSON tetap valid
-node -e "JSON.parse(require('fs').readFileSync('package.json','utf8')); console.log('valid')"
-
-git add package.json
-git commit -m "chore(deps): remove stale overrides after Directus upgrade to vXX.XX"
+cd backend
+go get github.com/<owner>/<module>@v<fixed>
+go mod tidy
+go build ./... && go test ./... -count=1
 ```
 
-### Step 4: Terapkan patch di package.json
+**Rules:**
 
+- Pakai **minimum fixed version**, bukan `@latest`, kecuali `latest` adalah patch release yang sama minor-nya
+- Untuk indirect dependency, `go get` tetap berlaku — Go akan menaikkan versi di `go.mod` sebagai `// indirect`
+- Jangan bump major (`/v2` → `/v3`) dalam skill ini — itu pekerjaan `/refactor` dengan ADR
+- Jalankan ulang `govulncheck` untuk konfirmasi
 
-Baca `package.json` dan update bagian `pnpm.overrides`:
+### Step 3b: Patch npm dependency
+
+```bash
+cd frontend
+npm audit fix --omit=dev          # non-breaking saja; JANGAN pakai --force
+npm run lint && npm run build     # tsc -b + vite build harus tetap hijau
+```
+
+Jika `npm audit fix` tidak bisa (fix ada di transitive dep yang di-pin parent-nya), tambahkan
+override **minimal**:
 
 ```json
 {
-  "pnpm": {
-    "overrides": {
-      "basic-ftp": "5.3.0",
-      "liquidjs": "10.25.7"
-    }
+  "overrides": {
+    "<package>": "<minimum-fixed-version>"
   }
 }
 ```
 
 **Rules:**
-- Selalu set ke versi **minimum fixed version** dari kolom FIX di audit-log
-- Jika package sudah ada di overrides, **bump** ke versi fix (jangan downgrade)
-- Jika package punya multiple CVE dengan fix version berbeda, gunakan **versi tertinggi**
-- Simpan komentar yang ada di package.json
-- Jangan hapus override yang tidak terkait CVE ini
 
-### Step 5: Untuk CVE tanpa fix — tambah ke .trivyignore
+- Set ke **minimum fixed version**; jika ada beberapa CVE, gunakan versi tertinggi di antara fix-nya
+- Jangan hapus override yang sudah ada tanpa alasan eksplisit
+- Setelah override, `npm install` agar `package-lock.json` ikut berubah, lalu `npm run build`
+- Pilih versi yang sudah dipublikasikan ≥ 7 hari (hindari versi baru yang belum ter-vetting)
 
-Format `.trivyignore`:
+### Step 3c: Bump Docker base image
 
-```
-# CVE-XXXX-XXXXX — <package>@<version>
-# Justifikasi: <alasan mengapa ini acceptable>
-# Ditambahkan: <tanggal>
-CVE-XXXX-XXXXX
-```
-
-**Panduan justifikasi yang valid:**
-- Package hanya digunakan di build-time, tidak di runtime
-- Vector attack tidak applicable (misal: vulnerability memerlukan akses lokal)
-- Package sudah akan di-remove di Directus versi berikutnya (link issue)
-
-**JANGAN tambahkan ke .trivyignore jika tidak ada justifikasi valid.**
-
-### Step 6: Validasi
-
-Jalankan syntax check terlebih dahulu:
+Ubah tag `FROM` ke patch release terbaru di minor yang sama (mis. `golang:1.26.0-alpine` → `golang:1.26.1-alpine`).
+Lalu:
 
 ```bash
-node --check extensions/survey-forms/index.js
+docker compose build backend frontend
 ```
 
-Kemudian verifikasi `package.json` valid JSON:
+Go version di `backend/Dockerfile` harus konsisten dengan direktif `go` di `backend/go.mod`.
+
+### Step 4: Dokumentasikan yang di-ignore
+
+Untuk CVE tanpa fix atau dengan fix yang tidak bisa diterapkan, tulis di
+`epmp-docs/audits/{YYYY-MM-DD}-dependency-cve.md`:
+
+```
+| CVE | Package@version | Severity | Keputusan | Justifikasi | Review ulang |
+|---|---|---|---|---|---|
+| GO-2026-XXXX | golang.org/x/net@v0.x | HIGH | IGNORE | symbol tidak reachable (govulncheck) | 2026-XX-XX |
+```
+
+**Justifikasi valid:** tidak reachable / build-time only / attack vector memerlukan kondisi
+yang tidak ada di deployment kita / menunggu upstream (sertakan link issue).
+**JANGAN ignore tanpa justifikasi.**
+
+### Step 5: Validasi
 
 ```bash
-node -e "JSON.parse(require('fs').readFileSync('package.json','utf8')); console.log('valid')"
+cd backend && go build ./... && go test ./... -count=1
+cd frontend && npm run lint && npm run build
 ```
 
-> **Catatan:** Jalankan `./audit.sh` ulang hanya jika user meminta verifikasi penuh.
-> Build ulang memakan waktu lama. Cukup validasi JSON dan syntax.
+Jika integration test skip karena DB tidak jalan, nyalakan `docker compose up -d postgres`
+dan ulangi — skip bukan pass.
 
-### Step 7: Ringkasan perubahan
-
-Setelah semua perubahan dibuat, tampilkan ringkasan:
+### Step 6: Ringkasan
 
 ```
 ## CVE Patch Summary
 
-### Patched via package.json overrides
-| Package | Dari | Ke | CVE |
+### Go modules
+| Module | Dari | Ke | Advisory |
 |---|---|---|---|
-| basic-ftp | 5.2.2 | 5.3.0 | GHSA-rp42-5vxx-qpwr |
-| liquidjs | 10.25.3 | 10.25.7 | CVE-2026-41311 |
 
-### Added to .trivyignore
-| CVE | Package | Justifikasi |
+### npm (production)
+| Package | Dari | Ke | Advisory | Cara (audit fix / override) |
+|---|---|---|---|---|
+
+### Docker base images
+| File | Dari | Ke |
 |---|---|---|
-| CVE-XXXX | pm2 | No fix available; build-only tool |
 
-### Skipped (no fix, LOW severity)
-- CVE-YYYY: nodemailer@7.0.11 — no fix available
+### Ignored (dengan justifikasi → epmp-docs/audits/...)
+### Skipped (dev-only / MEDIUM / LOW)
 ```
 
-### Step 8: Commit
+### Step 7: Commit
 
-Gunakan conventional commit:
+Satu commit per surface agar mudah di-revert:
 
 ```bash
-git add package.json .trivyignore
-git commit -m "fix(deps): patch HIGH/CRITICAL CVEs via pnpm overrides
+git add backend/go.mod backend/go.sum
+git commit -m "fix(deps): bump <module> to v<fixed> (GO-2026-XXXX)"
 
-- basic-ftp: 5.2.2 → 5.3.0 (GHSA-rp42-5vxx-qpwr)
-- liquidjs: 10.25.3 → 10.25.7 (CVE-2026-41311)"
+git add frontend/package.json frontend/package-lock.json
+git commit -m "fix(deps): patch <package> HIGH CVE via npm audit fix"
+
+git add backend/Dockerfile frontend/Dockerfile
+git commit -m "chore(docker): bump base images to latest patch release"
 ```
 
 ---
 
 ## Important Constraints
 
-1. **Jangan upgrade ke major version berbeda** tanpa memahami breaking changes.
-   - `uuid@14.0.0` adalah major upgrade — check jika Directus kompatibel sebelum override.
-   - Prefer minimum fix version (`5.3.0`) daripada latest (`6.0.0`).
-
-2. **Overrides bersifat transitive** — `"basic-ftp": "5.3.0"` akan mempengaruhi semua
-   packages yang depend pada `basic-ftp`, termasuk versi nested.
-
-3. **Setelah rebuild, re-run `./audit.sh`** untuk konfirmasi CVE sudah hilang.
-   Beberapa CVE mungkin masih muncul jika ada multiple paths ke library yang sama.
-
-4. **jangan hapus override yang sudah ada** kecuali ada alasan eksplisit —
-   override lama mungkin masih memproteksi dari CVE lain.
+1. **Jangan bump major version** dalam skill ini. Major bump = `/refactor` + ADR.
+2. **`npm audit fix --force` dilarang** — bisa mem-bump major secara diam-diam.
+3. **Override bersifat transitive** — satu override mempengaruhi semua consumer package tsb.
+4. **Lockfile harus ikut di-commit** (`go.sum`, `package-lock.json`); jangan pernah edit lockfile manual.
+5. **Selalu re-scan** setelah patch untuk konfirmasi advisory hilang.

@@ -1,30 +1,35 @@
 ---
-description: Requirement Gathering and Specification update workflow for out-of-scope requests
+description: Requirement gathering & spec update untuk request yang di luar scope saat ini
 ---
 
 # /create-spec Workflow
 
-When the user runs the `/create-spec` slash command, follow these exact steps to formally draft and integrate new feature requests into the official specification documents (PRD and TSD). Do not proceed to write application code during this workflow.
+Saat user menjalankan `/create-spec`, ikuti langkah berikut untuk mendraft dan mengintegrasikan permintaan fitur baru ke dokumen spesifikasi EPMP. **Jangan menulis kode aplikasi** selama workflow ini.
 
 ## Step 1: Gather Requirements
-1. Ask the user to comprehensively describe the new feature, user stories, and business logic they want to add to the module.
-2. Ask if there are any specific UI/UX dependencies or API constraints.
-3. Stop and **wait for the user's response**.
+
+1. Minta user mendeskripsikan fitur, user stories, dan business rules secara lengkap. Tanyakan property model mana yang terpengaruh (boarding house, apartment, co-living, office, dll).
+2. Tanyakan constraint UI/UX, API, dan apakah fitur bersifat per-organization (multi-tenant) atau global.
+3. Stop dan **tunggu jawaban user**.
 
 ## Step 2: Analyze Impact
-Once the user provides the requirements:
-1. Analyze how this change affects the existing PostgreSQL Database Schema / Directus Collections (`docs/schema.md`).
-2. Analyze how this affects the Directus JSON Extension API adapter (`extensions/survey-forms/index.js`).
-3. Propose a list of Functional Requirements (FR) and Non-Functional Requirements (NFR). 
-4. Assing strict `Requirement IDs` for each new feature (e.g., `REQ-002`, `FR-11`).
 
-## Step 3: Propose Implementation Plan
-1. Create an `implementation_plan.md` artifact detailing how the PRD and TSD will be modified to accommodate the new specs. 
-2. Set `request_feedback = true` and yield control. **Wait for user approval**.
+1. Dampak ke schema PostgreSQL: migration baru di `backend/migrations/` dan `MODULE.md` modul terkait.
+2. Dampak ke backend: modul mana di `backend/internal/modules/` yang berubah / modul baru (lihat `epmp-module-patterns.md`). Cross-module dependency harus lewat service interface, bukan repository.
+3. Dampak ke frontend: feature folder `frontend/src/features/`, routes di `frontend/src/App.tsx`, dan `PAGES_TO_TEST` di `frontend/run_e2e_tests.cjs`.
+4. Dampak ke dokumen EPMP AI (`tools/epmp-ai/CONTEXT.md`, `RULES.md`) jika ada aturan bisnis baru.
+5. Usulkan daftar Functional Requirements (FR) dan Non-Functional Requirements (NFR) dengan ID (`FR-xx`, `NFR-xx`).
 
-## Step 4: Update Documentation (PRD & TSD)
-Once the user approves the plan:
-1. Modify the official PRD (`/docs/PRD/PRD_v1.0.0.md` or the latest iteration) and TSD (`/docs/TSD/TSD_v1.0.0.md`).
-2. Append the new `Requirement ID`s, update the System Scope, and detail the newly defined API attributes or collections.
-3. Update the "Versi Dokumen" / Version History table at the top of both PRD and TSD to reflect the version bump (e.g., bumping to `v1.1.0`).
-4. Congratulate the user and remind them that the specifications are now officially "In Scope". Encourage them to use standard workflows (like `/2-implement` or `/orchestrator`) to begin the actual code execution.
+## Step 3: Propose Plan
+
+1. Buat `implementation_plan.md` yang merinci dokumen apa saja yang akan diubah dan bagaimana.
+2. **Tunggu approval user.**
+
+## Step 4: Update Documentation
+
+Setelah disetujui:
+
+1. Tulis/update spec di `epmp-docs/epmp-XXX-<slug>.md` (lanjutkan penomoran yang ada; lihat `epmp-docs/epmp-013-notification.md` sebagai contoh format).
+2. Jika ada keputusan arsitektur, buat ADR di `epmp-docs/adr/` dengan **ADR Skill**.
+3. Update `PROGRESS.md` bila fitur masuk roadmap.
+4. Ingatkan user bahwa spec kini "In Scope" dan lanjut dengan `/orchestrator` atau `/2-implement`.
